@@ -1,0 +1,10 @@
+// Time standard library example
+
+const start = time::now();
+io::print("Current timestamp:", start);
+
+io::print("Waiting for 1 second...");
+time::wait(1000); // milliseconds
+
+const end = time::now();
+io::print("Wait finished. Total time:", end - start, "ms");

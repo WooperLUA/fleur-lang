@@ -1,0 +1,88 @@
+import {
+    type NumberValue,
+    RuntimeValueType, type StringValue,
+} from "@types";
+import {
+    throw_exception,
+    check_args_length,
+    check_arg_type
+} from "@utils";
+import type {
+    RuntimeValue,
+    NativeFunctionValue,
+    StructValue,
+} from "@types";
+
+export const str: StructValue = {
+    type:       RuntimeValueType.Struct,
+    identifier: "str",
+    properties: new Map<string, RuntimeValue>(),
+    methods:    new Map<string, any>([
+        [
+            "length",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "str::length");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::length");
+                          const value = (args[0] as StringValue).value
+                          return {type: RuntimeValueType.Number, value: value.length};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "trim",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "str::trim");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::trim");
+                          const value = (args[0] as StringValue).value
+                          return {type: RuntimeValueType.String, value: value.trim()};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "upper",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "str::upper");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::upper");
+                          const value = (args[0] as StringValue).value
+                          return {type: RuntimeValueType.String, value: value.toUpperCase()};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "lower",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "str::lower");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::lower");
+                          const value = (args[0] as StringValue).value
+                          return {type: RuntimeValueType.String, value: value.toLowerCase()};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "contains",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "str::contains");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::contains");
+                          check_arg_type(args[1]!, RuntimeValueType.String, "str::contains");
+                          const [str, substr]: string[] = args.map(a => (a as any).value);
+                          return {type: RuntimeValueType.Boolean, value: str!.includes(substr!)};
+                      },
+            } as NativeFunctionValue,
+        ],
+    ]),
+};

@@ -1,0 +1,110 @@
+// Primitive Variable Declarations
+const a = 6;                         // Number literal
+const b = "7";                      // String literal
+const c = false;                   // Boolean literal
+
+// 1. "Object-like" structs: use ::new for behavior-rich structs
+struct User
+{
+    name,
+    age
+}
+
+// Convention: Use a 'new' method for behavior-rich structs.
+User::new(name, age) {
+    return User { name: name, age: age };
+}
+
+User::is_adult()
+{
+    return this.age > 18;
+}
+
+const u = User::new("Alex", 20); // Preferred way for object-like structs
+io::print(u.name, u.age);
+
+if u::is_adult()
+{
+    io::print("User is an adult");
+}
+else
+{
+    io::error("User is underaged");
+}
+
+// 2. "Map-like" data structs: use literals for simple data holding
+struct Point
+{
+    x,
+    y
+}
+
+const p = Point { x: 10, y: 20 }; // Standard literal way is fitting for map-like data
+const math_val = (5 - 2) * 4 / 2 % 3;
+const x = 5;
+const y = 10;
+const is_valid = true;
+
+// Logical & Comparison Conditionals
+if x != y and is_valid or not (x <= y and math_val >= 0)
+{
+    io::print("Condition passed");
+}
+else
+{
+    io::print("Condition failed");
+}
+
+// Equality Conditional
+if a == b
+{
+    io::print("Equal");
+}
+else
+{
+    io::print("Not equal");
+}
+
+// Pattern Matching
+when a
+{
+    6 => { io::print("X is 6"); }
+    7 => { io::print("X is 7"); }
+    else => { io::print("X is something else"); }
+}
+
+// Range Loops (Ascending and Descending)
+var sum = 0;
+for i = 1..10
+{
+    sum = sum + i;
+}
+
+for i = 10..1
+{
+    // Print loop
+}
+
+// While Loop
+var count = 0;
+while count < 5
+{
+    count = count + 1;
+}
+
+// Function with Multiple Parameters
+func foo(x, y)
+{
+    return x + y;
+}
+
+// Procedure (No Return Value)
+proc bar(x)
+{
+    io::print("Hello, World");
+}
+
+// Collection Indexing
+const my_list = [1, 2, 3, 4, 5];
+io::print(my_list[0]);
+

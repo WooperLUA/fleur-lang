@@ -1,0 +1,25 @@
+// Cast standard library example
+
+// To Number
+const n1 = cast::to_num("123");
+const n2 = cast::to_num(true);
+io::print("String to num:", n1);
+io::print("Bool to num:", n2);
+
+// To String
+const s1 = cast::to_str(456);
+const s2 = cast::to_str(false);
+const s3 = cast::to_str([1, 2, 3]);
+io::print("Num to str:", s1);
+io::print("Bool to str:", s2);
+io::print("Array to str:", s3);
+
+// To Boolean
+const b1 = cast::to_bool(1);
+const b2 = cast::to_bool(0);
+const b3 = cast::to_bool("hello");
+const b4 = cast::to_bool("");
+io::print("1 to bool:", b1);
+io::print("0 to bool:", b2);
+io::print("'hello' to bool:", b3);
+io::print("'' to bool:", b4);

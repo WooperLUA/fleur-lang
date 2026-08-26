@@ -1,0 +1,61 @@
+// List standard library example
+
+// Create a new empty list
+var my_list = [];
+io::print("Initial list:", my_list);
+
+// Add elements using list::add (modifies in place)
+list::add(my_list, 10);
+list::add(my_list, 20);
+list::add(my_list, "hello");
+io::print("After adding elements:", my_list);
+
+// Get length
+io::print("Length:", list::length(my_list));
+
+// Get element at index (existing syntax)
+io::print("Element at index 1:", my_list[1]);
+
+// Set element at index (existing syntax)
+my_list[1] = 99;
+io::print("After setting index 1 to 99:", my_list);
+
+// Remove element at index using list::remove (modifies in place)
+list::remove(my_list, 0); // removes 10
+io::print("After removing index 0:", my_list);
+
+// Pop element (modifies in place)
+const popped = list::pop(my_list);
+io::print("Popped value:", popped);
+io::print("After popping:", my_list);
+
+// Create list with initial elements
+var another_list = [1, 2, 3];
+io::print("List from array:", another_list);
+
+// Clear list (modifies in place)
+list::clear(another_list);
+io::print("After clearing:", another_list);
+
+// Test contains
+const test_list = [1, 2, [3, 4], "hello"];
+io::print("List for contains test:", test_list);
+io::print("Contains 2:", list::contains(test_list, 2));
+io::print("Contains 5:", list::contains(test_list, 5));
+io::print("Contains [3, 4]:", list::contains(test_list, [3, 4]));
+io::print("Contains [3, 5]:", list::contains(test_list, [3, 5]));
+
+struct Point { x, y }
+const p1 = Point { x: 1, y: 2 };
+const p2 = Point { x: 1, y: 2 };
+const p3 = Point { x: 2, y: 2 };
+const struct_list = [p1, "other"];
+io::print("Struct list:", struct_list);
+io::print("Contains p2 (same values as p1):", list::contains(struct_list, p2));
+io::print("Contains p3:", list::contains(struct_list, p3));
+
+// Test concat
+const l1 = [1, 2];
+const l2 = [3, 4];
+io::print("Concat [1, 2] and [3, 4]:", list::concat(l1, l2));
+io::print("Original l1 still:", l1);

@@ -1,0 +1,19 @@
+// String standard library example
+
+const text = "   Hello, Lys Lang!   ";
+
+// String length
+io::print("Length of '", text, "' is", str::length(text));
+
+// Trimming whitespace
+const trimmed = str::trim(text);
+io::print("Trimmed: '", trimmed, "'");
+
+// Case conversion
+io::print("Upper:", str::upper(trimmed));
+io::print("Lower:", str::lower(trimmed));
+
+// Substring check
+if str::contains(trimmed, "Lys") {
+    io::print("The string contains 'Lys'");
+}

@@ -1,0 +1,16 @@
+// Math standard library example
+
+// Random integers between 1 and 100
+const rand_i = math::random_int(1, 100);
+io::print("Random integer (1-100):", rand_i);
+
+// Random floats between 0 and 1
+const rand_f = math::random_float(0, 1);
+io::print("Random float (0-1):", rand_f);
+
+// Absolute value
+io::print("abs(-5) =", math::abs(-5));
+
+// Minimum and Maximum
+io::print("min(10, 20) =", math::min(10, 20));
+io::print("max(10, 20) =", math::max(10, 20));
