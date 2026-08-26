@@ -8,10 +8,14 @@ struct Person {
 
 // Convention: Use a static-like method 'new' for instantiation.
 // This is especially useful for "object-like" structs that have associated behavior (methods).
+// We use the capital Struct name (Person::new) to represent that it's "static-like".
+// In Lys, there are no formal static methods; if you need a utility that doesn't 
+// depend on an instance, you should usually just define a top-level function or proc.
 Person::new(name, age) {
     return Person { name: name, age: age };
 }
 
+// Instance method: called on an instance (e.g., alice::hello())
 Person::hello() {
     return "Hello, my name is " + this.name;
 }

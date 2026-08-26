@@ -11,10 +11,13 @@ struct User
 }
 
 // Convention: Use a 'new' method for behavior-rich structs.
+// Using the capital name (User::new) represents a "static-like" constructor.
+// For other "static" utilities, just use standard functions/procs.
 User::new(name, age) {
     return User { name: name, age: age };
 }
 
+// Instance method
 User::is_adult()
 {
     return this.age > 18;
