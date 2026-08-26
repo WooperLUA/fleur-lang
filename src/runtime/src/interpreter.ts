@@ -40,7 +40,7 @@ import {
     type NativeFunctionValue,
 } from "@types";
 import {throw_exception, stringify_value, is_equal} from "@utils";
-import { setup_stdlib } from "./stdlib";
+import {setup_stdlib} from "./stdlib";
 
 export class Environment
 {
@@ -69,7 +69,7 @@ export class Environment
     public get_methods(struct_name: string): Map<string, FunctionValue>
     {
         const all_methods = new Map<string, FunctionValue>();
-        
+
         // Collect methods from parents first (less specific)
         if (this.parent)
         {
@@ -172,7 +172,7 @@ export const interpret = (ast: Program, env: Environment) =>
 
     for (const stmt of ast.body)
     {
-        if (stmt.type === NodeType.FunctionDeclaration || 
+        if (stmt.type === NodeType.FunctionDeclaration ||
             stmt.type === NodeType.ProcedureDeclaration ||
             stmt.type === NodeType.MethodDeclaration)
         {
@@ -298,7 +298,7 @@ const execute_method_declaration = (stmt: MethodDeclaration, env: Environment): 
     };
 
     env.register_method(stmt.struct_name, stmt.identifier, method);
-    return { type: RuntimeValueType.Null, value: null };
+    return {type: RuntimeValueType.Null, value: null};
 };
 
 const structs = new Map<string, string[]>();
@@ -310,7 +310,11 @@ const execute_struct_declaration = (stmt: StructDeclaration, env: Environment): 
         type:       RuntimeValueType.Struct,
         identifier: stmt.identifier,
         properties: new Map<string, RuntimeValue>(),
-        get methods() { return env.get_methods(stmt.identifier); }
+        get methods()
+        {
+            return env.get_methods(stmt.identifier);
+        },
+        is_declaration: true
     };
 
     env.declare(stmt.identifier, struct_val, true);
@@ -479,7 +483,10 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
         case "+":
             if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
             {
-                return {type: RuntimeValueType.Number, value: (left as NumberValue).value + (right as NumberValue).value};
+                return {
+                    type:  RuntimeValueType.Number,
+                    value: (left as NumberValue).value + (right as NumberValue).value
+                };
             }
             throw_exception({
                 type:    "Runtime",
@@ -489,7 +496,10 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
         case "-":
             if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
             {
-                return {type: RuntimeValueType.Number, value: (left as NumberValue).value - (right as NumberValue).value};
+                return {
+                    type:  RuntimeValueType.Number,
+                    value: (left as NumberValue).value - (right as NumberValue).value
+                };
             }
             throw_exception({
                 type:    "Runtime",
@@ -566,7 +576,11 @@ const evaluate_struct_literal = (expr: StructLiteral, env: Environment): Runtime
         type:       RuntimeValueType.Struct,
         identifier: expr.identifier,
         properties,
-        get methods() { return env.get_methods(expr.identifier); }
+        get methods()
+        {
+            return env.get_methods(expr.identifier);
+        },
+        is_declaration: false
     } as StructValue;
 };
 
@@ -583,18 +597,48 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
         if (object.type === RuntimeValueType.Struct)
         {
             const struct = object as StructValue;
-            if (struct.methods.has(member.property.name))
+            if (struct.is_declaration)
             {
-                func = struct.methods.get(member.property.name)!;
-                this_val = struct;
+                if (member.property.name === "new")
+                {
+                    if (struct.methods.has("new"))
+                    {
+                        func = struct.methods.get("new")!;
+                        this_val = struct;
+                    }
+                    else
+                    {
+                        throw_exception({
+                            type:    "Runtime",
+                            message: `Struct '${struct.identifier}' does not have a '::new' method.`
+                        });
+                        return {type: RuntimeValueType.Null, value: null};
+                    }
+                }
+                else
+                {
+                    throw_exception({
+                        type:    "Runtime",
+                        message: `Method '${member.property.name}' cannot be called on the struct '${struct.identifier}' itself. Only '::new' is allowed as a static method.`
+                    });
+                    return {type: RuntimeValueType.Null, value: null};
+                }
             }
             else
             {
-                 throw_exception({
-                    type:    "Runtime",
-                    message: `Method '${member.property.name}' does not exist on struct '${struct.identifier}'. Use '.' for properties.`
-                });
-                return {type: RuntimeValueType.Null, value: null};
+                if (struct.methods.has(member.property.name))
+                {
+                    func = struct.methods.get(member.property.name)!;
+                    this_val = struct;
+                }
+                else
+                {
+                    throw_exception({
+                        type:    "Runtime",
+                        message: `Method '${member.property.name}' does not exist on struct '${struct.identifier}'.`
+                    });
+                    return {type: RuntimeValueType.Null, value: null};
+                }
             }
         }
         else
@@ -615,7 +659,7 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
             }
             else
             {
-                 throw_exception({
+                throw_exception({
                     type:    "Runtime",
                     message: `Property '${member.property.name}' does not exist on struct '${struct.identifier}'. Use '::' for methods.`
                 });
@@ -631,7 +675,7 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
     {
         func = evaluate(expr.callee, env);
     }
-    
+
     args = expr.arguments.map(a => evaluate(a, env));
 
     if (func.type === RuntimeValueType.NativeFunction)
@@ -718,15 +762,38 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
             message: "Static member access is only allowed on structs."
         });
     }
-
     const struct = object as StructValue;
     const property = expr.property.name;
+
+    if (struct.is_declaration)
+    {
+        if (property === "new")
+        {
+            if (struct.methods.has("new"))
+            {
+                return struct.methods.get("new")!;
+            }
+            else
+            {
+                throw_exception({
+                    type:    "Runtime",
+                    message: `Struct '${struct.identifier}' does not have a '::new' method.`
+                });
+            }
+        }
+        else
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: `Method '${property}' cannot be accessed on the struct '${struct.identifier}' itself. Only '::new' is allowed as a static method.`
+            });
+        }
+    }
 
     if (struct.methods.has(property))
     {
         return struct.methods.get(property)!;
     }
-
     if (struct.properties.has(property))
     {
         throw_exception({
@@ -734,12 +801,10 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
             message: `Property '${property}' is a field on struct '${struct.identifier}'. Use '.' to access it.`
         });
     }
-
     throw_exception({
         type:    "Runtime",
         message: `Method '${property}' does not exist on struct '${struct.identifier}'.`
     });
-
     return {type: RuntimeValueType.Null, value: null};
 };
 

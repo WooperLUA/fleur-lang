@@ -51,6 +51,7 @@ export type StructValue = {
     identifier: string;
     properties: Map<string, RuntimeValue>;
     methods: Map<string, FunctionValue>;
+    is_declaration?: boolean;
 };
 
 export type FunctionValue = {

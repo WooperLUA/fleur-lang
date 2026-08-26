@@ -31,7 +31,7 @@ import {
     type RangeExpression,
     type WhenCase,
     type StructProperty,
-    type Node
+    type Node, type MethodDeclaration, type StaticMemberExpression
 } from "@types";
 import {throw_exception} from "@utils";
 
@@ -289,16 +289,6 @@ export class Parser
         }
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
         const body = this.parse_block_statement();
-
-        if (!this.has_return_statement(body))
-        {
-             throw_exception({
-                type:    "SyntaxError",
-                message: `Method '${struct_name}::${identifier}' must have a return statement.`,
-                line:    this.tokens[this.pos - 1]?.line,
-                column:  this.tokens[this.pos - 1]?.column
-            });
-        }
 
         return {
             type: NodeType.MethodDeclaration,
