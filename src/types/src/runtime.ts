@@ -60,6 +60,7 @@ export type FunctionValue = {
     parameters: string[];
     body: BlockStatement;
     env: any; // Environment (circular dependency if typed here)
+    is_method?: boolean;
 };
 
 export type ProcedureValue = {

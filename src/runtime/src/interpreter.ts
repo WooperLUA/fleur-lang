@@ -294,7 +294,8 @@ const execute_method_declaration = (stmt: MethodDeclaration, env: Environment): 
         identifier: stmt.identifier,
         parameters: stmt.parameters,
         body:       stmt.body,
-        env
+        env,
+        is_method: true
     };
 
     env.register_method(stmt.struct_name, stmt.identifier, method);
@@ -693,7 +694,6 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
                 message: `Function '${fn.identifier}' expected ${fn.parameters.length} arguments, got ${args.length}.`
             });
         }
-
         const call_env = new Environment(fn.env);
         if (this_val)
         {
@@ -705,10 +705,18 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
         }
 
         const result = execute(fn.body, call_env);
+
         if (result.type === RuntimeValueType.Return)
         {
             return (result as ReturnValue).value;
         }
+
+        if (fn.type === RuntimeValueType.Procedure || (fn as FunctionValue).is_method)
+        {
+            return {type: RuntimeValueType.Null, value: null};
+        }
+
+        // fallback.
         return result;
     }
 
