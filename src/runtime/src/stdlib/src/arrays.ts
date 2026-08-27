@@ -16,9 +16,9 @@ import type {
     NumberValue,
 } from "@types";
 
-export const list: StructValue = {
+export const arrays: StructValue = {
     type:       RuntimeValueType.Struct,
-    identifier: "list",
+    identifier: "arrays",
     properties: new Map<string, RuntimeValue>(),
     methods:    new Map<string, any>([
         [
@@ -27,8 +27,8 @@ export const list: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 2, "list::add");
-                          check_arg_type(args[0]!, RuntimeValueType.Array, "list::add");
+                          check_args_length(args, 2, "arrays::add");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "arrays::add");
 
                           const arr = args[0] as ArrayValue;
                           arr.elements.push(args[1]!);
@@ -43,9 +43,9 @@ export const list: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 2, "list::remove");
-                          check_arg_type(args[0]!, RuntimeValueType.Array, "list::remove");
-                          check_arg_type(args[1]!, RuntimeValueType.Number, "list::remove");
+                          check_args_length(args, 2, "arrays::remove");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "arrays::remove");
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "arrays::remove");
 
                           const arr = args[0] as ArrayValue;
                           const index = (args[1] as NumberValue).value;
@@ -65,8 +65,8 @@ export const list: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 1, "list::length");
-                          check_arg_type(args[0]!, RuntimeValueType.Array, "list::length");
+                          check_args_length(args, 1, "arrays::length");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "arrays::length");
 
                           const arr = args[0] as ArrayValue;
                           return {
@@ -82,8 +82,8 @@ export const list: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 1, "list::clear");
-                          check_arg_type(args[0]!, RuntimeValueType.Array, "list::clear");
+                          check_args_length(args, 1, "arrays::clear");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "arrays::clear");
 
                           const arr = args[0] as ArrayValue;
                           arr.elements.length = 0;
@@ -98,8 +98,8 @@ export const list: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 1, "list::pop");
-                          check_arg_type(args[0]!, RuntimeValueType.Array, "list::pop");
+                          check_args_length(args, 1, "arrays::pop");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "arrays::pop");
 
                           const arr = args[0] as ArrayValue;
                           const val = arr.elements.pop();
@@ -114,9 +114,9 @@ export const list: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 3, "list::insert");
-                          check_arg_type(args[0]!, RuntimeValueType.Array, "list::insert");
-                          check_arg_type(args[1]!, RuntimeValueType.Number, "list::insert");
+                          check_args_length(args, 3, "arrays::insert");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "arrays::insert");
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "arrays::insert");
 
                           const arr = args[0] as ArrayValue;
                           const index = (args[1] as NumberValue).value;
@@ -132,8 +132,8 @@ export const list: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 2, "list::contains");
-                          check_arg_type(args[0]!, RuntimeValueType.Array, "list::contains");
+                          check_args_length(args, 2, "arrays::contains");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "arrays::contains");
 
                           const arr = args[0] as ArrayValue;
                           const target = args[1]!;
@@ -152,9 +152,9 @@ export const list: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 2, "list::concat");
-                          check_arg_type(args[0]!, RuntimeValueType.Array, "list::concat");
-                          check_arg_type(args[1]!, RuntimeValueType.Array, "list::concat");
+                          check_args_length(args, 2, "arrays::concat");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "arrays::concat");
+                          check_arg_type(args[1]!, RuntimeValueType.Array, "arrays::concat");
 
                           const arr1 = args[0] as ArrayValue;
                           const arr2 = args[1] as ArrayValue;

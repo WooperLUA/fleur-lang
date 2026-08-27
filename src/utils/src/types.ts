@@ -41,6 +41,13 @@ export const is_equal = (left: RuntimeValue, right: RuntimeValue): boolean =>
             if (l.length !== r.length) return false;
             return l.every((el, i) => is_equal(el, r[i]!));
         }
+        case RuntimeValueType.Set:
+        {
+            const l = (left as any).elements as RuntimeValue[];
+            const r = (right as any).elements as RuntimeValue[];
+            if (l.length !== r.length) return false;
+            return l.every(el => r.some(rEl => is_equal(el, rEl)));
+        }
         case RuntimeValueType.Struct:
         {
             const l = left as any;

@@ -1,0 +1,45 @@
+// Arrays standard library example
+var my_array = [];
+io::print("Initial array:", my_array);
+
+// Add elements using arrays::add (modifies in place)
+arrays::add(my_array, 10);
+arrays::add(my_array, 20);
+arrays::add(my_array, "hello");
+io::print("After adding elements:", my_array);
+
+// Get length
+io::print("Length:", arrays::length(my_array));
+
+// Get/Set element at index (native syntax)
+io::print("Element at index 1:", my_array[1]);
+my_array[1] = 99;
+io::print("After setting index 1 to 99:", my_array);
+
+// Remove & Pop
+arrays::remove(my_array, 0); 
+io::print("After removing index 0:", my_array);
+
+const popped = arrays::pop(my_array);
+io::print("Popped value:", popped);
+
+// Create array with initial elements & Clear
+var another_list = [1, 2, 3];
+arrays::clear(another_list);
+io::print("After clearing:", another_list);
+
+// Test contains
+const test_list = [1, 2, [3, 4], "hello"];
+io::print("Contains 2:", arrays::contains(test_list, 2));
+io::print("Contains [3, 4]:", arrays::contains(test_list, [3, 4]));
+
+struct Point { x, y }
+const p1 = Point { x: 1, y: 2 };
+const p2 = Point { x: 1, y: 2 };
+const struct_list = [p1, "other"];
+io::print("Contains p2 (same values as p1):", arrays::contains(struct_list, p2));
+
+// Test concat
+const l1 = [1, 2];
+const l2 = [3, 4];
+io::print("Concat [1, 2] and [3, 4]:", arrays::concat(l1, l2));

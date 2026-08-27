@@ -6,6 +6,7 @@ export enum RuntimeValueType
     String = "String",
     Boolean = "Boolean",
     Array = "Array",
+    Set = "Set",
     Struct = "Struct",
     Function = "Function",
     Procedure = "Procedure",
@@ -19,6 +20,7 @@ export type RuntimeValue =
     | StringValue
     | BooleanValue
     | ArrayValue
+    | SetValue
     | StructValue
     | FunctionValue
     | ProcedureValue
@@ -43,6 +45,11 @@ export type BooleanValue = {
 
 export type ArrayValue = {
     type: RuntimeValueType.Array;
+    elements: RuntimeValue[];
+};
+
+export type SetValue = {
+    type: RuntimeValueType.Set;
     elements: RuntimeValue[];
 };
 

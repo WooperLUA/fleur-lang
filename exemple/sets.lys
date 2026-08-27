@@ -1,0 +1,32 @@
+// Sets standard library example
+const s = sets::new();
+io::print("New set:", s);
+io::print("Length:", sets::length(s));
+
+sets::add(s, 1);
+sets::add(s, 2);
+sets::add(s, 1); // Duplicate
+io::print("Set after adding 1, 2, 1:", s);
+io::print("Length:", sets::length(s));
+
+io::print("Contains 1:", sets::contains(s, 1));
+io::print("Contains 3:", sets::contains(s, 3));
+
+sets::remove(s, 1);
+io::print("Set after removing 1:", s);
+
+// Test with complex types (structs)
+struct Point { x, y }
+const p1 = Point { x: 1, y: 2 };
+const p2 = Point { x: 1, y: 2 }; // Deep equality will catch this
+const p3 = Point { x: 3, y: 4 };
+
+const complex_set = sets::new();
+sets::add(complex_set, p1);
+sets::add(complex_set, p2);
+sets::add(complex_set, p3);
+io::print("Complex set (should have 2 points):", complex_set);
+io::print("Contains p2 (identical to p1):", sets::contains(complex_set, p2));
+
+sets::clear(s);
+io::print("Set s after clear:", s);

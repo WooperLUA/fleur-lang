@@ -17,6 +17,8 @@ export const stringify_value = (val: any): string =>
             return val.value;
         case RuntimeValueType.Array:
             return "[" + val.elements.map((e: any) => stringify_value(e)).join(", ") + "]";
+        case RuntimeValueType.Set:
+            return "Set(" + val.elements.map((e: any) => stringify_value(e)).join(", ") + ")";
         case RuntimeValueType.Struct:
             return val.identifier + " { " + Array.from(val.properties.entries()).map((entry) =>
             {

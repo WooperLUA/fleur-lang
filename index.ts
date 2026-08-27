@@ -17,10 +17,16 @@ const main = async () =>
 
             const path = args[1];
             const file = Bun.file(path);
+
             if (!await file.exists()) return throw_exception({
                 type:     "InvalidArgument",
                 message:  "Invalid file path.",
                 metadata: `\"${path}\"`
+            })
+
+            if (!(file?.name?.endsWith('.lys'))) return throw_exception({
+                type:     "InvalidArgument",
+                message:  "You must provide a file with the '.lys' extension.",
             })
 
             const bytes = await file.text();
