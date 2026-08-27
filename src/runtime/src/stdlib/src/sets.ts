@@ -27,10 +27,19 @@ export const sets: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 0, "sets::new");
+                          const set : any[] = []
+
+                          for (const arg of args)
+                          {
+                              const exists = set.some((el) => is_equal(el, arg));
+                              if (!exists)
+                              {
+                                  set.push(arg);
+                              }
+                          }
                           return {
                               type:     RuntimeValueType.Set,
-                              elements: [],
+                              elements: set,
                           } as SetValue;
                       },
             } as NativeFunctionValue,

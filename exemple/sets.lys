@@ -3,6 +3,10 @@ const s = sets::new();
 io::print("New set:", s);
 io::print("Length:", sets::length(s));
 
+const s_with_values = sets::new(1,2,3,4,5);
+io::print("New set with values:", s_with_values);
+io::print("Length:", sets::length(s_with_values));
+
 sets::add(s, 1);
 sets::add(s, 2);
 sets::add(s, 1); // Duplicate

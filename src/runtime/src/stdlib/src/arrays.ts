@@ -1,6 +1,6 @@
 import {
     type BooleanValue,
-    RuntimeValueType, type StringValue,
+    RuntimeValueType, type SetValue, type StringValue,
 } from "@types";
 import {
     check_args_length,
@@ -21,6 +21,19 @@ export const arrays: StructValue = {
     identifier: "arrays",
     properties: new Map<string, RuntimeValue>(),
     methods:    new Map<string, any>([
+        [
+            "new",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          return {
+                              type:     RuntimeValueType.Array,
+                              elements: [...args],
+                          } as ArrayValue;
+                      },
+            } as NativeFunctionValue,
+        ],
         [
             "add",
             {

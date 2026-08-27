@@ -2,6 +2,9 @@
 var my_array = [];
 io::print("Initial array:", my_array);
 
+var my_array_alt = arrays::new();
+io::print("Initial array_alt:", my_array_alt);
+
 // Add elements using arrays::add (modifies in place)
 arrays::add(my_array, 10);
 arrays::add(my_array, 20);
@@ -27,6 +30,10 @@ io::print("Popped value:", popped);
 var another_list = [1, 2, 3];
 arrays::clear(another_list);
 io::print("After clearing:", another_list);
+
+var another_list_alt = arrays::new(1, 2, 3);
+arrays::clear(another_list_alt);
+io::print("After clearing:", another_list_alt);
 
 // Test contains
 const test_list = [1, 2, [3, 4], "hello"];
