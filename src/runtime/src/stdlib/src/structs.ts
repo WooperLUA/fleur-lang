@@ -13,9 +13,9 @@ import type {
     StructValue,
 } from "@types";
 
-export const struct: StructValue = {
+export const structs: StructValue = {
     type:       RuntimeValueType.Struct,
-    identifier: "struct",
+    identifier: "structs",
     properties: new Map<string, RuntimeValue>(),
     methods:    new Map<string, any>([
         [
@@ -24,9 +24,9 @@ export const struct: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 2, "struct::has");
-                          check_arg_type(args[0]!, RuntimeValueType.Struct, "struct::has");
-                          check_arg_type(args[1]!, RuntimeValueType.String, "struct::has");
+                          check_args_length(args, 2, "structs::has");
+                          check_arg_type(args[0]!, RuntimeValueType.Struct, "structs::has");
+                          check_arg_type(args[1]!, RuntimeValueType.String, "structs::has");
 
                           const instance = args[0] as StructValue;
                           const key = (args[1] as StringValue).value;
@@ -39,13 +39,13 @@ export const struct: StructValue = {
             } as NativeFunctionValue,
         ],
         [
-            "get_type",
+            "name",
             {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 1, "struct::get_type");
-                          check_arg_type(args[0]!, RuntimeValueType.Struct, "struct::get_type");
+                          check_args_length(args, 1, "structs::name");
+                          check_arg_type(args[0]!, RuntimeValueType.Struct, "structs::name");
 
                           const instance = args[0] as StructValue;
 

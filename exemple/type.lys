@@ -1,0 +1,32 @@
+// Cast standard library example
+
+// Get type of
+io::print(type::of(1));
+io::print(type::of("1"));
+io::print(type::of(true));
+io::print(type::of([1]));
+
+// To Number
+const n1 = type::number("123");
+const n2 = type::number(true);
+io::print("String to num:", n1);
+io::print("Bool to num:", n2);
+
+// To String
+const s1 = type::string(456);
+const s2 = type::string(false);
+const s3 = type::string([1, 2, 3]);
+io::print("Num to str:", s1);
+io::print("Bool to str:", s2);
+io::print("Array to str:", s3);
+
+// To Boolean
+const b1 = type::boolean(1);
+const b2 = type::boolean(0);
+const b3 = type::boolean("hello");
+const b4 = type::boolean("");
+io::print("1 to bool:", b1);
+io::print("0 to bool:", b2);
+io::print("'hello' to bool:", b3);
+io::print("'' to bool:", b4);
+

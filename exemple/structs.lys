@@ -24,13 +24,13 @@ const alice = Person::new("Alice", 30); // Preferred way for behavior-heavy stru
 io::print("Person alice:", alice);
 io::print("Alice says:", alice::hello());
 
-// Test struct::has
-io::print("Has name:", struct::has(alice, "name"));
-io::print("Has age:", struct::has(alice, "age"));
-io::print("Has hello:", struct::has(alice, "hello"));
+// Test structs::has
+io::print("Has name:", structs::has(alice, "name"));
+io::print("Has age:", structs::has(alice, "age"));
+io::print("Has hello:", structs::has(alice, "hello"));
 
-// Test struct::get_type
-io::print("Type of alice:", struct::get_type(alice));
+// Test structs::name
+io::print("Struct name of alice:", structs::name(alice));
 
 // 2. "Map-like" data structs: use literal syntax
 // For simple data holding, explicit creation using the standard literal syntax
@@ -42,9 +42,9 @@ struct Point {
 
 const p = Point { x: 10, y: 20 }; // Standard literal way for data containers
 io::print("Point p:", p);
-io::print("Type of p:", struct::get_type(p));
+io::print("Struct name of p:", structs::name(p));
 
-// Verify that it works with other struct-like things in stdlib if any
-io::print("Type of struct module itself:", struct::get_type(struct));
-io::print("Has 'has' in struct module:", struct::has(struct, "has"));
-io::print("struct has get_type:", struct::has(struct, "get_type"));
+// Verify that it works with other structs-like things in stdlib if any
+io::print("Struct name of structs module itself:", structs::name(structs));
+io::print("Has 'has' in structs module:", structs::has(structs, "has"));
+io::print("structs has name:", structs::has(structs, "name"));
