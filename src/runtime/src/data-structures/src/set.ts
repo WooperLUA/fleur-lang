@@ -1,4 +1,4 @@
-import type {NativeFunctionValue, NumberValue, RuntimeValue, SetValue, StructValue,} from "@types";
+import type {ArrayValue, NativeFunctionValue, NumberValue, RuntimeValue, SetValue, StructValue,} from "@types";
 import {type BooleanValue, RuntimeValueType,} from "@types";
 import {check_arg_type, check_args_length, is_equal,} from "@utils";
 
@@ -168,8 +168,69 @@ export const set: StructValue = {
                                check_args_length(args, 1, "<set>::pop");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::pop");
 
-                               const arr = args[0] as SetValue;
-                               const val = arr.elements.pop();
+                               const set = args[0] as SetValue;
+                               const val = set.elements.pop();
+
+                               return val ?? {type: RuntimeValueType.Null, value: null};
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "index",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::index");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::index");
+
+                               const set = args[0] as SetValue;
+                               const target = args[1]!;
+
+                               const foundIndex = set.elements.findIndex((el) => is_equal(el, target));
+
+                               if (foundIndex !== -1)
+                               {
+                                   return {
+                                       type:  RuntimeValueType.Number,
+                                       value: foundIndex
+                                   } as NumberValue;
+                               }
+
+                               return {type: RuntimeValueType.Null, value: null};
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "first",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<set>::first");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::first");
+
+                               const set = args[0] as SetValue;
+                               const val = set.elements[0];
+
+                               return val ?? {type: RuntimeValueType.Null, value: null};
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "last",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<set>::last");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::last");
+
+                               const set = args[0] as SetValue;
+                               const val = set.elements[set.elements.length - 1];
 
                                return val ?? {type: RuntimeValueType.Null, value: null};
                            },

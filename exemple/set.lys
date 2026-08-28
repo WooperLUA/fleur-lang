@@ -1,4 +1,6 @@
-// Sets standard library example
+// Set data-structure example
+// Sets are ordered in Lys because they are arrays that dont allows duplicates under the hood, this makes
+// sets easier to work with but they dont provide any performance gains (if it is even your concern).
 
 // 1. Creation
 // Empty set
@@ -63,3 +65,12 @@ complex_set::add(p3);
 
 io::print("Complex set (should have exactly 2 points):", complex_set);
 io::print("Contains p2 (identical to p1)?", complex_set::contains(p2));
+
+// 12. Index of
+const set4 = Set::new(1,2,3);
+io::print("Index of value 1 in set4", set4::index(1));
+
+// 13. First and last elements
+const set5 = Set::new(1,2,3);
+io::print("First value of set5", set5::first());
+io::print("Last value of set5", set5::last());

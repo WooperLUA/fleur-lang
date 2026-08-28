@@ -1,4 +1,7 @@
-// Arrays standard library example
+// Arrays data-structure example
+// Technically arrays in Lys are lists because they have a variable size and allow for multiples types
+// to be in the array but they are called arrays because it's what most people are familiar with.
+
 
 // 1. Creation
 // Empty array using literal syntax
@@ -58,3 +61,12 @@ const p1 = Point { x: 1, y: 2 };
 const p2 = Point { x: 1, y: 2 }; // Deep equality check will match this
 const struct_array = Array::new(p1, "other");
 io::print("Struct array contains p2 (identical to p1)?", struct_array::contains(p2));
+
+// 11. Index of
+const arr4 = [1,2,3];
+io::print("Index of value 1 in arr4", arr4::index(1));
+
+// 12. First and last elements
+const arr5 = [1,2,3];
+io::print("First value of arr5", arr5::first());
+io::print("Last value of arr5", arr5::last());

@@ -156,10 +156,11 @@ export class Parser
     private parse_variable_declaration(): VariableDeclaration
     {
         const is_const = this.eat().kind === TokenKind.K_CONST;
-        const identifier = this.expect(TokenKind.IDENTIFIER, "Expected identifier after variable keyword").value;
-        this.expect(TokenKind.ASSIGN, "Expected '=' after identifier in variable declaration");
+        const var_or_const = is_const ? 'constant' : 'variable';
+        const identifier = this.expect(TokenKind.IDENTIFIER, `Expected identifier after ${var_or_const} keyword`).value;
+        this.expect(TokenKind.ASSIGN, `Expected '=' after identifier in ${var_or_const} declaration`);
         const value = this.parse_expression();
-        this.expect(TokenKind.SEMICOLON, "Expected ';' after variable declaration");
+        this.expect(TokenKind.SEMICOLON, `Expected ';' after ${var_or_const} declaration`);
 
         return {
             type: NodeType.VariableDeclaration,
