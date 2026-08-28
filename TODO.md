@@ -68,3 +68,20 @@ catch err
     io::print("Safely handled out of bounds:", err);
 }
 ```
+
+## Make Range Expressions a proper value that can be passed around and used.
+### *Low*
+Range expressions exist only in for loops which is kind of dumb because they could be a type that could be passed around for different use cases.
+```typescript
+const range = 1..10;
+
+for i in range
+{
+    io::print(i);
+}
+
+const array = Array::new(range);
+io::print(array);               // [1,2,3,4,5,6,7,8,9,10]
+
+
+```
