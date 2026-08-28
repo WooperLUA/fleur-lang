@@ -1,0 +1,65 @@
+// Sets standard library example
+
+// 1. Creation
+// Empty set
+var my_set = Set::new();
+io::print("Initial empty set:", my_set);
+
+// Set with initial values (duplicates are automatically ignored during creation)
+var my_set_alt = Set::new(1, 2, 3, 2, 1);
+io::print("Set created with Set::new (duplicates ignored):", my_set_alt);
+
+// 2. Adding elements
+my_set::add(1);
+my_set::add(2);
+my_set::add(1); // Duplicate, will be ignored
+io::print("Set after adding 1, 2, 1:", my_set);
+
+// 3. Length
+io::print("Current length:", my_set::length());
+
+// 4. Contains
+io::print("Contains 1?", my_set::contains(1));
+io::print("Contains 3?", my_set::contains(3));
+
+// 5. Removing elements
+my_set::remove(1);
+io::print("Set after removing 1:", my_set);
+
+// 6. Getting and Setting (Note: Sets are conceptually unordered, but indexed access is supported)
+io::print("Element at index 0:", my_set::get(0));
+my_set::set(0, 99);
+io::print("Set after setting index 0 to 99:", my_set);
+
+// 7. Inserting at a specific index
+my_set::insert(1, 42);
+io::print("Set after inserting 42 at index 1:", my_set);
+
+// 8. Popping
+const popped = my_set::pop();
+io::print("Popped value:", popped);
+io::print("Set after pop:", my_set);
+
+// 9. Clearing
+my_set::clear();
+io::print("Set after clear:", my_set);
+
+// 10. Concatenation
+const set1 = Set::new(1, 2);
+const set2 = Set::new(2, 3);
+const set3 = set1::concat(set2);
+io::print("Concatenated set:", set3);
+
+// 11. Complex types (Structs in Sets)
+struct Point { x, y }
+const p1 = Point { x: 1, y: 2 };
+const p2 = Point { x: 1, y: 2 }; // Deep equality will catch this as a duplicate
+const p3 = Point { x: 3, y: 4 };
+
+const complex_set = Set::new();
+complex_set::add(p1);
+complex_set::add(p2); // Should be ignored due to deep equality with p1
+complex_set::add(p3);
+
+io::print("Complex set (should have exactly 2 points):", complex_set);
+io::print("Contains p2 (identical to p1)?", complex_set::contains(p2));

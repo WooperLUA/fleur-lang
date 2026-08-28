@@ -41,6 +41,7 @@ import {
 } from "@types";
 import {throw_exception, stringify_value, is_equal} from "@utils";
 import {setup_stdlib} from "./stdlib";
+import {setup_data_structures} from "./data-structures";
 
 export class Environment
 {
@@ -295,7 +296,7 @@ const execute_method_declaration = (stmt: MethodDeclaration, env: Environment): 
         parameters: stmt.parameters,
         body:       stmt.body,
         env,
-        is_method: true
+        is_method:  true
     };
 
     env.register_method(stmt.struct_name, stmt.identifier, method);
@@ -406,6 +407,7 @@ export const create_global_env = (args: string[] = []): Environment =>
 {
     const env = new Environment();
     setup_stdlib(env, args);
+    setup_data_structures(env, args);
     return env;
 };
 
@@ -595,7 +597,26 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
     {
         const member = expr.callee as StaticMemberExpression;
         const object = evaluate(member.object, env);
-        if (object.type === RuntimeValueType.Struct)
+        if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set)
+        {
+            const ns_name = object.type === RuntimeValueType.Array ? "Array" : "Set";
+            const ns = env.lookup(ns_name) as StructValue;
+
+            if (ns.methods.has(member.property.name))
+            {
+                func = ns.methods.get(member.property.name)!;
+                this_val = object;
+            }
+            else
+            {
+                throw_exception({
+                    type:    "Runtime",
+                    message: `Method '${member.property.name}' does not exist on ${ns_name}.`
+                });
+                return {type: RuntimeValueType.Null, value: null};
+            }
+        }
+        else if (object.type === RuntimeValueType.Struct)
         {
             const struct = object as StructValue;
             if (struct.is_declaration)
@@ -634,11 +655,20 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
                 }
                 else
                 {
-                    throw_exception({
-                        type:    "Runtime",
-                        message: `Method '${member.property.name}' does not exist on struct '${struct.identifier}'.`
-                    });
-                    return {type: RuntimeValueType.Null, value: null};
+                    const baseStruct = env.lookup("Struct") as StructValue | undefined;
+                    if (baseStruct && baseStruct.methods.has(member.property.name))
+                    {
+                        func = baseStruct.methods.get(member.property.name)!;
+                        this_val = struct;
+                    }
+                    else
+                    {
+                        throw_exception({
+                            type:    "Runtime",
+                            message: `Method '${member.property.name}' does not exist on struct '${struct.identifier}'.`
+                        });
+                        return {type: RuntimeValueType.Null, value: null};
+                    }
                 }
             }
         }
@@ -681,7 +711,15 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
 
     if (func.type === RuntimeValueType.NativeFunction)
     {
-        return (func as NativeFunctionValue).call(args);
+        const nativeFunc = func as NativeFunctionValue;
+        let finalArgs = args;
+
+        if (nativeFunc.is_method && this_val)
+        {
+            finalArgs = [this_val, ...args];
+        }
+
+        return nativeFunc.call(finalArgs);
     }
 
     if (func.type === RuntimeValueType.Function || func.type === RuntimeValueType.Procedure)
@@ -763,15 +801,33 @@ const evaluate_member_expression = (expr: MemberExpression, env: Environment): R
 const evaluate_static_member_expression = (expr: StaticMemberExpression, env: Environment): RuntimeValue =>
 {
     const object = evaluate(expr.object, env);
+    const property = expr.property.name;
+
+    if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set)
+    {
+        const ns_name = object.type === RuntimeValueType.Array ? "Array" : "Set";
+        const ns = env.lookup(ns_name) as StructValue;
+
+        if (ns.methods.has(property))
+        {
+            return ns.methods.get(property)!;
+        }
+
+        throw_exception({
+            type:    "Runtime",
+            message: `Method '${property}' does not exist on ${ns_name}.`
+        });
+    }
+
     if (object.type !== RuntimeValueType.Struct)
     {
         throw_exception({
             type:    "Runtime",
-            message: "Static member access is only allowed on structs."
+            message: "Static member access is only allowed on structs, arrays, and sets."
         });
     }
+
     const struct = object as StructValue;
-    const property = expr.property.name;
 
     if (struct.is_declaration)
     {
@@ -793,7 +849,7 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
         {
             throw_exception({
                 type:    "Runtime",
-                message: `Method '${property}' cannot be accessed on the struct '${struct.identifier}' itself. Only '::new' is allowed as a static method.`
+                message: `Method '${property}' cannot be called on the struct '${struct.identifier}' itself. Only '::new' is allowed as a static method.`
             });
         }
     }
@@ -802,6 +858,13 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
     {
         return struct.methods.get(property)!;
     }
+
+    const baseStruct = env.lookup("Struct") as StructValue | undefined;
+    if (baseStruct && baseStruct.methods.has(property))
+    {
+        return baseStruct.methods.get(property)!;
+    }
+
     if (struct.properties.has(property))
     {
         throw_exception({
@@ -809,6 +872,7 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
             message: `Property '${property}' is a field on struct '${struct.identifier}'. Use '.' to access it.`
         });
     }
+
     throw_exception({
         type:    "Runtime",
         message: `Method '${property}' does not exist on struct '${struct.identifier}'.`

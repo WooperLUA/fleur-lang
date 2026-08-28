@@ -84,5 +84,20 @@ export const str: StructValue = {
                       },
             } as NativeFunctionValue,
         ],
+        [
+            "at",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "str::at");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::at");
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "str::at");
+                          const value = (args[0] as StringValue).value
+                          const index = (args[1] as NumberValue).value;
+                          return {type: RuntimeValueType.String, value: value.at(index)};
+                      },
+            } as NativeFunctionValue,
+        ],
     ]),
 };

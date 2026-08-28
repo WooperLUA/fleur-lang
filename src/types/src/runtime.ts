@@ -91,4 +91,5 @@ export type ReturnValue = {
 export type NativeFunctionValue = {
     type: RuntimeValueType.NativeFunction;
     call: (args: RuntimeValue[]) => RuntimeValue;
+    is_method?: boolean;
 };

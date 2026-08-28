@@ -1,0 +1,60 @@
+// Arrays standard library example
+
+// 1. Creation
+// Empty array using literal syntax
+var my_array = [];
+io::print("Initial empty array:", my_array);
+
+// Using Array::new with initial elements
+var my_array_alt = Array::new(10, 20, "hello");
+io::print("Array created with Array::new:", my_array_alt);
+
+// 2. Adding elements
+my_array_alt::add(30);
+io::print("After adding 30:", my_array_alt);
+
+// 3. Inserting at a specific index
+my_array_alt::insert(1, 15); // Insert 15 at index 1
+io::print("After inserting 15 at index 1:", my_array_alt);
+
+// 4. Getting and Setting elements
+io::print("Element at index 2:", my_array_alt::get(2));
+my_array_alt::set(2, 99);
+io::print("After setting index 2 to 99:", my_array_alt);
+
+// Native syntax still works perfectly alongside :: methods!
+io::print("Native index access [0]:", my_array_alt[0]);
+my_array_alt[0] = 5;
+io::print("After native assignment [0] = 5:", my_array_alt);
+
+// 5. Length
+io::print("Current length:", my_array_alt::length());
+
+// 6. Contains (with deep equality for complex types)
+io::print("Contains 99?", my_array_alt::contains(99));
+io::print("Contains 100?", my_array_alt::contains(100));
+
+// 7. Removing and Popping
+my_array_alt::remove(1); // Remove element at index 1
+io::print("After removing index 1:", my_array_alt);
+
+const popped = my_array_alt::pop();
+io::print("Popped value:", popped);
+io::print("Array after pop:", my_array_alt);
+
+// 8. Clearing
+my_array_alt::clear();
+io::print("Array after clear:", my_array_alt);
+
+// 9. Concatenation
+const arr1 = [1, 2];
+const arr2 = [3, 4];
+const arr3 = arr1::concat(arr2);
+io::print("Concatenated array:", arr3);
+
+// 10. Complex types (Structs in Arrays)
+struct Point { x, y }
+const p1 = Point { x: 1, y: 2 };
+const p2 = Point { x: 1, y: 2 }; // Deep equality check will match this
+const struct_array = Array::new(p1, "other");
+io::print("Struct array contains p2 (identical to p1)?", struct_array::contains(p2));
