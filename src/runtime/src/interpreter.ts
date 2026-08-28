@@ -37,7 +37,7 @@ import {
     type AssignmentExpression, type NumberValue,
     type StringValue,
     type BooleanValue,
-    type NativeFunctionValue,
+    type NativeFunctionValue, type RangeExpression, type SetValue,
 } from "@types";
 import {throw_exception, stringify_value, is_equal} from "@utils";
 import {setup_stdlib} from "./stdlib";
@@ -362,26 +362,26 @@ const execute_when_statement = (stmt: WhenStatement, env: Environment): RuntimeV
 
 const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeValue =>
 {
-    const start_val = evaluate(stmt.range.start, env);
-    const end_val = evaluate(stmt.range.end, env);
-
-    if (start_val.type !== RuntimeValueType.Number || end_val.type !== RuntimeValueType.Number)
-    {
-        throw_exception({
-            type:    "Runtime",
-            message: "For loop range must be numbers."
-        });
-    }
-
     let last_result: RuntimeValue = {type: RuntimeValueType.Null, value: null};
     const loop_env = new Environment(env);
 
-    const start = (start_val as NumberValue).value;
-    const end = (end_val as NumberValue).value;
-
-    if (start <= end)
+    // Ranges
+    if (stmt.iterable.type === NodeType.RangeExpression)
     {
-        for (let i = start; i <= end; i++)
+        const rangeExpr = stmt.iterable as RangeExpression;
+        const start_val = evaluate(rangeExpr.start, env);
+        const end_val = evaluate(rangeExpr.end, env);
+
+        if (start_val.type !== RuntimeValueType.Number || end_val.type !== RuntimeValueType.Number)
+        {
+            throw_exception({type: "Runtime", message: "For loop range bounds must be numbers."});
+        }
+
+        const start = (start_val as NumberValue).value;
+        const end = (end_val as NumberValue).value;
+        const step = start <= end ? 1 : -1;
+
+        for (let i = start; step > 0 ? i <= end : i >= end; i += step)
         {
             loop_env.assign_or_declare(stmt.identifier, {type: RuntimeValueType.Number, value: i});
             const result = execute(stmt.body, loop_env);
@@ -391,12 +391,56 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
     }
     else
     {
-        for (let i = start; i >= end; i--)
+        // Data structures
+        const iterable = evaluate(stmt.iterable, env);
+
+        if (iterable.type === RuntimeValueType.Array)
         {
-            loop_env.assign_or_declare(stmt.identifier, {type: RuntimeValueType.Number, value: i});
-            const result = execute(stmt.body, loop_env);
-            if (result.type === RuntimeValueType.Return) return result;
-            last_result = result;
+            const elements = (iterable as ArrayValue).elements;
+            for (const el of elements)
+            {
+                loop_env.assign_or_declare(stmt.identifier, el);
+                const result = execute(stmt.body, loop_env);
+                if (result.type === RuntimeValueType.Return) return result;
+                last_result = result;
+            }
+        }
+        else if (iterable.type === RuntimeValueType.Set)
+        {
+            const elements = (iterable as SetValue).elements;
+            for (const el of elements)
+            {
+                loop_env.assign_or_declare(stmt.identifier, el);
+                const result = execute(stmt.body, loop_env);
+                if (result.type === RuntimeValueType.Return) return result;
+                last_result = result;
+            }
+        }
+        else if (iterable.type === RuntimeValueType.Struct)
+        {
+            const struct = iterable as StructValue;
+            // yields an array of [key, value]
+            for (const [key, value] of struct.properties.entries())
+            {
+                const pair: ArrayValue = {
+                    type:     RuntimeValueType.Array,
+                    elements: [
+                        {type: RuntimeValueType.String, value: key},
+                        value
+                    ]
+                };
+                loop_env.assign_or_declare(stmt.identifier, pair);
+                const result = execute(stmt.body, loop_env);
+                if (result.type === RuntimeValueType.Return) return result;
+                last_result = result;
+            }
+        }
+        else
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: `Cannot iterate over type '${iterable.type}'. Expected Array, Set, Struct, or Range.`
+            });
         }
     }
 
@@ -597,6 +641,8 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
     {
         const member = expr.callee as StaticMemberExpression;
         const object = evaluate(member.object, env);
+
+        // Arrays and Sets aren't "structs" but we still want to call methods on them, so I had to make this shit up
         if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set)
         {
             const ns_name = object.type === RuntimeValueType.Array ? "Array" : "Set";
@@ -714,6 +760,7 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
         const nativeFunc = func as NativeFunctionValue;
         let finalArgs = args;
 
+        // This automatically passes the (array | set | struct) instance as the first argument to the method
         if (nativeFunc.is_method && this_val)
         {
             finalArgs = [this_val, ...args];
@@ -885,34 +932,61 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
     const object = evaluate(expr.object, env);
     const index = evaluate(expr.index, env);
 
-    if (object.type !== RuntimeValueType.Array)
+    // Indexing for Arrays
+    if (object.type === RuntimeValueType.Array)
+    {
+        if (index.type !== RuntimeValueType.Number)
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: "Array index must be a number."
+            });
+        }
+
+        const array = object as ArrayValue;
+        const idx = (index as NumberValue).value;
+
+        if (idx < 0 || idx >= array.elements.length)
+        {
+            throw_exception({
+                type:    "OutOfBounds",
+                message: `Array index ${idx} is out of bounds (length ${array.elements.length}).`
+            });
+        }
+
+        return array.elements[idx]!;
+    }
+    // Indexing for Structs (map like key access)
+    else if (object.type === RuntimeValueType.Struct)
+    {
+        if (index.type !== RuntimeValueType.String)
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: "Struct keys must be strings."
+            });
+        }
+        const struct = object as StructValue;
+        const key = (index as StringValue).value;
+
+        if (!struct.properties.has(key))
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: `Property '${key}' does not exist on struct '${struct.identifier}'.`
+            });
+        }
+        return struct.properties.get(key)!;
+    }
+    else
     {
         throw_exception({
             type:    "Runtime",
-            message: "Indexing is only allowed on arrays."
+            message: "Indexing is only allowed on arrays and structs."
         });
     }
-
-    if (index.type !== RuntimeValueType.Number)
-    {
-        throw_exception({
-            type:    "Runtime",
-            message: "Array index must be a number."
-        });
-    }
-
-    const array = object as ArrayValue;
-    const idx = (index as NumberValue).value;
-
-    if (idx < 0 || idx >= array.elements.length)
-    {
-        throw_exception({
-            type:    "OutOfBounds",
-            message: `Array index ${idx} is out of bounds (length ${array.elements.length}).`
-        });
-    }
-
-    return array.elements[idx]!;
+    // fallback
+    return {type: RuntimeValueType.Null, value: null};
 };
 
 const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environment): RuntimeValue =>

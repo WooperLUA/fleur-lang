@@ -382,14 +382,18 @@ export class Parser
     {
         this.eat(); // for
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected identifier in for loop").value;
-        this.expect(TokenKind.ASSIGN, "Expected '=' in for loop");
-        const range = this.parse_range(false) as RangeExpression;
+
+        this.expect(TokenKind.K_IN, "Expected 'in' in for loop");
+
+        // Parse 1..10 as a RangeExpression, [1,2,3] as an ArrayLiteral, Set(1,2,3) as a SetLiteral or Point {x : 6, y : 7} as a StructLiteral
+        const iterable = this.parse_expression();
+
         const body = this.parse_block_statement();
 
         return {
             type: NodeType.ForStatement,
             identifier,
-            range,
+            iterable,
             body
         };
     }

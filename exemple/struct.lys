@@ -6,12 +6,10 @@ struct Person {
     age
 }
 
-// Convention: Use a static-like method 'new' for instantiation.
 Person::new(name, age) {
     return Person { name: name, age: age };
 }
 
-// Instance method: called on an instance (e.g., alice::hello())
 Person::hello() {
     return "Hello, my name is " + this.name;
 }
@@ -21,13 +19,11 @@ io::print("Person alice:", alice);
 io::print("Alice says:", alice::hello());
 
 // 2. Base Struct methods (available on ALL struct instances natively)
-// Test Struct::has_property
 io::print("Has 'name'?", alice::has_property("name"));
 io::print("Has 'age'?", alice::has_property("age"));
 io::print("Has 'hello'?", alice::has_property("hello"));
 io::print("Has 'unknown'?", alice::has_property("unknown"));
 
-// Test Struct::struct_name
 io::print("Struct name of alice:", alice::struct_name());
 
 // 3. "Map-like" data structs: use literal syntax
@@ -38,7 +34,11 @@ struct Point {
 const p = Point { x: 10, y: 20 };
 io::print("Point p:", p);
 
-// Base methods work on map-like structs too!
 io::print("Struct name of p:", p::struct_name());
 io::print("Has 'x'?", p::has_property("x"));
 io::print("Has 'z'?", p::has_property("z"));
+
+// 4. Computed Key Access (Map-like behavior)
+// You can use variables to access struct properties dynamically
+const dynamic_key = "x";
+io::print("Accessing 'x' via variable:", p[dynamic_key]);

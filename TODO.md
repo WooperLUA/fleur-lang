@@ -68,14 +68,3 @@ catch err
     io::print("Safely handled out of bounds:", err);
 }
 ```
-
-## Foreach keyword for arrays, sets and structs as a syntax sugar for range loops
-### *Low*
-It may remove from Lys's simplicity, but it's a very handy feature that is now present everywhere.
-```typescript
-const arr = [1,2,3];
-for elt in arr
-{
-    io::print(elt);
-}
-```

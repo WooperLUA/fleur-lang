@@ -109,7 +109,7 @@ export type WhenStatement = Node & {
 export type ForStatement = Node & {
     type: NodeType.ForStatement;
     identifier: string;
-    range: RangeExpression;
+    iterable: Expression;
     body: BlockStatement;
 };
 
