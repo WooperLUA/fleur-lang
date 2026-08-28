@@ -5,6 +5,7 @@ import {math} from "./src/math";
 import {time} from "./src/time";
 import {str} from "./src/str";
 import {type} from "./src/type.ts";
+import {file} from "./src/file.ts";
 
 export const setup_stdlib = (env: Environment, args: string[] = []) =>
 {
@@ -19,4 +20,5 @@ export const setup_stdlib = (env: Environment, args: string[] = []) =>
     env.declare("math", math, true);
     env.declare("str", str, true);
     env.declare("time", time, true);
+    env.declare("file", file, true);
 };
