@@ -3,9 +3,7 @@ import {
     RuntimeValueType, type StringValue,
 } from "@types";
 import {
-    throw_exception,
-    check_args_length,
-    check_arg_type
+    check_args_length, check_arg_type,
 } from "@utils";
 import type {
     RuntimeValue,

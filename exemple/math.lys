@@ -14,3 +14,25 @@ io::print("abs(-5) =", math::abs(-5));
 // Minimum and Maximum
 io::print("min(10, 20) =", math::min(10, 20));
 io::print("max(10, 20) =", math::max(10, 20));
+
+// --- Rounding Methods ---
+const pi = 3.14159;
+const neg_pi = -3.14159;
+
+// Round to nearest integer
+io::print("round(3.14) =", math::round(pi));       // 3
+io::print("round(3.9) =", math::round(3.9));       // 4
+io::print("round(-3.14) =", math::round(neg_pi));  // -3
+
+// Floor (always rounds down to the lower integer)
+io::print("floor(3.99) =", math::floor(3.99));     // 3
+io::print("floor(-3.1) =", math::floor(neg_pi));   // -4
+
+// Ceil (always rounds up to the higher integer)
+io::print("ceil(3.01) =", math::ceil(3.01));       // 4
+io::print("ceil(-3.9) =", math::ceil(neg_pi));     // -3
+
+// Cos, Sin and Tan
+io::print("cos(3.14) =", math::cos(pi));
+io::print("sin(3.14) =", math::sin(3.14));
+io::print("tan(3.14) =", math::tan(3.14));
