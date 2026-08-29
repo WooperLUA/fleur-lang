@@ -383,14 +383,12 @@ export class Parser
     {
         this.eat(); // for
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected identifier in for loop").value;
-
         this.expect(TokenKind.K_IN, "Expected 'in' in for loop");
 
-        // Parse 1..10 as a RangeExpression, [1,2,3] as an ArrayLiteral, Set(1,2,3) as a SetLiteral or Point {x : 6, y : 7} as a StructLiteral
-        const iterable = this.parse_expression();
+        // FIX: Pass false to tell the parser "do not look for struct literals here"
+        const iterable = this.parse_expression(false);
 
         const body = this.parse_block_statement();
-
         return {
             type: NodeType.ForStatement,
             identifier,

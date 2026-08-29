@@ -6,7 +6,7 @@ import {RuntimeValueType} from "@types";
 export const start_repl = () =>
 {
     const env = create_global_env();
-
+    console.clear();
     console.log("\x1b[33m\x1b[1mLys REPL\x1b[0m");
     console.log("\x1b[90mType 'exit' or press Ctrl+C to quit.\x1b[0m");
 
