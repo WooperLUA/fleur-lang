@@ -40,6 +40,48 @@ export const struct: StructValue = {
             } as NativeFunctionValue,
         ],
         [
+            "add_property",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 3, "<struct>::add_property");
+                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<struct>::add_property");
+                               check_arg_type(args[1]!, RuntimeValueType.String, "<struct>::add_property");
+
+                               const instance = args[0] as StructValue;
+                               const key = (args[1] as StringValue).value;
+                               const value = args[2]!;
+
+                               instance.properties.set(key, value);
+
+                               return instance;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "remove_property",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<struct>::remove_property");
+                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<struct>::remove_property");
+                               check_arg_type(args[1]!, RuntimeValueType.String, "<struct>::remove_property");
+
+                               const instance = args[0] as StructValue;
+                               const key = (args[1] as StringValue).value;
+
+                               return {
+                                   type:  RuntimeValueType.Boolean,
+                                   value: instance.properties.delete(key),
+                               } as BooleanValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
             "struct_name",
             {
                 type:      RuntimeValueType.NativeFunction,
