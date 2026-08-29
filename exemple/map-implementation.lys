@@ -1,0 +1,58 @@
+// Maps dont exist in Lys as structs already do what maps can but here is a small implementation of a Map in Lys.
+
+struct Map
+{
+    keys,  // string
+    values // any
+}
+
+// Here i declare a constructor because it's a data structure with a lot of methods in it, meaning it's "object-like"
+Map::new() { return Map { keys : [], values : [] }; }
+
+Map::add(k,v)
+{
+    const key = type::string(k);
+
+    if not this.keys::contains(key)
+    {
+       this.keys::add(key);
+       this.values::add(v);
+    }
+}
+
+Map::remove(k)
+{
+    const key = type::string(k);
+    const index = this.keys::index(key);
+
+    this.keys::remove(index);
+    this.values::remove(index);
+}
+
+Map::get(k)
+{
+    const key = type::string(k);
+    const index = this.keys::index(key);
+
+    if index { return this.values[index]; }
+}
+
+Map::set(k, v)
+{
+    const key = type::string(k);
+
+    if this.keys::contains(key)
+    {
+        const index = this.keys::index(key);
+        this.values[index] = v;
+    }
+}
+
+Map::has(k)
+{
+    const key = type::string(k);
+
+    return this.keys::contains(key);
+}
+
+Map::size() { return this.keys::length(); }

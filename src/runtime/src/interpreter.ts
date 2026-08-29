@@ -46,14 +46,16 @@ import {setup_data_structures} from "./data-structures";
 export class Environment
 {
     private readonly parent?: Environment;
-    private variables: Map<string, RuntimeValue>;
+    private variables: Record<string, RuntimeValue>;
     private constants: Set<string>;
     private methods: Map<string, Map<string, FunctionValue>>;
 
     constructor(parent?: Environment)
     {
         this.parent = parent;
-        this.variables = new Map();
+        // Weird quirk, but I use this instead of {} because then it would have a
+        // prototype with methods, but we only want a Map like record
+        this.variables = Object.create(null);
         this.constants = new Set();
         this.methods = new Map();
     }
@@ -89,74 +91,44 @@ export class Environment
 
     public declare(name: string, value: RuntimeValue, is_const: boolean): RuntimeValue
     {
-        if (this.variables.has(name))
+        if (name in this.variables)
         {
-            throw_exception({
-                type:    "Runtime",
-                message: `Variable '${name}' is already declared in this scope.`
-            });
+            throw_exception({type: "Runtime", message: `Variable '${name}' is already declared.`});
         }
-
-        this.variables.set(name, value);
-        if (is_const)
-        {
-            this.constants.add(name);
-        }
+        this.variables[name] = value;
+        if (is_const) this.constants.add(name);
         return value;
     }
 
     public assign(name: string, value: RuntimeValue): RuntimeValue
     {
         const env = this.resolve(name);
-
-        if (env.constants.has(name))
-        {
-            throw_exception({
-                type:    "Runtime",
-                message: `Cannot assign to constant '${name}'.`
-            });
-        }
-
-        env.variables.set(name, value);
+        if (env.constants.has(name)) throw_exception({
+            type:    "Runtime",
+            message: `Cannot assign to constant '${name}'.`
+        });
+        env.variables[name] = value;
         return value;
     }
 
     public lookup(name: string): RuntimeValue
     {
         const env = this.resolve(name);
-        return env.variables.get(name)!;
+        return env.variables[name]!;
     }
 
     public assign_or_declare(name: string, value: RuntimeValue): RuntimeValue
     {
-        if (this.variables.has(name))
-        {
-            this.variables.set(name, value);
-        }
-        else
-        {
-            this.variables.set(name, value);
-        }
+        this.variables[name] = value;
         return value;
     }
 
     private resolve(name: string): Environment
     {
-        if (this.variables.has(name))
-        {
-            return this;
-        }
-
-        if (this.parent)
-        {
-            return this.parent.resolve(name);
-        }
-
-        throw_exception({
-            type:    "Runtime",
-            message: `Variable '${name}' is not defined.`
-        });
-        return this; // return for ts compliance
+        if (name in this.variables) return this;
+        if (this.parent) return this.parent.resolve(name);
+        throw_exception({type: "Runtime", message: `Variable '${name}' is not defined.`});
+        return this;
     }
 }
 
