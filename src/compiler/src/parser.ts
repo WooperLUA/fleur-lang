@@ -31,7 +31,7 @@ import {
     type RangeExpression,
     type WhenCase,
     type StructProperty,
-    type Node, type MethodDeclaration, type StaticMemberExpression
+    type Node, type MethodDeclaration, type StaticMemberExpression, type NullLiteral
 } from "@types";
 import {throw_exception} from "@utils";
 
@@ -678,6 +678,9 @@ export class Parser
             case TokenKind.K_FALSE:
                 this.eat();
                 return {type: NodeType.BooleanLiteral, value: token.kind === TokenKind.K_TRUE} as BooleanLiteral;
+            case TokenKind.K_NULL:
+                this.eat();
+                return {type: NodeType.NullLiteral} as NullLiteral;
             case TokenKind.K_STRUCT:
             case TokenKind.IDENTIFIER:
                 this.eat();

@@ -21,6 +21,7 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.K_RETURN]: /^return\b/,
     [TokenKind.K_TRUE]:   /^true\b/,
     [TokenKind.K_FALSE]:  /^false\b/,
+    [TokenKind.K_NULL]:   /^null\b/,
     [TokenKind.K_IN]: /^in\b/,
 
     // Logical Operators

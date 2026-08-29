@@ -69,13 +69,6 @@ catch err
 }
 ```
 
-## Make null value instantiable by the user
-### *Low*
-Right now null is only returned by the stdlib and that's stupid, the user should be able to also choose when he uses null or not.
-```typescript
-const nullable = null;
-```
-
 ## Make Range Expressions a proper value that can be passed around and used.
 ### *Low*
 Range expressions exist only in for loops which is kind of dumb because they could be a type that could be passed around for different use cases.

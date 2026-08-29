@@ -12,6 +12,7 @@ export enum TokenKind {
     K_RETURN = "RETURN",
     K_TRUE = "TRUE",
     K_FALSE = "FALSE",
+    K_NULL = "NULL",
     K_IN = "IN",
 
     AND = "AND",

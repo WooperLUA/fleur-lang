@@ -452,6 +452,8 @@ const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
             return {type: RuntimeValueType.String, value: (expr as StringLiteral).value};
         case NodeType.BooleanLiteral:
             return {type: RuntimeValueType.Boolean, value: (expr as BooleanLiteral).value};
+        case NodeType.NullLiteral:
+            return {type: RuntimeValueType.Null, value: null};
         case NodeType.Identifier:
             return env.lookup((expr as Identifier).name);
         case NodeType.BinaryExpression:

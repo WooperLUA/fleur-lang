@@ -19,6 +19,7 @@ export enum NodeType
     NumericLiteral = "NumericLiteral",
     StringLiteral = "StringLiteral",
     BooleanLiteral = "BooleanLiteral",
+    NullLiteral = "NullLiteral",
     ArrayLiteral = "ArrayLiteral",
     StructLiteral = "StructLiteral",
     CallExpression = "CallExpression",
@@ -141,6 +142,7 @@ export type Expression =
     | NumericLiteral
     | StringLiteral
     | BooleanLiteral
+    | NullLiteral
     | ArrayLiteral
     | StructLiteral
     | CallExpression
@@ -181,6 +183,10 @@ export type StringLiteral = Node & {
 export type BooleanLiteral = Node & {
     type: NodeType.BooleanLiteral;
     value: boolean;
+};
+
+export type NullLiteral = Node & {
+    type: NodeType.NullLiteral;
 };
 
 export type ArrayLiteral = Node & {
