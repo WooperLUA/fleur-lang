@@ -65,3 +65,15 @@ export const is_equal = (left: RuntimeValue, right: RuntimeValue): boolean =>
             return left === right;
     }
 };
+
+// Add this to the bottom of the file
+export const check_mutability = (val: RuntimeValue, operation: string): void =>
+{
+    if ((val as any).is_immutable)
+    {
+        throw_exception({
+            type:    "Runtime",
+            message: `Cannot perform '${operation}' on an immutable (const) value.`
+        });
+    }
+}

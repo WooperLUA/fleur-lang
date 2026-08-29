@@ -46,11 +46,13 @@ export type BooleanValue = {
 export type ArrayValue = {
     type: RuntimeValueType.Array;
     elements: RuntimeValue[];
+    is_immutable?: boolean;
 };
 
 export type SetValue = {
     type: RuntimeValueType.Set;
     elements: RuntimeValue[];
+    is_immutable?: boolean;
 };
 
 export type StructValue = {
@@ -59,6 +61,7 @@ export type StructValue = {
     properties: Map<string, RuntimeValue>;
     methods: Map<string, FunctionValue>;
     is_declaration?: boolean;
+    is_immutable?: boolean;
 };
 
 export type FunctionValue = {

@@ -58,7 +58,7 @@ const p1 = Point { x: 1, y: 2 };
 const p2 = Point { x: 1, y: 2 }; // Deep equality will catch this as a duplicate
 const p3 = Point { x: 3, y: 4 };
 
-const complex_set = Set::new();
+var complex_set = Set::new();
 complex_set::add(p1);
 complex_set::add(p2); // Should be ignored due to deep equality with p1
 complex_set::add(p3);

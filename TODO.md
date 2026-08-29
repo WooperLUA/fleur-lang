@@ -6,11 +6,6 @@
  - Low
 
 
-## Make const arrays, sets and structs (properties) actually immutable and not only reference immutable
-### *High*
-We just have to make add methods and assignment look for is_const. I think complete immutability suits Lys's phylosophie better.
-
-
 ## Import | Module system with multiple file imports
 ### *Moderate*
 On one hand Lys is not made to do real programs with so implementing a tedious system like this makes no sens but having a proper

@@ -6,7 +6,7 @@ import {
     check_args_length,
     check_arg_type,
     is_equal,
-    stringify_value,
+    stringify_value, check_mutability,
 } from "@utils";
 import type {
     RuntimeValue,
@@ -43,6 +43,7 @@ export const array: StructValue = {
                            {
                                check_args_length(args, 2, "<array>::add");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::add");
+                               check_mutability(args[0]!, "<array>::add");
 
                                const arr = args[0] as ArrayValue;
                                arr.elements.push(args[1]!);
@@ -61,6 +62,7 @@ export const array: StructValue = {
                                check_args_length(args, 2, "<array>::remove");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::remove");
                                check_arg_type(args[1]!, RuntimeValueType.Number, "<array>::remove");
+                               check_mutability(args[0]!, "<array>::remove");
 
                                const arr = args[0] as ArrayValue;
                                const index = (args[1] as NumberValue).value;
@@ -101,6 +103,7 @@ export const array: StructValue = {
                            {
                                check_args_length(args, 1, "<array>::clear");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::clear");
+                               check_mutability(args[0]!, "<array>::clear");
 
                                const arr = args[0] as ArrayValue;
                                arr.elements.length = 0;
@@ -118,6 +121,7 @@ export const array: StructValue = {
                            {
                                check_args_length(args, 1, "<array>::pop");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::pop");
+                               check_mutability(args[0]!, "<array>::pop");
 
                                const arr = args[0] as ArrayValue;
                                const val = arr.elements.pop();
@@ -197,6 +201,7 @@ export const array: StructValue = {
                                check_args_length(args, 3, "<array>::insert");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::insert");
                                check_arg_type(args[1]!, RuntimeValueType.Number, "<array>::insert");
+                               check_mutability(args[0]!, "<array>::insert");
 
                                const arr = args[0] as ArrayValue;
                                const index = (args[1] as NumberValue).value;
@@ -234,6 +239,7 @@ export const array: StructValue = {
                                check_args_length(args, 3, "<array>::set");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::set");
                                check_arg_type(args[1]!, RuntimeValueType.Number, "<array>::set");
+                               check_mutability(args[0]!, "<array>::set");
 
                                const array = args[0] as ArrayValue;
                                const index = (args[1] as NumberValue).value;

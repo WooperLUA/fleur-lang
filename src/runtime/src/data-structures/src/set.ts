@@ -1,6 +1,6 @@
 import type {ArrayValue, NativeFunctionValue, NumberValue, RuntimeValue, SetValue, StructValue,} from "@types";
 import {type BooleanValue, RuntimeValueType,} from "@types";
-import {check_arg_type, check_args_length, is_equal,} from "@utils";
+import {check_arg_type, check_args_length, check_mutability, is_equal,} from "@utils";
 
 export const set: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -39,6 +39,8 @@ export const set: StructValue = {
                            {
                                check_args_length(args, 2, "<set>::add");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::add");
+                               check_mutability(args[0]!, "<set>::add");
+
                                const s = args[0] as SetValue;
                                const val = args[1]!;
                                const exists = s.elements.some((el) => is_equal(el, val));
@@ -59,6 +61,8 @@ export const set: StructValue = {
                            {
                                check_args_length(args, 2, "<set>::remove");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::remove");
+                               check_mutability(args[0]!, "<set>::remove");
+
                                const s = args[0] as SetValue;
                                const val = args[1]!;
                                const index = s.elements.findIndex((el) => is_equal(el, val));
@@ -98,6 +102,7 @@ export const set: StructValue = {
                                check_args_length(args, 3, "<set>::set");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::set");
                                check_arg_type(args[1]!, RuntimeValueType.Number, "<set>::set");
+                               check_mutability(args[0]!, "<set>::set");
 
                                const set = args[0] as SetValue;
                                const index = (args[1] as NumberValue).value;
@@ -152,6 +157,8 @@ export const set: StructValue = {
                            {
                                check_args_length(args, 1, "<set>::clear");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::clear");
+                               check_mutability(args[0]!, "<set>::clear");
+
                                const s = args[0] as SetValue;
                                s.elements.length = 0;
                                return s;
@@ -167,6 +174,7 @@ export const set: StructValue = {
                            {
                                check_args_length(args, 1, "<set>::pop");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::pop");
+                               check_mutability(args[0]!, "<set>::pop");
 
                                const set = args[0] as SetValue;
                                const val = set.elements.pop();
@@ -246,6 +254,7 @@ export const set: StructValue = {
                                check_args_length(args, 3, "<set>::insert");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::insert");
                                check_arg_type(args[1]!, RuntimeValueType.Number, "<set>::insert");
+                               check_mutability(args[0]!, "<set>::insert");
 
                                const set = args[0] as SetValue;
                                const index = (args[1] as NumberValue).value;

@@ -5,7 +5,7 @@ import {
 } from "@types";
 import {
     check_args_length,
-    check_arg_type,
+    check_arg_type, check_mutability,
 } from "@utils";
 import type {
     RuntimeValue,
@@ -49,6 +49,7 @@ export const struct: StructValue = {
                                check_args_length(args, 3, "<struct>::add_property");
                                check_arg_type(args[0]!, RuntimeValueType.Struct, "<struct>::add_property");
                                check_arg_type(args[1]!, RuntimeValueType.String, "<struct>::add_property");
+                               check_mutability(args[0]!, "<struct>::add_property");
 
                                const instance = args[0] as StructValue;
                                const key = (args[1] as StringValue).value;
@@ -70,6 +71,7 @@ export const struct: StructValue = {
                                check_args_length(args, 2, "<struct>::remove_property");
                                check_arg_type(args[0]!, RuntimeValueType.Struct, "<struct>::remove_property");
                                check_arg_type(args[1]!, RuntimeValueType.String, "<struct>::remove_property");
+                               check_mutability(args[0]!, "<struct>::remove_property");
 
                                const instance = args[0] as StructValue;
                                const key = (args[1] as StringValue).value;

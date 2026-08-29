@@ -233,6 +233,15 @@ const is_truthy = (val: RuntimeValue): boolean =>
 const execute_variable_declaration = (stmt: VariableDeclaration, env: Environment): RuntimeValue =>
 {
     const value = evaluate(stmt.value, env);
+    if (stmt.is_const)
+    {
+        if (value.type === RuntimeValueType.Array ||
+            value.type === RuntimeValueType.Set ||
+            value.type === RuntimeValueType.Struct)
+        {
+            (value as any).is_immutable = true;
+        }
+    }
     return env.declare(stmt.identifier, value, stmt.is_const);
 };
 
@@ -975,11 +984,20 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
     {
         const member = expr.left as MemberExpression;
         const object = evaluate(member.object, env);
+
         if (object.type !== RuntimeValueType.Struct)
         {
             throw_exception({
                 type:    "Runtime",
                 message: "Member assignment is only allowed on structs."
+            });
+        }
+
+        if ((object as StructValue).is_immutable)
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: `Cannot assign to property of immutable struct '${(object as StructValue).identifier}'.`
             });
         }
         (object as StructValue).properties.set(member.property.name, value);
@@ -991,35 +1009,50 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
         const object = evaluate(index_expr.object, env);
         const index = evaluate(index_expr.index, env);
 
-        if (object.type !== RuntimeValueType.Array)
+        if (object.type === RuntimeValueType.Array)
+        {
+            if ((object as ArrayValue).is_immutable)
+            {
+                throw_exception({type: "Runtime", message: `Cannot assign to index of immutable array.`});
+            }
+            if (index.type !== RuntimeValueType.Number)
+            {
+                throw_exception({type: "Runtime", message: "Array index must be a number."});
+            }
+            const array = object as ArrayValue;
+            const idx = (index as NumberValue).value;
+            if (idx < 0 || idx >= array.elements.length)
+            {
+                throw_exception({type: "OutOfBounds", message: `Array index ${idx} is out of bounds.`});
+            }
+            array.elements[idx] = value;
+            return value;
+        }
+        else if (object.type === RuntimeValueType.Struct)
+        {
+            if ((object as StructValue).is_immutable)
+            {
+                throw_exception({
+                    type:    "Runtime",
+                    message: `Cannot assign to property of immutable instance of struct '${(object as StructValue).identifier}'.`
+                });
+            }
+            if (index.type !== RuntimeValueType.String)
+            {
+                throw_exception({type: "Runtime", message: "Struct keys must be strings."});
+            }
+            const struct = object as StructValue;
+            const key = (index as StringValue).value;
+            struct.properties.set(key, value);
+            return value;
+        }
+        else
         {
             throw_exception({
                 type:    "Runtime",
-                message: "Index assignment is only allowed on arrays."
+                message: "Index assignment is only allowed on arrays and structs."
             });
         }
-
-        if (index.type !== RuntimeValueType.Number)
-        {
-            throw_exception({
-                type:    "Runtime",
-                message: "Array index must be a number."
-            });
-        }
-
-        const array = object as ArrayValue;
-        const idx = (index as NumberValue).value;
-
-        if (idx < 0 || idx >= array.elements.length)
-        {
-            throw_exception({
-                type:    "OutOfBounds",
-                message: `Array index ${idx} is out of bounds.`
-            });
-        }
-
-        array.elements[idx] = value;
-        return value;
     }
 
     throw_exception({

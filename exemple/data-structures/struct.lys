@@ -42,7 +42,7 @@ io::print("Has 'z'?", p::has_property("z"));
 struct Config {
     theme
 }
-const my_config = Config { theme: "light" };
+var my_config = Config { theme: "light" };
 
 // Add a new property dynamically
 my_config::add_property("version", "1.0.0");
@@ -55,7 +55,7 @@ io::print("Config after adding properties:", my_config);
 io::print("Has 'version'?", my_config::has_property("version"));
 
 // You can also chain add_property since it returns the instance!
-const empty_config = Config {};
+var empty_config = Config {};
 empty_config::add_property("a", 1)::add_property("b", 2)::add_property("c", 3);
 io::print("Chained config:", empty_config);
 
