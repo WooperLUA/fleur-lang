@@ -7,8 +7,11 @@ io::print(1, true, [1, 2, 3]);
 // printing to stderr
 io::error("This is an error message");
 
+// clears the terminal
+io::clear();
+
 // reading input from the user
-const name = io::read_input("What is your name? ");
+const name = io::read("What is your name? ");
 io::print("Hello, ", name);
 
 // accessing command line arguments

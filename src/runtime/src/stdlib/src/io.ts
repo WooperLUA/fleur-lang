@@ -48,13 +48,25 @@ export const io: StructValue = {
             } as NativeFunctionValue,
         ],
         [
-            "read_input",
+            "clear",
             {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 1, "io::read_input");
-                          check_arg_type(args[0]!, RuntimeValueType.String, "io::read_input");
+                          check_args_length(args, 0, "clear");
+                          console.clear()
+                          return {type: RuntimeValueType.Null, value: null};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "read",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "io::read");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "io::read");
 
                           const value = (args[0] as StringValue).value
 
