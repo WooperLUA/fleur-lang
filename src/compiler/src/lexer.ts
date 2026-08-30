@@ -43,6 +43,12 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.DOT_DOT]:       /^\.\./,
     [TokenKind.DOUBLE_COLON]:  /^::/,
 
+    [TokenKind.PLUS_ASSIGN]: /^\+=/,
+    [TokenKind.MINUS_ASSIGN]: /^-=/,
+    [TokenKind.STAR_ASSIGN]: /^\*=/,
+    [TokenKind.SLASH_ASSIGN]: /^\/=/,
+    [TokenKind.PERCENT_ASSIGN]: /^%=/,
+
     // Single-character Operators
     [TokenKind.ASSIGN]:  /^=/,
     [TokenKind.LESS]:    /^</,

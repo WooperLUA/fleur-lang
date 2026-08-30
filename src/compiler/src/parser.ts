@@ -457,13 +457,21 @@ export class Parser
     {
         const left = this.parse_or(allow_struct);
 
-        if (this.match(TokenKind.ASSIGN))
+        const assignTokens = [
+            TokenKind.ASSIGN, TokenKind.PLUS_ASSIGN, TokenKind.MINUS_ASSIGN,
+            TokenKind.STAR_ASSIGN, TokenKind.SLASH_ASSIGN, TokenKind.PERCENT_ASSIGN
+        ];
+
+        if (assignTokens.includes(this.peek().kind))
         {
+            const operator = this.eat().value;
             const right = this.parse_assignment(allow_struct);
+
             return {
                 type: NodeType.AssignmentExpression,
+                operator,
                 left,
-                right
+                right,
             } as AssignmentExpression;
         }
 

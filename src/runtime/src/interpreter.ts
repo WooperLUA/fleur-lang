@@ -974,35 +974,97 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
 
 const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environment): RuntimeValue =>
 {
-    const value = evaluate(expr.right, env);
+    const right = evaluate(expr.right, env);
+    const operator = expr.operator || "=";
 
+    const compute_new_value = (current: RuntimeValue): RuntimeValue =>
+    {
+        if (operator === "=") return right;
+
+        if (operator === "+=" && current.type === RuntimeValueType.String)
+        {
+            return {
+                type:  RuntimeValueType.String,
+                value: (current as StringValue).value + stringify_value(right)
+            } as StringValue;
+        }
+
+        if (current.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+        {
+            const l = (current as NumberValue).value;
+            const r = (right as NumberValue).value;
+            let result = 0;
+
+            switch (operator)
+            {
+                case "+=":
+                    result = l + r;
+                    break;
+                case "-=":
+                    result = l - r;
+                    break;
+                case "*=":
+                    result = l * r;
+                    break;
+                case "/=":
+                    result = l / r;
+                    break;
+                case "%=":
+                    result = l % r;
+                    break;
+            }
+
+            return {type: RuntimeValueType.Number, value: result};
+        }
+
+        throw_exception({
+            type:    "Runtime",
+            message: `Operator '${operator}' cannot be applied to types ${current.type} and ${right.type}.`
+        });
+        return {type: RuntimeValueType.Null, value: null};
+    };
+
+    // Variable Assignment
     if (expr.left.type === NodeType.Identifier)
     {
-        return env.assign((expr.left as Identifier).name, value);
+        const name = (expr.left as Identifier).name;
+        if (operator === "=")
+        {
+            return env.assign(name, right);
+        }
+        const current = env.lookup(name);
+        return env.assign(name, compute_new_value(current));
     }
+
+    // Struct Property Assignment
     else if (expr.left.type === NodeType.MemberExpression)
     {
         const member = expr.left as MemberExpression;
         const object = evaluate(member.object, env);
-
         if (object.type !== RuntimeValueType.Struct)
         {
-            throw_exception({
-                type:    "Runtime",
-                message: "Member assignment is only allowed on structs."
-            });
+            throw_exception({type: "Runtime", message: "Member assignment is only allowed on structs."});
         }
 
-        if ((object as StructValue).is_immutable)
+        const struct = object as StructValue;
+        if (struct.is_immutable)
         {
-            throw_exception({
-                type:    "Runtime",
-                message: `Cannot assign to property of immutable struct '${(object as StructValue).identifier}'.`
-            });
+            throw_exception({type: "Runtime", message: `Cannot assign to property of immutable struct.`});
         }
-        (object as StructValue).properties.set(member.property.name, value);
-        return value;
+
+        if (operator === "=")
+        {
+            struct.properties.set(member.property.name, right);
+            return right;
+        }
+
+        const current = struct.properties.get(member.property.name)!;
+        const newVal = compute_new_value(current);
+        struct.properties.set(member.property.name, newVal);
+        return newVal;
     }
+
+    // Index Assignment
     else if (expr.left.type === NodeType.IndexExpression)
     {
         const index_expr = expr.left as IndexExpression;
@@ -1011,53 +1073,65 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
 
         if (object.type === RuntimeValueType.Array)
         {
-            if ((object as ArrayValue).is_immutable)
-            {
-                throw_exception({type: "Runtime", message: `Cannot assign to index of immutable array.`});
-            }
-            if (index.type !== RuntimeValueType.Number)
-            {
-                throw_exception({type: "Runtime", message: "Array index must be a number."});
-            }
             const array = object as ArrayValue;
+            if (array.is_immutable) throw_exception({
+                type:    "Runtime",
+                message: `Cannot assign to index of immutable array.`
+            });
+            if (index.type !== RuntimeValueType.Number) throw_exception({
+                type:    "Runtime",
+                message: "Array index must be a number."
+            });
+
             const idx = (index as NumberValue).value;
-            if (idx < 0 || idx >= array.elements.length)
+            if (idx < 0 || idx >= array.elements.length) throw_exception({
+                type:    "OutOfBounds",
+                message: `Array index ${idx} is out of bounds.`
+            });
+
+            if (operator === "=")
             {
-                throw_exception({type: "OutOfBounds", message: `Array index ${idx} is out of bounds.`});
+                array.elements[idx] = right;
+                return right;
             }
-            array.elements[idx] = value;
-            return value;
+
+            const current = array.elements[idx]!;
+            const newVal = compute_new_value(current);
+            array.elements[idx] = newVal;
+            return newVal;
         }
+
         else if (object.type === RuntimeValueType.Struct)
         {
-            if ((object as StructValue).is_immutable)
-            {
-                throw_exception({
-                    type:    "Runtime",
-                    message: `Cannot assign to property of immutable instance of struct '${(object as StructValue).identifier}'.`
-                });
-            }
-            if (index.type !== RuntimeValueType.String)
-            {
-                throw_exception({type: "Runtime", message: "Struct keys must be strings."});
-            }
             const struct = object as StructValue;
+            if (struct.is_immutable) throw_exception({
+                type:    "Runtime",
+                message: `Cannot assign to property of immutable struct.`
+            });
+            if (index.type !== RuntimeValueType.String) throw_exception({
+                type:    "Runtime",
+                message: "Struct keys must be strings."
+            });
+
             const key = (index as StringValue).value;
-            struct.properties.set(key, value);
-            return value;
+
+            if (operator === "=")
+            {
+                struct.properties.set(key, right);
+                return right;
+            }
+
+            const current = struct.properties.get(key)!;
+            const newVal = compute_new_value(current);
+            struct.properties.set(key, newVal);
+            return newVal;
         }
         else
         {
-            throw_exception({
-                type:    "Runtime",
-                message: "Index assignment is only allowed on arrays and structs."
-            });
+            throw_exception({type: "Runtime", message: "Index assignment is only allowed on arrays and structs."});
         }
     }
 
-    throw_exception({
-        type:    "Runtime",
-        message: "Invalid assignment target."
-    });
+    throw_exception({type: "Runtime", message: "Invalid assignment target."});
     return {type: RuntimeValueType.Null, value: null};
 };

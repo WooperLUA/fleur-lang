@@ -67,7 +67,6 @@ catch err
 ## Make Range Expressions a proper value that can be passed around and used.
 ### *Low*
 Range expressions exist only in for loops which is kind of dumb because they could be a type that could be passed around for different use cases.
-Also you can't do 1..n or n..1.
 ```typescript
 const range = 1..10;
 

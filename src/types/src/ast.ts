@@ -233,6 +233,7 @@ export type AssignmentExpression = Node & {
     type: NodeType.AssignmentExpression;
     left: Expression;
     right: Expression;
+    operator: string;
 };
 
 export type RangeExpression = Node & {
