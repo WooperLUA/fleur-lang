@@ -14,6 +14,8 @@ export enum TokenKind {
     K_FALSE = "FALSE",
     K_NULL = "NULL",
     K_IN = "IN",
+    K_TRY = "TRY",
+    K_CATCH = "CATCH",
 
     AND = "AND",
     OR = "OR",

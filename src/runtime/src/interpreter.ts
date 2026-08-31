@@ -37,11 +37,12 @@ import {
     type AssignmentExpression, type NumberValue,
     type StringValue,
     type BooleanValue,
-    type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue,
+    type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement,
 } from "@types";
-import {throw_exception, stringify_value, is_equal} from "@utils";
+import {throw_exception, stringify_value, is_equal, LysError} from "@utils";
 import {setup_stdlib} from "./stdlib";
 import {setup_data_structures} from "./data-structures";
+import {setup_other_structs} from "./others";
 
 export class Environment
 {
@@ -194,6 +195,8 @@ const execute = (stmt: Statement, env: Environment): RuntimeValue =>
                 type:  RuntimeValueType.Return,
                 value: evaluate((stmt as ReturnStatement).value, env)
             } as ReturnValue;
+        case NodeType.TryStatement:
+            return execute_try_statement(stmt as TryStatement, env);
         case NodeType.BlockStatement:
             return execute_block_statement(stmt as BlockStatement, new Environment(env));
         case NodeType.ExpressionStatement:
@@ -420,11 +423,30 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
     return last_result;
 }
 
+const execute_try_statement = (stmt: TryStatement, env: Environment): RuntimeValue =>
+{
+    try
+    {
+        return execute(stmt.body, env);
+    }
+    catch (e)
+    {
+        if (e instanceof LysError)
+        {
+            const catch_env = new Environment(env);
+            catch_env.declare(stmt.catch_param, e.value, false);
+            return execute(stmt.catch_body, catch_env);
+        }
+        throw e;
+    }
+};
+
 export const create_global_env = (args: string[] = []): Environment =>
 {
     const env = new Environment();
     setup_stdlib(env, args);
     setup_data_structures(env, args);
+    setup_other_structs(env, args);
     return env;
 };
 
@@ -624,9 +646,9 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
         const object = evaluate(member.object, env);
 
         // Arrays and Sets aren't "structs" but we still want to call methods on them, so I had to make this shit up
-        if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set)
+        if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set || object.type === RuntimeValueType.Error)
         {
-            const ns_name = object.type === RuntimeValueType.Array ? "Array" : "Set";
+            const ns_name = object.type.toString();
             const ns = env.lookup(ns_name) as StructValue;
 
             if (ns.methods.has(member.property.name))
@@ -831,9 +853,9 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
     const object = evaluate(expr.object, env);
     const property = expr.property.name;
 
-    if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set)
+    if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set || object.type === RuntimeValueType.Error)
     {
-        const ns_name = object.type === RuntimeValueType.Array ? "Array" : "Set";
+        const ns_name = object.type.toString();
         const ns = env.lookup(ns_name) as StructValue;
 
         if (ns.methods.has(property))

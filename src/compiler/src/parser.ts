@@ -31,7 +31,7 @@ import {
     type RangeExpression,
     type WhenCase,
     type StructProperty,
-    type Node, type MethodDeclaration, type StaticMemberExpression, type NullLiteral
+    type Node, type MethodDeclaration, type StaticMemberExpression, type NullLiteral, type TryStatement
 } from "@types";
 import {throw_exception} from "@utils";
 
@@ -116,6 +116,8 @@ export class Parser
                 return this.parse_while_statement();
             case TokenKind.K_RETURN:
                 return this.parse_return_statement();
+            case TokenKind.K_TRY:
+                return this.parse_try_statement();
             case TokenKind.LBRACE:
                 return this.parse_block_statement();
             case TokenKind.IDENTIFIER:
@@ -557,6 +559,22 @@ export class Parser
             } as RangeExpression;
         }
         return left;
+    }
+
+    private parse_try_statement(): TryStatement
+    {
+        this.eat(); // try
+        const body = this.parse_block_statement();
+        this.expect(TokenKind.K_CATCH, "Expected 'catch' after 'try' block");
+        const catch_param = this.expect(TokenKind.IDENTIFIER, "Expected identifier after 'catch'").value;
+        const catch_body = this.parse_block_statement();
+
+        return {
+            type: NodeType.TryStatement,
+            body,
+            catch_param,
+            catch_body
+        };
     }
 
     private parse_additive(allow_struct: boolean = true): Expression

@@ -23,6 +23,8 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.K_FALSE]:  /^false\b/,
     [TokenKind.K_NULL]:   /^null\b/,
     [TokenKind.K_IN]: /^in\b/,
+    [TokenKind.K_TRY]:   /^try\b/,
+    [TokenKind.K_CATCH]: /^catch\b/,
 
     // Logical Operators
     [TokenKind.AND]: /^and\b/,

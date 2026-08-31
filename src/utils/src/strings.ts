@@ -33,6 +33,8 @@ export const stringify_value = (val: any): string =>
             return "null";
         case RuntimeValueType.Range:
             return `${stringify_value((val as RangeValue).start)}..${stringify_value((val as RangeValue).end)}`;
+        case RuntimeValueType.Error:
+            return `Error: ${(val as any).message}`;
         default:
             return String(val.value);
     }

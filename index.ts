@@ -1,6 +1,7 @@
-import {throw_exception} from "@utils";
+import {LysError, throw_exception} from "@utils";
 import {tokenize, Parser} from "@compiler";
 import {interpret, create_global_env, start_repl} from "@runtime";
+import type {ErrorValue} from "@types";
 
 const main = async () =>
 {
@@ -29,12 +30,28 @@ const main = async () =>
                 message:  "You must provide a file with the '.lys' extension.",
             })
 
-            const bytes = await file.text();
-            const tokens = tokenize(bytes);
-            const parser = new Parser(tokens);
-            const ast = parser.parse();
-            const env = create_global_env(args.slice(2));
-            interpret(ast, env);
+            try
+            {
+                const bytes = await file.text();
+                const tokens = tokenize(bytes);
+                const parser = new Parser(tokens);
+                const ast = parser.parse();
+                const env = create_global_env(args.slice(2));
+                interpret(ast, env);
+            }
+            catch (e)
+            {
+                if (e instanceof LysError)
+                {
+                    console.error(`\x1b[31m[lys] -> ${(e.value as ErrorValue).message}\x1b[0m`);
+                    process.exit(1);
+                }
+                else
+                {
+                    console.error(e);
+                    process.exit(1);
+                }
+            }
             break;
         }
         case 'repl':

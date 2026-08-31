@@ -14,6 +14,7 @@ export enum RuntimeValueType
     Return = "Return",
     NativeFunction = "NativeFunction",
     Range = "Range",
+    Error = "Error",
 }
 
 export type RuntimeValue =
@@ -28,7 +29,8 @@ export type RuntimeValue =
     | NullValue
     | ReturnValue
     | NativeFunctionValue
-    | RangeValue;
+    | RangeValue
+    | ErrorValue;
 
 export type NumberValue = {
     type: RuntimeValueType.Number;
@@ -103,4 +105,9 @@ export type RangeValue = {
     type: RuntimeValueType.Range;
     start: RuntimeValue;
     end: RuntimeValue;
+};
+
+export type ErrorValue = {
+    type: RuntimeValueType.Error;
+    message: string;
 };

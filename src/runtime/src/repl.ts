@@ -1,7 +1,7 @@
 import {tokenize, Parser} from "@compiler";
 import {interpret, create_global_env} from "./interpreter";
-import {stringify_value} from "@utils";
-import {RuntimeValueType} from "@types";
+import {LysError, stringify_value} from "@utils";
+import {type ErrorValue, RuntimeValueType} from "@types";
 
 export const start_repl = () =>
 {
@@ -39,7 +39,11 @@ export const start_repl = () =>
         }
         catch (e: any)
         {
-            if (e.message && !e.message.includes("Runtime :"))
+            if (e instanceof LysError)
+            {
+                console.error(`\x1b[31m[lys] -> ${(e.value as ErrorValue).message}\x1b[0m`);
+            }
+            else if (e.message)
             {
                 console.error(e.message);
             }

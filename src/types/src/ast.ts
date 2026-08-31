@@ -12,6 +12,7 @@ export enum NodeType
     ReturnStatement = "ReturnStatement",
     BlockStatement = "BlockStatement",
     ExpressionStatement = "ExpressionStatement",
+    TryStatement = "TryStatement",
 
     BinaryExpression = "BinaryExpression",
     UnaryExpression = "UnaryExpression",
@@ -52,7 +53,8 @@ export type Statement =
     | WhileStatement
     | ReturnStatement
     | BlockStatement
-    | ExpressionStatement;
+    | ExpressionStatement
+    | TryStatement;
 
 export type VariableDeclaration = Node & {
     type: NodeType.VariableDeclaration;
@@ -133,6 +135,13 @@ export type BlockStatement = Node & {
 export type ExpressionStatement = Node & {
     type: NodeType.ExpressionStatement;
     expression: Expression;
+};
+
+export type TryStatement = Node & {
+    type: NodeType.TryStatement;
+    body: BlockStatement;
+    catch_param: string;
+    catch_body: BlockStatement;
 };
 
 export type Expression =

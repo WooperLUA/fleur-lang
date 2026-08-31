@@ -28,38 +28,9 @@ import [x, foo, Point] in 'file1.lys'
 ```
 
 
-## Error handling
-### *Moderate*
-Error handling is a very complex topic and many languages have their own implementation of it.
-I suggest adding some kind of basic error | exception to Lys to teach about their usage without making them too verbose | complex.
-Error should probably be a type and a data structure.
+## Ternary expressions
+### *Low*
+Ternaries add a bit of complexity, but I feel like they really remove some if boilerplate + are very common in most languages.
 ```typescript
-func divide(a, b)
-{
-    if b == 0 
-    {
-        throw Error::new("Division by zero is not allowed");
-    }
-    return a / b;
-}
-
-try 
-{
-    divide(10, 0);
-} 
-catch e 
-{
-    io::print("Caught an error:", e);
-}
-
-// Works perfectly with internal runtime errors too
-try 
-{
-    const arr = [1, 2, 3];
-    io::print(arr[99]);
-} 
-catch err 
-{
-    io::print("Safely handled out of bounds:", err);
-}
+const time_suffix = hours > 12 ? "pm" : "am"
 ```
