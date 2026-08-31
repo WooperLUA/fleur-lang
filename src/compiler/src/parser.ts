@@ -679,7 +679,20 @@ export class Parser
                 return {type: NodeType.NumericLiteral, value: parseFloat(token.value)} as NumericLiteral;
             case TokenKind.STRING:
                 this.eat();
-                return {type: NodeType.StringLiteral, value: token.value.slice(1, -1)} as StringLiteral;
+
+                const rawValue = token.value.slice(1, -1);
+
+                const unescapedValue = rawValue
+                    .replace(/\\n/g, '\n')   // Newline
+                    .replace(/\\t/g, '\t')   // Tab
+                    .replace(/\\r/g, '\r')   // Carriage return
+                    .replace(/\\"/g, '"')    // Double quote
+                    .replace(/\\\\/g, '\\'); // Backslash
+
+                return {
+                    type: NodeType.StringLiteral,
+                    value: unescapedValue
+                } as StringLiteral;
             case TokenKind.K_TRUE:
             case TokenKind.K_FALSE:
                 this.eat();

@@ -41,7 +41,8 @@ if os::platform() == "win32" {
     list_cmd = "dir /b";
 }
 const files = os::exec(list_cmd);
-io::print("Files in current directory:\n" + files);
+io::print("Files in current directory : ");
+io::print(files);
 
 
 // 6. Process Control
