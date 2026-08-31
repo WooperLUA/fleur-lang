@@ -12,7 +12,8 @@ export enum RuntimeValueType
     Procedure = "Procedure",
     Null = "Null",
     Return = "Return",
-    NativeFunction = "NativeFunction"
+    NativeFunction = "NativeFunction",
+    Range = "Range",
 }
 
 export type RuntimeValue =
@@ -26,7 +27,8 @@ export type RuntimeValue =
     | ProcedureValue
     | NullValue
     | ReturnValue
-    | NativeFunctionValue;
+    | NativeFunctionValue
+    | RangeValue;
 
 export type NumberValue = {
     type: RuntimeValueType.Number;
@@ -95,4 +97,10 @@ export type NativeFunctionValue = {
     type: RuntimeValueType.NativeFunction;
     call: (args: RuntimeValue[]) => RuntimeValue;
     is_method?: boolean;
+};
+
+export type RangeValue = {
+    type: RuntimeValueType.Range;
+    start: RuntimeValue;
+    end: RuntimeValue;
 };

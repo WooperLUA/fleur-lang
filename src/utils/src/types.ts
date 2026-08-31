@@ -1,16 +1,23 @@
 import {type RuntimeValue, RuntimeValueType} from "@types";
 import {throw_exception} from "./exception";
 
-export const check_arg_type = (arg: RuntimeValue, expected: RuntimeValueType, name: string): void =>
+export const check_arg_type = (arg: RuntimeValue, expected: RuntimeValueType | RuntimeValueType[], name: string): void =>
 {
-    if (arg.type !== expected)
+    const expectations = Array.isArray(expected) ? expected : [expected];
+
+    if (!expectations.includes(arg.type))
     {
+        const expected_str = Array.isArray(expected)
+            ? expected.join(" or ")
+            : expected;
+
         throw_exception({
             type:    "Runtime",
-            message: `${name} expects argument of type ${expected}, but got ${arg.type}.`
+            message: `${name} expects argument of type ${expected_str}, but got ${arg.type}.`
         });
     }
 }
+
 
 export const is_simple_value = (val: RuntimeValue): boolean =>
 {

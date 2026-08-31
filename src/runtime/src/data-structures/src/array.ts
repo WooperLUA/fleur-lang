@@ -1,12 +1,12 @@
 import {
-    type BooleanValue,
+    type BooleanValue, type RangeValue,
     RuntimeValueType, type SetValue, type StringValue,
 } from "@types";
 import {
     check_args_length,
     check_arg_type,
     is_equal,
-    stringify_value, check_mutability,
+    stringify_value, check_mutability, throw_exception,
 } from "@utils";
 import type {
     RuntimeValue,
@@ -33,6 +33,39 @@ export const array: StructValue = {
                           } as ArrayValue;
                       },
             } as NativeFunctionValue,
+        ],
+        [
+            "from",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "Array::from");
+                          check_arg_type(args[0]!, RuntimeValueType.Range, "Array::from");
+
+                          const elements: RuntimeValue[] = [];
+                          const arg = args[0]!;
+
+                          const range = arg as RangeValue;
+                          if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
+                          {
+                              throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
+                          }
+                          const start = (range.start as NumberValue).value;
+                          const end = (range.end as NumberValue).value;
+                          const step = start <= end ? 1 : -1;
+
+                          for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                          {
+                              elements.push({type: RuntimeValueType.Number, value: i});
+                          }
+
+                          return {
+                              type:     RuntimeValueType.Array,
+                              elements: elements,
+                          } as ArrayValue;
+                      }
+            }
         ],
         [
             "add",

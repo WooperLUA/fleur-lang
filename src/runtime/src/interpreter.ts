@@ -37,7 +37,7 @@ import {
     type AssignmentExpression, type NumberValue,
     type StringValue,
     type BooleanValue,
-    type NativeFunctionValue, type RangeExpression, type SetValue,
+    type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue,
 } from "@types";
 import {throw_exception, stringify_value, is_equal} from "@utils";
 import {setup_stdlib} from "./stdlib";
@@ -347,19 +347,17 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
     const loop_env = new Environment(env);
 
     // Ranges
-    if (stmt.iterable.type === NodeType.RangeExpression)
+    const iterable = evaluate(stmt.iterable, env);
+
+    if (iterable.type === RuntimeValueType.Range)
     {
-        const rangeExpr = stmt.iterable as RangeExpression;
-        const start_val = evaluate(rangeExpr.start, env);
-        const end_val = evaluate(rangeExpr.end, env);
-
-        if (start_val.type !== RuntimeValueType.Number || end_val.type !== RuntimeValueType.Number)
+        const range = iterable as RangeValue;
+        if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
         {
-            throw_exception({type: "Runtime", message: "For loop range bounds must be numbers."});
+            throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
         }
-
-        const start = (start_val as NumberValue).value;
-        const end = (end_val as NumberValue).value;
+        const start = (range.start as NumberValue).value;
+        const end = (range.end as NumberValue).value;
         const step = start <= end ? 1 : -1;
 
         for (let i = start; step > 0 ? i <= end : i >= end; i += step)
@@ -370,63 +368,57 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
             last_result = result;
         }
     }
+    else if (iterable.type === RuntimeValueType.Array)
+    {
+        const elements = (iterable as ArrayValue).elements;
+        for (const el of elements)
+        {
+            loop_env.assign_or_declare(stmt.identifier, el);
+            const result = execute(stmt.body, loop_env);
+            if (result.type === RuntimeValueType.Return) return result;
+            last_result = result;
+        }
+    }
+    else if (iterable.type === RuntimeValueType.Set)
+    {
+        const elements = (iterable as SetValue).elements;
+        for (const el of elements)
+        {
+            loop_env.assign_or_declare(stmt.identifier, el);
+            const result = execute(stmt.body, loop_env);
+            if (result.type === RuntimeValueType.Return) return result;
+            last_result = result;
+        }
+    }
+    else if (iterable.type === RuntimeValueType.Struct)
+    {
+        const struct = iterable as StructValue;
+        // yields an array of [key, value]
+        for (const [key, value] of struct.properties.entries())
+        {
+            const pair: ArrayValue = {
+                type:     RuntimeValueType.Array,
+                elements: [
+                    {type: RuntimeValueType.String, value: key},
+                    value
+                ]
+            };
+            loop_env.assign_or_declare(stmt.identifier, pair);
+            const result = execute(stmt.body, loop_env);
+            if (result.type === RuntimeValueType.Return) return result;
+            last_result = result;
+        }
+    }
     else
     {
-        // Data structures
-        const iterable = evaluate(stmt.iterable, env);
-
-        if (iterable.type === RuntimeValueType.Array)
-        {
-            const elements = (iterable as ArrayValue).elements;
-            for (const el of elements)
-            {
-                loop_env.assign_or_declare(stmt.identifier, el);
-                const result = execute(stmt.body, loop_env);
-                if (result.type === RuntimeValueType.Return) return result;
-                last_result = result;
-            }
-        }
-        else if (iterable.type === RuntimeValueType.Set)
-        {
-            const elements = (iterable as SetValue).elements;
-            for (const el of elements)
-            {
-                loop_env.assign_or_declare(stmt.identifier, el);
-                const result = execute(stmt.body, loop_env);
-                if (result.type === RuntimeValueType.Return) return result;
-                last_result = result;
-            }
-        }
-        else if (iterable.type === RuntimeValueType.Struct)
-        {
-            const struct = iterable as StructValue;
-            // yields an array of [key, value]
-            for (const [key, value] of struct.properties.entries())
-            {
-                const pair: ArrayValue = {
-                    type:     RuntimeValueType.Array,
-                    elements: [
-                        {type: RuntimeValueType.String, value: key},
-                        value
-                    ]
-                };
-                loop_env.assign_or_declare(stmt.identifier, pair);
-                const result = execute(stmt.body, loop_env);
-                if (result.type === RuntimeValueType.Return) return result;
-                last_result = result;
-            }
-        }
-        else
-        {
-            throw_exception({
-                type:    "Runtime",
-                message: `Cannot iterate over type '${iterable.type}'. Expected Array, Set, Struct, or Range.`
-            });
-        }
+        throw_exception({
+            type:    "Runtime",
+            message: `Cannot iterate over type '${iterable.type}'. Expected Array, Set, Struct, or Range.`
+        });
     }
 
     return last_result;
-};
+}
 
 export const create_global_env = (args: string[] = []): Environment =>
 {
@@ -486,10 +478,16 @@ const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
             return evaluate_index_expression(expr as IndexExpression, env);
         case NodeType.AssignmentExpression:
             return evaluate_assignment_expression(expr as AssignmentExpression, env);
+        case NodeType.RangeExpression:
+            return {
+                type:  RuntimeValueType.Range,
+                start: evaluate((expr as RangeExpression).start, env),
+                end:   evaluate((expr as RangeExpression).end, env)
+            } as RangeValue;
         default:
             throw_exception({
                 type:    "Runtime",
-                message: `Unknown expression type: ${expr.type}`
+                message: `Unknown expression type: ${(expr as any).type}`
             });
             return {type: RuntimeValueType.Null, value: null};
     }

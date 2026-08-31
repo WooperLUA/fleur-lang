@@ -12,6 +12,11 @@ io::print("Initial empty array:", my_array);
 var my_array_alt = Array::new(10, 20, "hello");
 io::print("Array created with Array::new:", my_array_alt);
 
+// Using Array::from with a range
+const my_array_from_range = Array::from(1..10);
+io::print("Array created with Array::from:", my_array_from_range);
+
+
 // 2. Adding elements
 my_array_alt::add(30);
 io::print("After adding 30:", my_array_alt);

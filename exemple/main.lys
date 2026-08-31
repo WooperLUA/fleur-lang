@@ -65,6 +65,16 @@ else
     io::print("Not equal");
 }
 
+// Assignment operators
+var string_append = "Hello, ";
+string_append += "World";
+var a_number = 5;
+a_number += 1;
+a_number -= 1;
+a_number *= 1;
+a_number /= 1;
+a_number %= 1;
+
 // Pattern Matching
 when a
 {

@@ -1,4 +1,4 @@
-import {RuntimeValueType} from "@types";
+import {type RangeValue, RuntimeValueType} from "@types";
 
 export const stringify_value = (val: any): string =>
 {
@@ -31,6 +31,8 @@ export const stringify_value = (val: any): string =>
             return `[Procedure: ${val.identifier}]`;
         case RuntimeValueType.Null:
             return "null";
+        case RuntimeValueType.Range:
+            return `${stringify_value((val as RangeValue).start)}..${stringify_value((val as RangeValue).end)}`;
         default:
             return String(val.value);
     }

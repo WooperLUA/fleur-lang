@@ -11,6 +11,10 @@ io::print("Initial empty set:", my_set);
 var my_set_alt = Set::new(1, 2, 3, 2, 1);
 io::print("Set created with Set::new (duplicates ignored):", my_set_alt);
 
+// Using Set::from with a range
+const my_set_from_range = Set::from(1..10);
+io::print("Set created with Set::from:", my_set_from_range);
+
 // 2. Adding elements
 my_set::add(1);
 my_set::add(2);

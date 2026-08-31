@@ -1,6 +1,14 @@
-import type {ArrayValue, NativeFunctionValue, NumberValue, RuntimeValue, SetValue, StructValue,} from "@types";
+import type {
+    ArrayValue,
+    NativeFunctionValue,
+    NumberValue,
+    RangeValue,
+    RuntimeValue,
+    SetValue,
+    StructValue,
+} from "@types";
 import {type BooleanValue, RuntimeValueType,} from "@types";
-import {check_arg_type, check_args_length, check_mutability, is_equal,} from "@utils";
+import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception,} from "@utils";
 
 export const set: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -29,6 +37,44 @@ export const set: StructValue = {
                           } as SetValue;
                       },
             } as NativeFunctionValue,
+        ],
+        [
+            "from",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "Set::from");
+                          check_arg_type(args[0]!, RuntimeValueType.Range, "Set::from");
+
+                          const elements: RuntimeValue[] = [];
+                          const arg = args[0]!;
+
+                          const range = arg as RangeValue;
+                          if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
+                          {
+                              throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
+                          }
+                          const start = (range.start as NumberValue).value;
+                          const end = (range.end as NumberValue).value;
+                          const step = start <= end ? 1 : -1;
+
+                          for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                          {
+                              const value : RuntimeValue = {type: RuntimeValueType.Number, value: i};
+                              const exists = elements.some((el) => is_equal(el, value));
+                              if (!exists)
+                              {
+                                  elements.push(value);
+                              }
+                          }
+
+                          return {
+                              type:     RuntimeValueType.Set,
+                              elements: elements,
+                          } as SetValue;
+                      }
+            }
         ],
         [
             "add",
