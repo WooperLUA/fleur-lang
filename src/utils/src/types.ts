@@ -1,4 +1,4 @@
-import {type RuntimeValue, RuntimeValueType} from "@types";
+import {type NumberValue, type RangeValue, type RuntimeValue, RuntimeValueType} from "@types";
 import {throw_exception} from "./exception";
 
 export const check_arg_type = (arg: RuntimeValue, expected: RuntimeValueType | RuntimeValueType[], name: string): void =>
@@ -19,7 +19,7 @@ export const check_arg_type = (arg: RuntimeValue, expected: RuntimeValueType | R
 }
 
 
-export const is_simple_value = (val: RuntimeValue): boolean =>
+export const is_primitive_value = (val: RuntimeValue): boolean =>
 {
     return [
         RuntimeValueType.Number,
@@ -67,6 +67,14 @@ export const is_equal = (left: RuntimeValue, right: RuntimeValue): boolean =>
                 if (!is_equal(val, r.properties.get(key)!)) return false;
             }
             return true;
+        }
+        case RuntimeValueType.Range:
+        {
+            const l = left as RangeValue;
+            const r = right as RangeValue;
+
+            return (l.start as NumberValue).value === (r.start as NumberValue).value &&
+                (l.end as NumberValue).value === (r.end as NumberValue).value;
         }
         default:
             return left === right;
