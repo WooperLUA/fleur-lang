@@ -34,3 +34,7 @@ io::print("File removed.");
 
 // 8. Verify deletion
 io::print("File exists after deletion?", file::exists(test_file));
+
+// 9. Path Utilities (Cross-platform safe)
+const config_path = file::join_path(os::homedir(), ".config", "lys", "settings.json");
+io::print("Joined path:", config_path);

@@ -14,6 +14,8 @@ import type {
     StructValue,
 } from "@types";
 import * as fs from "node:fs";
+import * as node_path from "node:path";
+
 
 export const file: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -141,6 +143,21 @@ export const file: StructValue = {
                               });
                               return {type: RuntimeValueType.Null, value: null};
                           }
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "join_path",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          const parts = args.map(arg =>
+                          {
+                              check_arg_type(arg, RuntimeValueType.String, "file::join_path");
+                              return (arg as StringValue).value;
+                          });
+                          return {type: RuntimeValueType.String, value: node_path.join(...parts)} as StringValue;
                       },
             } as NativeFunctionValue,
         ],

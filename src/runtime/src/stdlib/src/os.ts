@@ -16,7 +16,7 @@ import type {
 
 import * as node_os from "node:os";
 import {execSync} from "node:child_process";
-import * as node_path from "node:path";
+
 
 export const os: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -74,21 +74,6 @@ export const os: StructValue = {
                 call: (_: RuntimeValue[]) =>
                       {
                           return {type: RuntimeValueType.String, value: node_os.homedir()} as StringValue;
-                      },
-            } as NativeFunctionValue,
-        ],
-        [
-            "join_path",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          const parts = args.map(arg =>
-                          {
-                              check_arg_type(arg, RuntimeValueType.String, "os::join_path");
-                              return (arg as StringValue).value;
-                          });
-                          return {type: RuntimeValueType.String, value: node_path.join(...parts)} as StringValue;
                       },
             } as NativeFunctionValue,
         ],

@@ -20,14 +20,6 @@ io::print("Platform:", os::platform());      // e.g., "win32", "linux", "darwin"
 io::print("Home Directory:", os::homedir());
 
 
-// 3. Path Utilities (Cross-platform safe)
-io::print("--- Path Utilities ---");
-
-// Join paths safely (uses '\' on Windows, '/' on Mac/Linux)
-const config_path = os::join_path(os::homedir(), ".config", "lys", "settings.json");
-io::print("Joined path:", config_path);
-
-
 // 4. Shell Execution
 io::print("--- Shell Execution ---");
 

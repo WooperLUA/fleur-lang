@@ -1,7 +1,7 @@
 import {LysError, throw_exception} from "@utils";
 import {tokenize, Parser} from "@compiler";
 import {interpret, create_global_env, start_repl} from "@runtime";
-import type {ErrorValue} from "@types";
+import {type ErrorValue} from "@types";
 
 const main = async () =>
 {
