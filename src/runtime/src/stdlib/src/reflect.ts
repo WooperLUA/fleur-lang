@@ -1,33 +1,21 @@
-import {
-    type BooleanValue,
-    RuntimeValueType,
-    type StringValue,
-} from "@types";
-import {
-    check_args_length,
-    check_arg_type, check_mutability,
-} from "@utils";
-import type {
-    RuntimeValue,
-    NativeFunctionValue,
-    StructValue,
-} from "@types";
+import type {NativeFunctionValue, NullValue, RuntimeValue, StructValue,} from "@types";
+import {type BooleanValue, RuntimeValueType, type StringValue,} from "@types";
+import {check_arg_type, check_args_length, check_mutability,} from "@utils";
 
-export const struct: StructValue = {
+export const reflect: StructValue = {
     type:       RuntimeValueType.Struct,
     identifier: "Struct",
     properties: new Map<string, RuntimeValue>(),
     methods:    new Map<string, any>([
         [
-            "has_property",
+            "has",
             {
                 type:      RuntimeValueType.NativeFunction,
-                is_method: true,
                 call:      (args: RuntimeValue[]) =>
                            {
-                               check_args_length(args, 2, "<struct>::has_property");
-                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<struct>::has_property");
-                               check_arg_type(args[1]!, RuntimeValueType.String, "<struct>::has_property");
+                               check_args_length(args, 2, "<reflect>::has");
+                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<reflect>::has");
+                               check_arg_type(args[1]!, RuntimeValueType.String, "<reflect>::has");
 
                                const instance = args[0] as StructValue;
                                const key = (args[1] as StringValue).value;
@@ -40,38 +28,51 @@ export const struct: StructValue = {
             } as NativeFunctionValue,
         ],
         [
-            "add_property",
+            "get",
             {
                 type:      RuntimeValueType.NativeFunction,
-                is_method: true,
                 call:      (args: RuntimeValue[]) =>
                            {
-                               check_args_length(args, 3, "<struct>::add_property");
-                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<struct>::add_property");
-                               check_arg_type(args[1]!, RuntimeValueType.String, "<struct>::add_property");
-                               check_mutability(args[0]!, "<struct>::add_property");
+                               check_args_length(args, 2, "<reflect>::get");
+                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<reflect>::get");
+                               check_arg_type(args[1]!, RuntimeValueType.String, "<reflect>::get");
+
+                               const instance = args[0] as StructValue;
+                               const key = (args[1] as StringValue).value;
+
+                               return instance.properties.get(key) ?? {type : RuntimeValueType.Null, value : null} as NullValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "add",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 3, "<reflect>::add");
+                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<reflect>::add");
+                               check_arg_type(args[1]!, RuntimeValueType.String, "<reflect>::add");
+                               check_mutability(args[0]!, "<reflect>::add");
 
                                const instance = args[0] as StructValue;
                                const key = (args[1] as StringValue).value;
                                const value = args[2]!;
 
                                instance.properties.set(key, value);
-
-                               return instance;
                            },
             } as NativeFunctionValue,
         ],
         [
-            "remove_property",
+            "remove",
             {
                 type:      RuntimeValueType.NativeFunction,
-                is_method: true,
                 call:      (args: RuntimeValue[]) =>
                            {
-                               check_args_length(args, 2, "<struct>::remove_property");
-                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<struct>::remove_property");
-                               check_arg_type(args[1]!, RuntimeValueType.String, "<struct>::remove_property");
-                               check_mutability(args[0]!, "<struct>::remove_property");
+                               check_args_length(args, 2, "<reflect>::remove");
+                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<reflect>::remove");
+                               check_arg_type(args[1]!, RuntimeValueType.String, "<reflect>::remove");
+                               check_mutability(args[0]!, "<reflect>::remove");
 
                                const instance = args[0] as StructValue;
                                const key = (args[1] as StringValue).value;
@@ -84,14 +85,13 @@ export const struct: StructValue = {
             } as NativeFunctionValue,
         ],
         [
-            "struct_name",
+            "identifier",
             {
                 type:      RuntimeValueType.NativeFunction,
-                is_method: true,
                 call:      (args: RuntimeValue[]) =>
                            {
-                               check_args_length(args, 1, "<struct>::struct_name");
-                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<struct>::struct_name");
+                               check_args_length(args, 1, "<reflect>::identifier");
+                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<reflect>::identifier");
 
                                const instance = args[0] as StructValue;
 

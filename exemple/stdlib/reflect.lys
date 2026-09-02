@@ -1,4 +1,4 @@
-// Struct standard library example
+// Reflect standard library example
 
 // 1. "Object-like" structs: use ::new for behavior-rich structs
 struct Person {
@@ -19,12 +19,12 @@ io::print("Person alice:", alice);
 io::print("Alice says:", alice::hello());
 
 // 2. Base Struct methods (available on ALL struct instances natively)
-io::print("Has 'name'?", alice::has_property("name"));
-io::print("Has 'age'?", alice::has_property("age"));
-io::print("Has 'hello'?", alice::has_property("hello"));
-io::print("Has 'unknown'?", alice::has_property("unknown"));
+io::print("Has 'name'?", reflect::has(alice, "name"));
+io::print("Has 'age'?", reflect::has(alice, "age"));
+io::print("Has 'hello'?", reflect::has(alice, "hello"));
+io::print("Has 'unknown'?", reflect::has(alice, "unknown"));
 
-io::print("Struct name of alice:", alice::struct_name());
+io::print("Struct name of alice:", reflect::identifier(alice));
 
 // 3. "Map-like" data structs: use literal syntax
 struct Point {
@@ -34,9 +34,9 @@ struct Point {
 const p = Point { x: 10, y: 20 };
 io::print("Point p:", p);
 
-io::print("Struct name of p:", p::struct_name());
-io::print("Has 'x'?", p::has_property("x"));
-io::print("Has 'z'?", p::has_property("z"));
+io::print("Struct name of p:", reflect::identifier(p));
+io::print("Has 'x'?", reflect::has(p, "x"));
+io::print("Has 'z'?", reflect::has(p, "z"));
 
 // 4. Dynamic Properties (Map-like behavior)
 struct Config {
@@ -45,25 +45,21 @@ struct Config {
 var my_config = Config { theme: "light" };
 
 // Add a new property dynamically
-my_config::add_property("version", "1.0.0");
-my_config::add_property("debug", true);
+reflect::add(my_config, "version", "1.0.0");
+reflect::add(my_config, "debug", true);
 my_config["dev_mode"] = false; // short hand syntax
 
 io::print("Config after adding properties:", my_config);
 
 // Verify they exist
-io::print("Has 'version'?", my_config::has_property("version"));
+io::print("Has 'version'?", reflect::has(my_config, "version"));
 
-// You can also chain add_property since it returns the instance!
-var empty_config = Config {};
-empty_config::add_property("a", 1)::add_property("b", 2)::add_property("c", 3);
-io::print("Chained config:", empty_config);
 
 // Remove a property
-const was_removed = my_config::remove_property("debug");
+const was_removed = reflect::remove(my_config, "debug");
 io::print("Was 'debug' removed?", was_removed); // true
 io::print("Config after removal:", my_config);
 
 // Try removing a non-existent property
-const was_removed_2 = my_config::remove_property("non_existent");
+const was_removed_2 = reflect::remove(my_config, "non_existent");
 io::print("Was 'non_existent' removed?", was_removed_2); // false

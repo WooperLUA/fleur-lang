@@ -7,6 +7,7 @@ import {str} from "./src/str";
 import {type} from "./src/type.ts";
 import {file} from "./src/file.ts";
 import {os} from "./src/os.ts";
+import {reflect} from "./src/reflect.ts";
 
 export const setup_stdlib = (env: Environment, args: string[] = []) =>
 {
@@ -23,4 +24,5 @@ export const setup_stdlib = (env: Environment, args: string[] = []) =>
     env.declare("time", time, true);
     env.declare("file", file, true);
     env.declare("os", os, true);
+    env.declare("reflect", reflect, true);
 };

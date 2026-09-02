@@ -6,7 +6,7 @@ struct Map
     values // any
 }
 
-// Here i declare a constructor because it's a data structure with a lot of methods in it, meaning it's "object-like"
+// Here i declare a constructor because it's a data structure and i dont want keys and values to be set directly on instantiation
 Map::new() { return Map { keys : [], values : [] }; }
 
 Map::add(k,v)

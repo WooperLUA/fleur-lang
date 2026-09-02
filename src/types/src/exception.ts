@@ -8,7 +8,7 @@ type ExceptionType = "InvalidArgument"
     | "SyntaxError"
     | "Generic"
 
-export type Exception<T> = {
+export type Exception = {
     type: ExceptionType,
     message: string,
     metadata?: string,

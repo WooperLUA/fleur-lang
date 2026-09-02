@@ -28,18 +28,6 @@ import [x, foo, Point] in 'file1.lys'
 ```
 
 
-## Struct built-in methods
-### *Moderate*
-I hate how they look and feel but I cant find better names for now.
-```typescript
-const a = A {};
-a::has_property("foo");   // ew
-a::add_property("foo");   // no ?
-a::remove_propery("foo"); // please stop
-a::struct_name();         // am I supposed to guess that ?
-```
-
-
 ## Ternary expressions
 ### *Low*
 Ternaries add a bit of complexity, but I feel like they really remove some if boilerplate + are very common in most languages.
