@@ -1,20 +1,15 @@
 import {
-    type BooleanValue, type RangeValue,
-    RuntimeValueType, type SetValue, type StringValue,
+    type ArrayValue,
+    type BooleanValue,
+    type NativeFunctionValue,
+    type NumberValue,
+    type RangeValue,
+    type RuntimeValue,
+    RuntimeValueType,
+    type StringValue,
+    type StructValue,
 } from "@types";
-import {
-    check_args_length,
-    check_arg_type,
-    is_equal,
-    stringify_value, check_mutability, throw_exception,
-} from "@utils";
-import type {
-    RuntimeValue,
-    NativeFunctionValue,
-    StructValue,
-    ArrayValue,
-    NumberValue,
-} from "@types";
+import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception,} from "@utils";
 
 export const array: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -41,23 +36,35 @@ export const array: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, 1, "Array::from");
-                          check_arg_type(args[0]!, RuntimeValueType.Range, "Array::from");
+                          check_arg_type(args[0]!, [RuntimeValueType.Range, RuntimeValueType.Array], "Array::from");
 
-                          const elements: RuntimeValue[] = [];
+                          let elements: RuntimeValue[] = [];
                           const arg = args[0]!;
 
-                          const range = arg as RangeValue;
-                          if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
+                          switch (arg.type)
                           {
-                              throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
-                          }
-                          const start = (range.start as NumberValue).value;
-                          const end = (range.end as NumberValue).value;
-                          const step = start <= end ? 1 : -1;
+                              case RuntimeValueType.Range:
+                              {
+                                  const range = arg as RangeValue;
+                                  if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
+                                  {
+                                      throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
+                                  }
+                                  const start = (range.start as NumberValue).value;
+                                  const end = (range.end as NumberValue).value;
+                                  const step = start <= end ? 1 : -1;
 
-                          for (let i = start; step > 0 ? i <= end : i >= end; i += step)
-                          {
-                              elements.push({type: RuntimeValueType.Number, value: i});
+                                  for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                                  {
+                                      elements.push({type: RuntimeValueType.Number, value: i});
+                                  }
+                                  break
+                              }
+                              case RuntimeValueType.Array:
+                              {
+                                  const arr = arg as ArrayValue;
+                                  elements = Array.from(arr.elements);
+                              }
                           }
 
                           return {
@@ -321,6 +328,77 @@ export const array: StructValue = {
                                    type:     RuntimeValueType.Array,
                                    elements: [...arr1.elements, ...arr2.elements],
                                } as ArrayValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "sort",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<array>::sort");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::sort");
+                               check_mutability(args[0]!, "<array>::sort");
+
+                               const array = args[0] as ArrayValue;
+
+                               array.elements.toSorted((a, b) =>
+                               {
+                                   if (a.type === RuntimeValueType.Number && b.type === RuntimeValueType.Number)
+                                   {
+                                       return (a as NumberValue).value - (b as NumberValue).value;
+                                   }
+
+                                   if (a.type === RuntimeValueType.String && b.type === RuntimeValueType.String)
+                                   {
+                                       return (a as StringValue).value.localeCompare((b as StringValue).value);
+                                   }
+
+                                   if (a.type === RuntimeValueType.Boolean && b.type === RuntimeValueType.Boolean)
+                                   {
+                                       return Number((a as BooleanValue).value) - Number((b as BooleanValue).value);
+                                   }
+
+                                   return 0;
+                               });
+
+                               return array;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "keep",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::keep");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::keep");
+                               check_arg_type(args[1]!, RuntimeValueType.Range, "<array>::keep");
+                               check_mutability(args[0]!, "<array>::keep");
+                               const array = args[0] as ArrayValue;
+                               const range = args[1] as RangeValue
+                               const start = (range.start as NumberValue).value;
+                               const end = (range.end as NumberValue).value;
+
+                               // If the user wants to include the very last element (-1),
+                               // JS slice needs `undefined` to go to the end of the array.
+                               // If we pass 0 (-1 + 1), JS thinks we want to stop at index 0.
+                               let js_end: number | undefined;
+                               if (end === -1)
+                               {
+                                   js_end = undefined;
+                               }
+                               else
+                               {
+                                   js_end = end + 1;
+                               }
+
+                               array.elements = array.elements.slice(start, js_end)
+                               return array;
                            },
             } as NativeFunctionValue,
         ],

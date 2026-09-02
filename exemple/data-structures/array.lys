@@ -14,7 +14,11 @@ io::print("Array created with Array::new:", my_array_alt);
 
 // Using Array::from with a range
 const my_array_from_range = Array::from(1..10);
-io::print("Array created with Array::from:", my_array_from_range);
+io::print("Array created with Array::from a range : ", my_array_from_range);
+
+// Using Array::from with an array (useful to copy an array)
+const my_array_from_array = Array::from([1, 10]);
+io::print("Array created with Array::from an array : ", my_array_from_array);
 
 
 // 2. Adding elements

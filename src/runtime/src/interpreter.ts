@@ -948,8 +948,8 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
 
         const array = object as ArrayValue;
         const idx = (index as NumberValue).value;
-
-        if (idx < 0 || idx >= array.elements.length)
+        const length = array.elements.length
+        if (idx < -length || idx >= length)
         {
             throw_exception({
                 type:    "OutOfBounds",
@@ -957,7 +957,7 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
             });
         }
 
-        return array.elements[idx]!;
+        return array.elements.at(idx) ?? {type: RuntimeValueType.Null, value : null };
     }
     // Indexing for Structs (map like key access)
     else if (object.type === RuntimeValueType.Struct)
