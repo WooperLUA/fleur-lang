@@ -7,6 +7,7 @@ export enum RuntimeValueType
     Boolean = "Boolean",
     Array = "Array",
     Set = "Set",
+    Map = "Map",
     Struct = "Struct",
     Function = "Function",
     Procedure = "Procedure",
@@ -23,6 +24,7 @@ export type RuntimeValue =
     | BooleanValue
     | ArrayValue
     | SetValue
+    | MapValue
     | StructValue
     | FunctionValue
     | ProcedureValue
@@ -56,6 +58,12 @@ export type ArrayValue = {
 export type SetValue = {
     type: RuntimeValueType.Set;
     elements: RuntimeValue[];
+    is_immutable?: boolean;
+};
+
+export type MapValue = {
+    type: RuntimeValueType.Map;
+    elements: { key: RuntimeValue; value: RuntimeValue }[];
     is_immutable?: boolean;
 };
 

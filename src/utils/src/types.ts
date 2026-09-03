@@ -1,4 +1,4 @@
-import {type NumberValue, type RangeValue, type RuntimeValue, RuntimeValueType} from "@types";
+import {type MapValue, type NumberValue, type RangeValue, type RuntimeValue, RuntimeValueType} from "@types";
 import {throw_exception} from "./exception";
 
 export const check_arg_type = (arg: RuntimeValue, expected: RuntimeValueType | RuntimeValueType[], name: string): void =>
@@ -54,6 +54,18 @@ export const is_equal = (left: RuntimeValue, right: RuntimeValue): boolean =>
             const r = (right as any).elements as RuntimeValue[];
             if (l.length !== r.length) return false;
             return l.every(el => r.some(rEl => is_equal(el, rEl)));
+        }
+        case RuntimeValueType.Map:
+        {
+            const l = left as MapValue;
+            const r = right as MapValue;
+            if (l.elements.length !== r.elements.length) return false;
+            return l.elements.every(l_elt =>
+            {
+                const r_idx = r.elements.findIndex(r_elt => is_equal(r_elt.key, l_elt.key));
+                if (r_idx === -1) return false;
+                return is_equal(l_elt.value, r.elements[r_idx]!.value);
+            });
         }
         case RuntimeValueType.Struct:
         {

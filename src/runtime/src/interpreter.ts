@@ -37,7 +37,7 @@ import {
     type AssignmentExpression, type NumberValue,
     type StringValue,
     type BooleanValue,
-    type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement,
+    type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
 } from "@types";
 import {throw_exception, stringify_value, is_equal, LysError} from "@utils";
 import {setup_stdlib} from "./stdlib";
@@ -645,7 +645,7 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
         const member = expr.callee as StaticMemberExpression;
         const object = evaluate(member.object, env);
 
-        const valid_members = [RuntimeValueType.Array, RuntimeValueType.Set, RuntimeValueType.Error, RuntimeValueType.Range];
+        const valid_members = [RuntimeValueType.Array, RuntimeValueType.Set, RuntimeValueType.Error, RuntimeValueType.Range, RuntimeValueType.Map];
 
         if (valid_members.includes(object.type))
         {
@@ -854,7 +854,7 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
     const object = evaluate(expr.object, env);
     const property = expr.property.name;
 
-    const valid_members = [RuntimeValueType.Array, RuntimeValueType.Set, RuntimeValueType.Error, RuntimeValueType.Range];
+    const valid_members = [RuntimeValueType.Array, RuntimeValueType.Set, RuntimeValueType.Error, RuntimeValueType.Range, RuntimeValueType.Map];
 
     if (valid_members.includes(object.type))
     {
@@ -983,6 +983,16 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
             });
         }
         return struct.properties.get(key)!;
+    }
+    // Actual maps
+    else if (object.type === RuntimeValueType.Map)
+    {
+        const m = object as MapValue;
+        const key = index;
+        const idx = m.elements.findIndex(el => is_equal(el.key, key));
+
+        if (idx !== -1) return m.elements[idx]!.value;
+        return {type: RuntimeValueType.Null, value: null};
     }
     else
     {
@@ -1122,6 +1132,28 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
             const newVal = compute_new_value(current);
             array.elements[idx] = newVal;
             return newVal;
+        }
+
+        else if (object.type === RuntimeValueType.Map)
+        {
+            const m = object as MapValue;
+            if (m.is_immutable) throw_exception({
+                type:    "Runtime",
+                message: `Cannot assign to key of immutable map.`
+            });
+
+            const key = index;
+            const idx = m.elements.findIndex(el => is_equal(el.key, key));
+
+            if (idx !== -1)
+            {
+                m.elements[idx]!.value = right;
+            }
+            else
+            {
+                m.elements.push({key, value: right});
+            }
+            return right;
         }
 
         else if (object.type === RuntimeValueType.Struct)

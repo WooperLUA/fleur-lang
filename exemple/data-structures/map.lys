@@ -1,0 +1,43 @@
+// Map data-structure example
+
+// 1. Basic Usage
+var inventory = Map::new();
+inventory::set("apples", 5);
+inventory::set("bananas", 10);
+
+io::print("Apples : ", inventory::get("apples")); // 5
+io::print("Has bananas ? ", inventory::has("bananas")); // true
+
+// 2. Bracket Syntax
+inventory["oranges"] = 12;
+io::print("Oranges via [] : ", inventory["oranges"]); // 12
+
+// 3. Removing
+inventory::remove("apples");
+io::print("Has apples : ", inventory::has("apples")); // false
+
+// 4. Deep Equality Keys
+struct Point { x, y }
+
+var grid = Map::new();
+grid[Point { x: 10, y: 20 }] = "Treasure";
+grid[Point { x: 0, y: 0 }] = "Origin";
+
+io::print("Grid size : ", grid::length()); // 2
+
+const lookup = Point { x: 10, y: 20 };
+io::print("Found at 10,20 : ", grid[lookup]); // Prints: "Treasure"
+
+// 5. Iteration
+io::print("\n--- All Keys ---");
+for k in grid::keys() {
+    io::print("Key : ", k);
+}
+
+io::print("\n--- All values ---");
+for k in grid::values() {
+    io::print("Value : ", k);
+}
+
+// 6. Clearing
+grid::clear();

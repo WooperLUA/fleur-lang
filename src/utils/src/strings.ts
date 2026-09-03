@@ -1,4 +1,4 @@
-import {type RangeValue, RuntimeValueType} from "@types";
+import {type MapValue, type RangeValue, RuntimeValueType} from "@types";
 
 export const stringify_value = (val: any): string =>
 {
@@ -19,6 +19,11 @@ export const stringify_value = (val: any): string =>
             return "[" + val.elements.map((e: any) => stringify_value(e)).join(", ") + "]";
         case RuntimeValueType.Set:
             return "Set(" + val.elements.map((e: any) => stringify_value(e)).join(", ") + ")";
+        case RuntimeValueType.Map:
+            return "Map { " + (val as MapValue).elements.map((el) =>
+            {
+                return `${stringify_value(el.key)}: ${stringify_value(el.value)}`;
+            }).join(", ") + " }";
         case RuntimeValueType.Struct:
             return val.identifier + " { " + Array.from(val.properties.entries()).map((entry) =>
             {
