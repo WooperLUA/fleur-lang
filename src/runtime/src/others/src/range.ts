@@ -1,6 +1,7 @@
 import {RuntimeValueType, type RangeValue, type NumberValue, type BooleanValue} from "@types";
-import { check_args_length, check_arg_type } from "@utils";
+import {check_args_length, check_arg_type, check_mutability} from "@utils";
 import type { RuntimeValue, NativeFunctionValue, StructValue } from "@types";
+import {array} from "../../data-structures/src/array.ts";
 
 export const range: StructValue = {
     type: RuntimeValueType.Struct,
@@ -54,6 +55,25 @@ export const range: StructValue = {
                     } as BooleanValue;
                 }
             } as NativeFunctionValue
-        ]
+        ],
+        [
+            "reverse",
+            {
+                type: RuntimeValueType.NativeFunction,
+                is_method: true,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "<range>::reverse");
+                          check_mutability(args[0]!, "<range>::reverse");
+                          const range = args[0]! as RangeValue;
+
+                          const temp = range.start;
+                          range.start = range.end;
+                          range.end = temp;
+
+                          return range;
+                      }
+            }
+        ],
     ])
 };
