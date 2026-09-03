@@ -102,5 +102,20 @@ export const reflect: StructValue = {
                            },
             } as NativeFunctionValue,
         ],
+        [
+            "is",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<reflect>::is");
+                               // Simply check if they are the exact same object in memory
+                               return {
+                                   type:  RuntimeValueType.Boolean,
+                                   value: args[0] === args[1],
+                               } as BooleanValue;
+                           },
+            } as NativeFunctionValue,
+        ],
     ]),
 };

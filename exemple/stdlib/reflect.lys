@@ -63,3 +63,11 @@ io::print("Config after removal:", my_config);
 // Try removing a non-existent property
 const was_removed_2 = reflect::remove(my_config, "non_existent");
 io::print("Was 'non_existent' removed?", was_removed_2); // false
+
+
+// 5. Reference equality
+const obj_a = 1;
+const obj_b = 1;
+const obj_c = obj_a;
+io::print("Is obj_a obj_b ? : ", reflect::is(obj_a, obj_b));
+io::print("Is obj_c obj_a ? : ", reflect::is(obj_a, obj_c));
