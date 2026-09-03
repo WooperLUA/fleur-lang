@@ -368,39 +368,5 @@ export const array: StructValue = {
                            },
             } as NativeFunctionValue,
         ],
-        [
-            "keep",
-            {
-                type:      RuntimeValueType.NativeFunction,
-                is_method: true,
-                call:      (args: RuntimeValue[]) =>
-                           {
-                               check_args_length(args, 2, "<array>::keep");
-                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::keep");
-                               check_arg_type(args[1]!, RuntimeValueType.Range, "<array>::keep");
-                               check_mutability(args[0]!, "<array>::keep");
-                               const array = args[0] as ArrayValue;
-                               const range = args[1] as RangeValue
-                               const start = (range.start as NumberValue).value;
-                               const end = (range.end as NumberValue).value;
-
-                               // If the user wants to include the very last element (-1),
-                               // JS slice needs `undefined` to go to the end of the array.
-                               // If we pass 0 (-1 + 1), JS thinks we want to stop at index 0.
-                               let js_end: number | undefined;
-                               if (end === -1)
-                               {
-                                   js_end = undefined;
-                               }
-                               else
-                               {
-                                   js_end = end + 1;
-                               }
-
-                               array.elements = array.elements.slice(start, js_end)
-                               return array;
-                           },
-            } as NativeFunctionValue,
-        ],
     ]),
 };

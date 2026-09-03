@@ -84,7 +84,14 @@ const mixed = Array::new("start", 1..3, "end");
 io::print("Mixed array:", mixed); // [start, 1..3, end]
 
 
-// 5. Practical Use Case: Pagination
+// 5. Range containing values
+io::print("\n--- Range containing values ---");
+const r = 1..5;
+io::print("Does 1..5 contains 2 :", r::contains(2));
+io::print("Does 1..5 contains 6 :", r::contains(6));
+
+
+// 6. Practical Use Case: Pagination
 io::print("\n--- Practical: Pagination ---");
 
 const total_items = 25;

@@ -645,8 +645,9 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
         const member = expr.callee as StaticMemberExpression;
         const object = evaluate(member.object, env);
 
-        // Arrays and Sets aren't "structs" but we still want to call methods on them, so I had to make this shit up
-        if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set || object.type === RuntimeValueType.Error)
+        const valid_members = [RuntimeValueType.Array, RuntimeValueType.Set, RuntimeValueType.Error, RuntimeValueType.Range];
+
+        if (valid_members.includes(object.type))
         {
             const ns_name = object.type.toString();
             const ns = env.lookup(ns_name) as StructValue;
@@ -853,7 +854,9 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
     const object = evaluate(expr.object, env);
     const property = expr.property.name;
 
-    if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set || object.type === RuntimeValueType.Error)
+    const valid_members = [RuntimeValueType.Array, RuntimeValueType.Set, RuntimeValueType.Error, RuntimeValueType.Range];
+
+    if (valid_members.includes(object.type))
     {
         const ns_name = object.type.toString();
         const ns = env.lookup(ns_name) as StructValue;
@@ -957,7 +960,7 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
             });
         }
 
-        return array.elements.at(idx) ?? {type: RuntimeValueType.Null, value : null };
+        return array.elements.at(idx) ?? {type: RuntimeValueType.Null, value: null};
     }
     // Indexing for Structs (map like key access)
     else if (object.type === RuntimeValueType.Struct)

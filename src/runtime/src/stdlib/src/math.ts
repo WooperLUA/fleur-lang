@@ -1,5 +1,5 @@
 import {
-    type NumberValue,
+    type NumberValue, type RangeValue,
     RuntimeValueType, type StringValue,
 } from "@types";
 import {
@@ -19,32 +19,42 @@ export const math: StructValue = {
     properties: new Map<string, RuntimeValue>(),
     methods:    new Map<string, any>([
         [
-            "random_int",
+            "random",
             {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          check_args_length(args, 2, "math::random_int");
-                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::random_int");
-                          check_arg_type(args[1]!, RuntimeValueType.Number, "math::random_int");
-                          const [min, max] = args.map(a => (a as any).value);
-                          const random = Math.floor(Math.random() * (max - min + 1)) + min
-                          return {type: RuntimeValueType.Number, value: random};
-                      },
-            } as NativeFunctionValue,
-        ],
-        [
-            "random_float",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          check_args_length(args, 2, "math::random_float");
-                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::random_float");
-                          check_arg_type(args[1]!, RuntimeValueType.Number, "math::random_float");
-                          const [min, max] = args.map(a => (a as any).value);
-                          const random = Math.random() * (max - min) + min
-                          return {type: RuntimeValueType.Number, value: random};
+                          check_args_length(args, 1, "math::random");
+                          check_arg_type(args[0]!, RuntimeValueType.Range, "math::random");
+
+                          const range = args[0] as RangeValue;
+                          const start = (range.start as NumberValue).value;
+                          const end = (range.end as NumberValue).value;
+
+                          if (Number.isInteger(start))
+                          {
+                              if (!Number.isInteger(end))
+                              {
+                                  return throw_exception({
+                                      type:    "Runtime",
+                                      message: `You must pass either two integers or two floats.`,
+                                  })
+                              }
+                              const random = Math.floor(Math.random() * (end - start + 1)) + start
+                              return {type: RuntimeValueType.Number, value: random}
+                          }
+                          else
+                          {
+                              if (Number.isInteger(end))
+                              {
+                                  return throw_exception({
+                                      type:    "Runtime",
+                                      message: `You must pass either two integers or two floats.`,
+                                  })
+                              }
+                              const random = Math.random() * (end - start) + start
+                              return {type: RuntimeValueType.Number, value: random}
+                          }
                       },
             } as NativeFunctionValue,
         ],
@@ -167,5 +177,50 @@ export const math: StructValue = {
                       },
             } as NativeFunctionValue,
         ],
+        [
+            "float",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "math::float");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::float");
+                          const value = (args[0] as NumberValue).value
+                          return {type: RuntimeValueType.Number, value: value.toFixed(1)}
+                      }
+            }
+        ],
+        [
+            "int",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "math::int");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::int");
+                          const value = String((args[0] as NumberValue).value)
+                          return {type: RuntimeValueType.Number, value: parseInt(value)}
+                      }
+            }
+        ],
+        [
+            "clamp",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "math::clamp");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::clamp");
+                          check_arg_type(args[1]!, RuntimeValueType.Range, "math::clamp");
+                          const value = (args[0] as NumberValue).value
+                          const range = args[1] as RangeValue;
+                          const start = (range.start as NumberValue).value;
+                          const end = (range.end as NumberValue).value;
+
+                          return {type: RuntimeValueType.Number, value: Math.min(Math.max(value, start), end)}
+                      }
+            }
+        ]
+
     ]),
 };
