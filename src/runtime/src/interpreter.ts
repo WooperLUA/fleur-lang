@@ -38,11 +38,15 @@ import {
     type StringValue,
     type BooleanValue,
     type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
+    type ImportStatement,
 } from "@types";
 import {throw_exception, stringify_value, is_equal, LysError} from "@utils";
 import {setup_stdlib} from "./stdlib";
 import {setup_data_structures} from "./data-structures";
 import {setup_other_structs} from "./others";
+import * as node_fs from "node:fs";
+import * as node_path from "node:path";
+import {Parser, tokenize} from "@compiler";
 
 export class Environment
 {
@@ -51,7 +55,9 @@ export class Environment
     private constants: Set<string>;
     private methods: Map<string, Map<string, FunctionValue>>;
 
-    constructor(parent?: Environment)
+    public readonly base_dir: string;
+
+    constructor(parent?: Environment, base_dir?: string)
     {
         this.parent = parent;
         // Weird quirk, but I use this instead of {} because then it would have a
@@ -59,6 +65,7 @@ export class Environment
         this.variables = Object.create(null);
         this.constants = new Set();
         this.methods = new Map();
+        this.base_dir = base_dir ?? parent?.base_dir ?? process.cwd();
     }
 
     public register_method(struct_name: string, method_name: string, value: FunctionValue)
@@ -197,6 +204,8 @@ const execute = (stmt: Statement, env: Environment): RuntimeValue =>
             } as ReturnValue;
         case NodeType.TryStatement:
             return execute_try_statement(stmt as TryStatement, env);
+        case NodeType.ImportStatement:
+            return execute_import_statement(stmt as ImportStatement, env);
         case NodeType.BlockStatement:
             return execute_block_statement(stmt as BlockStatement, new Environment(env));
         case NodeType.ExpressionStatement:
@@ -441,9 +450,66 @@ const execute_try_statement = (stmt: TryStatement, env: Environment): RuntimeVal
     }
 };
 
-export const create_global_env = (args: string[] = []): Environment =>
+const moduleCache = new Map<string, Record<string, RuntimeValue>>();
+
+const execute_import_statement = (stmt: ImportStatement, env: Environment): RuntimeValue =>
 {
-    const env = new Environment();
+    const target_path = node_path.resolve(env.base_dir, stmt.source);
+    const target_dir = node_path.dirname(target_path);
+
+    if (moduleCache.has(target_path))
+    {
+        const cached_exports = moduleCache.get(target_path)!;
+        bind_exports(cached_exports, stmt.specifiers, env, stmt.source);
+        return {type: RuntimeValueType.Null, value: null};
+    }
+
+    moduleCache.set(target_path, {});
+
+    if (!node_fs.existsSync(target_path))
+    {
+        throw_exception({type: "Runtime", message: `Module not found: ${stmt.source} (Looked in ${env.base_dir})`});
+    }
+
+    const code = node_fs.readFileSync(target_path, "utf-8");
+    const tokens = tokenize(code);
+    const ast = new Parser(tokens).parse();
+
+    const module_env = new Environment(env, target_dir);
+
+    interpret(ast, module_env);
+
+    const exports: Record<string, RuntimeValue> = {};
+    for (const s of ast.body)
+    {
+        if ((s as any).is_pub && 'identifier' in s)
+        {
+            const name = (s as any).identifier;
+            exports[name] = module_env.lookup(name);
+        }
+    }
+
+    moduleCache.set(target_path, exports);
+    bind_exports(exports, stmt.specifiers, env, stmt.source);
+
+    return {type: RuntimeValueType.Null, value: null};
+};
+
+const bind_exports = (exports: Record<string, RuntimeValue>, specifiers: string[], env: Environment, source: string) =>
+{
+    for (const name of specifiers)
+    {
+        if (!(name in exports))
+        {
+            throw_exception({type: "Runtime", message: `Module '${source}' does not export '${name}'.`});
+        }
+        env.declare(name, exports[name]!, true);
+    }
+};
+
+export const create_global_env = (args: string[] = [], base_dir: string = process.cwd()): Environment =>
+{
+    const env = new Environment(undefined, base_dir);
     setup_stdlib(env, args);
     setup_data_structures(env, args);
     setup_other_structs(env, args);

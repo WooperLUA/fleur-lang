@@ -2,6 +2,7 @@ import {LysError, throw_exception} from "@utils";
 import {tokenize, Parser} from "@compiler";
 import {interpret, create_global_env, start_repl} from "@runtime";
 import {type ErrorValue} from "@types";
+import * as node_path from "node:path";
 
 const main = async () =>
 {
@@ -19,6 +20,8 @@ const main = async () =>
                 })
 
                 const path = args[1];
+                const absolute_path = node_path.resolve(path);
+                const current_dir = node_path.dirname(absolute_path);
                 const file = Bun.file(path);
 
                 if (!await file.exists()) return throw_exception({
@@ -38,7 +41,7 @@ const main = async () =>
                     const tokens = tokenize(bytes);
                     const parser = new Parser(tokens);
                     const ast = parser.parse();
-                    const env = create_global_env(args.slice(2));
+                    const env = create_global_env(args.slice(2), current_dir);
                     interpret(ast, env);
                 }
                 catch (e)

@@ -31,7 +31,8 @@ import {
     type RangeExpression,
     type WhenCase,
     type StructProperty,
-    type Node, type MethodDeclaration, type StaticMemberExpression, type NullLiteral, type TryStatement
+    type Node, type MethodDeclaration, type StaticMemberExpression, type NullLiteral, type TryStatement,
+    type ImportStatement
 } from "@types";
 import {throw_exception} from "@utils";
 
@@ -95,6 +96,16 @@ export class Parser
 
     private parse_statement(): Statement
     {
+        // pub priority
+        if (this.peek().kind === TokenKind.K_PUB)
+        {
+            const next = this.tokens[this.pos + 1]?.kind;
+            if (next === TokenKind.K_VAR || next === TokenKind.K_CONST) return this.parse_variable_declaration();
+            if (next === TokenKind.K_FUNC) return this.parse_function_declaration();
+            if (next === TokenKind.K_PROC) return this.parse_procedure_declaration();
+            if (next === TokenKind.K_STRUCT) return this.parse_struct_declaration();
+        }
+
         switch (this.peek().kind)
         {
             case TokenKind.K_VAR:
@@ -118,6 +129,8 @@ export class Parser
                 return this.parse_return_statement();
             case TokenKind.K_TRY:
                 return this.parse_try_statement();
+            case TokenKind.K_IMPORT:
+                return this.parse_import_statement();
             case TokenKind.LBRACE:
                 return this.parse_block_statement();
             case TokenKind.IDENTIFIER:
@@ -157,6 +170,7 @@ export class Parser
 
     private parse_variable_declaration(): VariableDeclaration
     {
+        const is_pub = this.match(TokenKind.K_PUB);
         const is_const = this.eat().kind === TokenKind.K_CONST;
         const var_or_const = is_const ? 'constant' : 'variable';
         const identifier = this.expect(TokenKind.IDENTIFIER, `Expected identifier after ${var_or_const} keyword`).value;
@@ -168,7 +182,8 @@ export class Parser
             type: NodeType.VariableDeclaration,
             identifier,
             value,
-            is_const
+            is_const,
+            is_pub
         };
     }
 
@@ -210,6 +225,7 @@ export class Parser
 
     private parse_function_declaration(): FunctionDeclaration
     {
+        const is_pub = this.match(TokenKind.K_PUB);
         this.eat(); // func
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected function name").value;
         this.expect(TokenKind.LPAREN, "Expected '(' after function name");
@@ -238,12 +254,14 @@ export class Parser
             type: NodeType.FunctionDeclaration,
             identifier,
             parameters,
-            body
+            body,
+            is_pub
         };
     }
 
     private parse_procedure_declaration(): ProcedureDeclaration
     {
+        const is_pub = this.match(TokenKind.K_PUB);
         this.eat(); // proc
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected procedure name").value;
         this.expect(TokenKind.LPAREN, "Expected '(' after procedure name");
@@ -272,7 +290,8 @@ export class Parser
             type: NodeType.ProcedureDeclaration,
             identifier,
             parameters,
-            body
+            body,
+            is_pub
         };
     }
 
@@ -304,6 +323,7 @@ export class Parser
 
     private parse_struct_declaration(): StructDeclaration
     {
+        const is_pub = this.match(TokenKind.K_PUB);
         this.eat(); // struct
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected struct name").value;
         this.expect(TokenKind.LBRACE, "Expected '{' after struct name");
@@ -320,7 +340,8 @@ export class Parser
         return {
             type: NodeType.StructDeclaration,
             identifier,
-            fields
+            fields,
+            is_pub
         };
     }
 
@@ -577,6 +598,35 @@ export class Parser
         };
     }
 
+    private parse_import_statement(): ImportStatement
+    {
+        this.eat(); // consume 'import'
+        this.expect(TokenKind.LBRACKET, "Expected '[' after import");
+
+        const specifiers: string[] = [];
+        if (this.peek().kind !== TokenKind.RBRACKET)
+        {
+            do
+            {
+                specifiers.push(this.expect(TokenKind.IDENTIFIER, "Expected identifier in import list").value);
+            } while (this.match(TokenKind.COMMA));
+        }
+
+        this.expect(TokenKind.RBRACKET, "Expected ']' after import list");
+        this.expect(TokenKind.K_IN, "Expected 'in' after import list");
+
+        const source_token = this.expect(TokenKind.STRING, "Expected module path string");
+        const source = source_token.value.slice(1, -1); // Remove quotes
+
+        this.expect(TokenKind.SEMICOLON, "Expected ';' after import statement");
+
+        return {
+            type: NodeType.ImportStatement,
+            specifiers,
+            source
+        };
+    }
+
     private parse_additive(allow_struct: boolean = true): Expression
     {
         let left = this.parse_multiplicative(allow_struct);
@@ -708,7 +758,7 @@ export class Parser
                     .replace(/\\\\/g, '\\'); // Backslash
 
                 return {
-                    type: NodeType.StringLiteral,
+                    type:  NodeType.StringLiteral,
                     value: unescapedValue
                 } as StringLiteral;
             case TokenKind.K_TRUE:

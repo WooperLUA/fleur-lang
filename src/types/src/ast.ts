@@ -13,6 +13,7 @@ export enum NodeType
     BlockStatement = "BlockStatement",
     ExpressionStatement = "ExpressionStatement",
     TryStatement = "TryStatement",
+    ImportStatement = "ImportStatement",
 
     BinaryExpression = "BinaryExpression",
     UnaryExpression = "UnaryExpression",
@@ -54,13 +55,15 @@ export type Statement =
     | ReturnStatement
     | BlockStatement
     | ExpressionStatement
-    | TryStatement;
+    | TryStatement
+    | ImportStatement;
 
 export type VariableDeclaration = Node & {
     type: NodeType.VariableDeclaration;
     identifier: string;
     value: Expression;
     is_const: boolean;
+    is_pub: boolean;
 };
 
 export type FunctionDeclaration = Node & {
@@ -68,6 +71,7 @@ export type FunctionDeclaration = Node & {
     identifier: string;
     parameters: string[];
     body: BlockStatement;
+    is_pub: boolean;
 };
 
 export type ProcedureDeclaration = Node & {
@@ -75,6 +79,7 @@ export type ProcedureDeclaration = Node & {
     identifier: string;
     parameters: string[];
     body: BlockStatement;
+    is_pub: boolean;
 };
 
 export type MethodDeclaration = Node & {
@@ -89,6 +94,7 @@ export type StructDeclaration = Node & {
     type: NodeType.StructDeclaration;
     identifier: string;
     fields: string[];
+    is_pub: boolean;
 };
 
 export type IfStatement = Node & {
@@ -142,6 +148,12 @@ export type TryStatement = Node & {
     body: BlockStatement;
     catch_param: string;
     catch_body: BlockStatement;
+};
+
+export type ImportStatement = Node & {
+    type: NodeType.ImportStatement;
+    specifiers: string[]; // the things you want to import
+    source: string;       // file path
 };
 
 export type Expression =

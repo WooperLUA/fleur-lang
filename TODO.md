@@ -6,28 +6,6 @@
  - Low
 
 
-## Import | Module system with multiple file imports
-### *Moderate*
-On one hand Lys is not made to do real programs with so implementing a tedious system like this makes no sens but having a proper
-import | module system would make Lys more useful and teach about imports.
-```typescript
-// file1.lys
-pub const x = 5;
-pub func foo()
-{
-    return 1;
-}
-pub struct Point
-{
-    x,
-    y
-}
-
-// file2.lys
-import [x, foo, Point] in 'file1.lys'
-```
-
-
 ## Ternary expressions
 ### *Low*
 Ternaries add a bit of complexity, but I feel like they really remove some if boilerplate + are very common in most languages.
