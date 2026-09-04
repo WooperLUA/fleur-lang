@@ -16,8 +16,8 @@ io::print("Custom var:", os::env("LYS_CUSTOM_VAR"));
 
 // 2. System Information
 io::print("--- System Info ---");
-io::print("Platform:", os::platform());      // e.g., "win32", "linux", "darwin"
-io::print("Home Directory:", os::homedir());
+io::print("Platform:", os.platform);      // e.g., "win32", "linux", "darwin"
+io::print("Home Directory:", os.homedir);
 
 
 // 4. Shell Execution
@@ -29,7 +29,7 @@ io::print("Echo result:", echo_result);
 
 // Cross-platform directory listing
 var list_cmd = "ls -1";
-if os::platform() == "win32" {
+if os.platform == "win32" {
     list_cmd = "dir /b";
 }
 const files = os::exec(list_cmd);

@@ -16,8 +16,8 @@ io::print("min(10, 20) =", math::min(10, 20));
 io::print("max(10, 20) =", math::max(10, 20));
 
 // --- Rounding Methods ---
-const pi = 3.14159;
-const neg_pi = -3.14159;
+const pi = math.PI;
+const neg_pi = -math.PI;
 
 // Round to nearest integer
 io::print("round(3.14) =", math::round(pi));       // 3

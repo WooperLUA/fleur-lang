@@ -10,7 +10,7 @@ export class LysError extends Error
     }
 }
 
-export const throw_exception = (err: Exception<unknown>) =>
+export const throw_exception = (err: Exception) =>
 {
     const position = err.line && err.column ? `at ${err.line}:${err.column} ` : "";
 

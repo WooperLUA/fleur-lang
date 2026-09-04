@@ -1,6 +1,6 @@
 import {
     type NumberValue, type RangeValue,
-    RuntimeValueType, type StringValue,
+    RuntimeValueType,
 } from "@types";
 import {
     throw_exception,
@@ -16,7 +16,15 @@ import type {
 export const math: StructValue = {
     type:       RuntimeValueType.Struct,
     identifier: "math",
-    properties: new Map<string, RuntimeValue>(),
+    properties: new Map<string, RuntimeValue>([
+        [
+            "PI",
+            {
+                type:     RuntimeValueType.Number,
+                value: Math.PI
+            }
+        ]
+    ]),
     methods:    new Map<string, any>([
         [
             "random",

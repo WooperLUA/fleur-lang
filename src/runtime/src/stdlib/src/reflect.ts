@@ -45,15 +45,15 @@ export const reflect: StructValue = {
             } as NativeFunctionValue,
         ],
         [
-            "add",
+            "set",
             {
                 type:      RuntimeValueType.NativeFunction,
                 call:      (args: RuntimeValue[]) =>
                            {
-                               check_args_length(args, 3, "<reflect>::add");
-                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<reflect>::add");
-                               check_arg_type(args[1]!, RuntimeValueType.String, "<reflect>::add");
-                               check_mutability(args[0]!, "<reflect>::add");
+                               check_args_length(args, 3, "<reflect>::set");
+                               check_arg_type(args[0]!, RuntimeValueType.Struct, "<reflect>::set");
+                               check_arg_type(args[1]!, RuntimeValueType.String, "<reflect>::set");
+                               check_mutability(args[0]!, "<reflect>::set");
 
                                const instance = args[0] as StructValue;
                                const key = (args[1] as StringValue).value;

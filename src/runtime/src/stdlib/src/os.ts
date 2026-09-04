@@ -21,7 +21,22 @@ import {execSync} from "node:child_process";
 export const os: StructValue = {
     type:       RuntimeValueType.Struct,
     identifier: "os",
-    properties: new Map<string, RuntimeValue>(),
+    properties: new Map<string, RuntimeValue>([
+        [
+            "platform",
+            {
+                type:  RuntimeValueType.String,
+                value: process.platform
+            }
+        ],
+        [
+            "homedir",
+            {
+                type: RuntimeValueType.String,
+                value: node_os.homedir()
+            },
+        ],
+    ]),
     methods:    new Map<string, any>([
         [
             "env",
@@ -54,26 +69,6 @@ export const os: StructValue = {
                           check_arg_type(args[1]!, RuntimeValueType.String, "os::set_env");
                           process.env[(args[0] as StringValue).value] = (args[1] as StringValue).value;
                           return {type: RuntimeValueType.Null, value: null};
-                      },
-            } as NativeFunctionValue,
-        ],
-        [
-            "platform",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (_: RuntimeValue[]) =>
-                      {
-                          return {type: RuntimeValueType.String, value: process.platform} as StringValue;
-                      },
-            } as NativeFunctionValue,
-        ],
-        [
-            "homedir",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (_: RuntimeValue[]) =>
-                      {
-                          return {type: RuntimeValueType.String, value: node_os.homedir()} as StringValue;
                       },
             } as NativeFunctionValue,
         ],

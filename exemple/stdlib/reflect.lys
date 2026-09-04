@@ -45,11 +45,11 @@ struct Config {
 var my_config = Config { theme: "light" };
 
 // Add a new property dynamically
-reflect::add(my_config, "version", "1.0.0");
-reflect::add(my_config, "debug", true);
+reflect::set(my_config, "version", "1.0.0");
+reflect::set(my_config, "debug", true);
 my_config["dev_mode"] = false; // short hand syntax
 
-io::print("Config after adding properties:", my_config);
+io::print("Config after setting properties:", my_config);
 
 // Verify they exist
 io::print("Has 'version'?", reflect::has(my_config, "version"));
