@@ -96,7 +96,7 @@ io::print("\n--- Reversing ranges ---");
 var range_to_reverse = 1..5;
 io::print("Range 1..5 before reversing : ", range_to_reverse);
 range_to_reverse::reverse();
-io::print("Range 1..5 after reversing :", range_to_reverse);
+io::print("Range 1..5 after reversing : ", range_to_reverse);
 
 // 7. Practical Use Case: Pagination
 io::print("\n--- Practical: Pagination ---");

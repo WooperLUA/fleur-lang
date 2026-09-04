@@ -1,0 +1,58 @@
+// Regex standard library example
+
+// 1. Test if regexp is in a string
+const email = "alice@example.com";
+const is_email = regex::test("^[a-z]+@[a-z]+\\.[a-z]+$", email);
+io::print("Is valid email ? : ", is_email); // true
+
+const bad_email = "not-an-email";
+io::print("Is valid email ? : ", regex::test("^[a-z]+@[a-z]+\\.[a-z]+$", bad_email)); // false
+
+// Check if a string contains only digits
+const phone = "1234567890";
+io::print("All digits ? : ", regex::test("^[0-9]+$", phone)); // true
+
+// Case-insensitive flag works too (using the 3rd argument "i")
+io::print("Has hello ? : ", regex::test("hello", "Hello World", "i")); // true
+
+
+// 2. Get the matches of a regexp and a string
+const text = "My phone is 555-1234 and my zip is 90210";
+
+// Extract the first sequence of digits
+const first_match = regex::match("[0-9]+", text);
+
+if first_match != null {
+    io::print("Found a number : ", first_match);
+}
+
+// Try matching something that doesn't exist
+const no_match = regex::match("xyz", text);
+if no_match == null {
+    io::print("No match found for 'xyz'");
+}
+
+// Extract a date pattern
+const log = "Error on 2025-01-15 : disk full";
+const date_match = regex::match("[0-9]{4}-[0-9]{2}-[0-9]{2}", log);
+if date_match != null {
+    io::print("Date found : ", date_match);
+}
+
+
+// Practical example: simple input validation
+proc validate_username(name) {
+    // 3-16 chars, only letters, numbers, underscores
+    if regex::test("^[a-zA-Z0-9_]{3,16}$", name)
+    {
+        io::print(name, "-> Valid username!");
+    }
+    else
+    {
+        io::print(name, "-> Invalid username!");
+    }
+}
+
+validate_username("alice_99");    // Valid
+validate_username("ab");          // Invalid (too short)
+validate_username("bad user!");   // Invalid (spaces and !)
