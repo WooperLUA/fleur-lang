@@ -1,14 +1,14 @@
-import {RuntimeValueType} from "@types";
-import {check_args_length, check_mutability, is_equal} from "@utils";
 import type {
-    RuntimeValue,
-    NativeFunctionValue,
-    StructValue,
-    MapValue,
     ArrayValue,
     BooleanValue,
-    NumberValue
+    MapValue,
+    NativeFunctionValue,
+    NumberValue,
+    RuntimeValue,
+    StructValue
 } from "@types";
+import {RuntimeValueType} from "@types";
+import {check_args_length, check_mutability, is_equal} from "@utils";
 
 const find_key_index = (elements: { key: RuntimeValue; value: RuntimeValue }[], target: RuntimeValue): number =>
 {

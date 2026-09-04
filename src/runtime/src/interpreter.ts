@@ -47,7 +47,7 @@ import {setup_other_structs} from "./others";
 export class Environment
 {
     private readonly parent?: Environment;
-    private variables: Record<string, RuntimeValue>;
+    private readonly variables: Record<string, RuntimeValue>;
     private constants: Set<string>;
     private methods: Map<string, Map<string, FunctionValue>>;
 
