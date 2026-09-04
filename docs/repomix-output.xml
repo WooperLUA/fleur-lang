@@ -1,0 +1,1527 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+public/
+  favicon.svg
+src/
+  assets/
+    houston.webp
+  content/
+    docs/
+      guides/
+        stdlib/
+          file.md
+          io.md
+          math.md
+          os.md
+          reflect.md
+          regex.md
+          str.md
+          time.md
+          type.md
+        advanced.md
+        arrays.md
+        basics.md
+        control-flow.md
+        errors.md
+        example.md
+        functions.md
+        getting-started.md
+        maps.md
+        modules.md
+        sets.md
+        stdlib.md
+        structs.md
+      index.mdx
+  styles/
+    custom.css
+  content.config.ts
+.gitignore
+AGENTS.md
+astro.config.mjs
+lys.tmLanguage.json
+package.json
+README.md
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="public/favicon.svg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><path fill-rule="evenodd" d="M81 36 64 0 47 36l-1 2-9-10a6 6 0 0 0-9 9l10 10h-2L0 64l36 17h2L28 91a6 6 0 1 0 9 9l9-10 1 2 17 36 17-36v-2l9 10a6 6 0 1 0 9-9l-9-9 2-1 36-17-36-17-2-1 9-9a6 6 0 1 0-9-9l-9 10v-2Zm-17 2-2 5c-4 8-11 15-19 19l-5 2 5 2c8 4 15 11 19 19l2 5 2-5c4-8 11-15 19-19l5-2-5-2c-8-4-15-11-19-19l-2-5Z" clip-rule="evenodd"/><path d="M118 19a6 6 0 0 0-9-9l-3 3a6 6 0 1 0 9 9l3-3Zm-96 4c-2 2-6 2-9 0l-3-3a6 6 0 1 1 9-9l3 3c3 2 3 6 0 9Zm0 82c-2-2-6-2-9 0l-3 3a6 6 0 1 0 9 9l3-3c3-2 3-6 0-9Zm96 4a6 6 0 0 1-9 9l-3-3a6 6 0 1 1 9-9l3 3Z"/><style>path{fill:#000}@media (prefers-color-scheme:dark){path{fill:#fff}}</style></svg>
+</file>
+
+<file path="src/content/docs/guides/stdlib/file.md">
+---
+title: File Module
+description: Reference for the Lys file module.
+---
+
+File system operations.
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `read(path)` | Reads the entire content of the file at `path` as a string. |
+| `write(path, content)` | Writes `content` string to the file at `path`. Overwrites existing content. |
+| `append(path, content)` | Appends `content` string to the end of the file at `path`. |
+| `exists(path)` | Returns `true` if a file or directory exists at `path`. |
+| `remove(path)` | Deletes the file at `path`. |
+| `join_path(...parts)` | Joins multiple path segments into a single path string. |
+
+### Examples
+
+```lys
+const config_path = "config.json";
+if file::exists(config_path) {
+    const data = file::read(config_path);
+    io::print(data);
+}
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib/io.md">
+---
+title: IO Module
+description: Reference for the Lys io module.
+---
+
+The `io` module provides basic input and output functionality.
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `print(...args)` | Prints values to the standard output, separated by spaces and followed by a newline. |
+| `error(...args)` | Prints values to the standard error output. |
+| `read(prompt)` | Displays a `prompt` and reads a string input from the user (stdin). |
+| `clear()` | Clears the terminal console. |
+
+### Examples
+
+```lys
+io::print("Hello", "World");
+const name = io::read("Enter your name: ");
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib/math.md">
+---
+title: Math Module
+description: Reference for the Lys math module.
+---
+
+Provides mathematical constants and functions.
+
+## Properties
+
+| Member | Description |
+| :--- | :--- |
+| `PI` | The ratio of a circle's circumference to its diameter (~3.14159). |
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `abs(x)` | Returns the absolute value of `x`. |
+| `min(a, b)` | Returns the smaller of two numbers `a` and `b`. |
+| `max(a, b)` | Returns the larger of two numbers `a` and `b`. |
+| `round(x)` | Returns the value of `x` rounded to the nearest integer. |
+| `floor(x)` | Returns the largest integer less than or equal to `x`. |
+| `ceil(x)` | Returns the smallest integer greater than or equal to `x`. |
+| `sin(x)` | Returns the sine of `x` (in radians). |
+| `cos(x)` | Returns the cosine of `x` (in radians). |
+| `tan(x)` | Returns the tangent of `x` (in radians). |
+| `random(range)` | Returns a random number within the given `range` (e.g., `0..10`). |
+| `float(x)` | Formats a number `x` to a single decimal place string/number. |
+| `int(x)` | Parses a number `x` into an integer (truncating decimals). |
+| `clamp(x, range)` | Clamps the value `x` to be within the `range` (e.g., `math::clamp(15, 0..10)` returns `10`). |
+
+### Examples
+
+```lys
+const radius = 5;
+const area = math.PI * radius * radius;
+const dice_roll = math::random(1..7); // 1 to 6
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib/os.md">
+---
+title: OS Module
+description: Reference for the Lys os module.
+---
+
+Operating system and process information.
+
+## Properties
+
+| Member | Description |
+| :--- | :--- |
+| `platform` | Returns the OS platform string (e.g., `"win32"`, `"linux"`). |
+| `homedir` | Returns the path to the current user's home directory. |
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `env(key)` | Returns the value of the environment variable `key`, or `null` if not set. |
+| `set_env(key, val)` | Sets the environment variable `key` to `val`. |
+| `exit(code)` | Exits the current process with the given `code`. |
+| `exec(command)` | Executes a shell `command` and returns its standard output as a string. |
+
+### Examples
+
+```lys
+io::print("Running on: ", os.platform);
+const user_home = os.homedir;
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib/reflect.md">
+---
+title: Reflect Module
+description: Reference for the Lys reflect module.
+---
+
+Metaprogramming and introspection for Structs.
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `has(struct, key)` | Returns `true` if the `struct` instance has a property or method named `key`. |
+| `get(struct, key)` | Returns the value of the property `key` from the `struct` instance, or `null`. |
+| `set(struct, key, val)` | Sets the property `key` of the `struct` instance to `val`. Requires the struct to be mutable. |
+| `remove(struct, key)` | Deletes the property `key` from the `struct` instance. Returns `true` if successful. |
+| `identifier(struct)` | Returns the name of the Struct definition used to create the instance. |
+| `is(a, b)` | Returns `true` if `a` and `b` are the exact same object in memory (reference equality). |
+
+### Examples
+
+```lys
+struct Point { x, y }
+const p = Point { x: 1, y: 2 };
+
+io::print(reflect::identifier(p)); // "Point"
+io::print(reflect::has(p, "x"));   // true
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib/regex.md">
+---
+title: Regex Module
+description: Reference for the Lys regex module.
+---
+
+Regular expression utilities.
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `test(pattern, s, [flags])` | Returns `true` if the `pattern` matches anywhere in string `s`. |
+| `match(pattern, s, [flags])` | Returns an Array of matches found in string `s` using the `pattern`, or `null` if no match. |
+
+### Examples
+
+```lys
+const is_valid = regex::test("^[a-z]+$", "hello"); // true
+const matches = regex::match("\\d+", "abc 123 def 456"); // ["123", "456"]
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib/str.md">
+---
+title: String Module
+description: Reference for the Lys str module.
+---
+
+String manipulation utilities. Note that these are static methods on the `str` module, not methods on string instances.
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `length(s)` | Returns the number of characters in string `s`. |
+| `trim(s)` | Removes whitespace from both ends of string `s`. |
+| `upper(s)` | Returns a new string with all characters in `s` converted to uppercase. |
+| `lower(s)` | Returns a new string with all characters in `s` converted to lowercase. |
+| `contains(s, sub)` | Returns `true` if `s` contains the substring `sub`. |
+| `at(s, index)` | Returns the character at the specified `index` in string `s`. Supports negative indices. |
+
+### Examples
+
+```lys
+const name = "  Lys Lang  ";
+const trimmed = str::trim(name); // "Lys Lang"
+const is_lys = str::contains(trimmed, "Lys"); // true
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib/time.md">
+---
+title: Time Module
+description: Reference for the Lys time module.
+---
+
+Time-related utilities.
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `now()` | Returns the current timestamp in milliseconds. |
+| `wait(ms)` | Synchronously pauses execution for `ms` milliseconds. |
+
+### Examples
+
+```lys
+const start = time::now();
+time::wait(1000);
+const end = time::now();
+io::print("Elapsed: ", end - start, "ms");
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib/type.md">
+---
+title: Type Module
+description: Reference for the Lys type module.
+---
+
+Type checking and explicit conversion.
+
+## Methods
+
+| Member | Description |
+| :--- | :--- |
+| `of(value)` | Returns the internal type name of the `value` as a string (e.g., `"Number"`, `"Array"`). |
+| `number(value)` | Converts `value` to a number. Returns `0` if conversion fails. |
+| `string(value)` | Converts `value` to its string representation. |
+| `boolean(value)` | Converts `value` to a boolean. |
+| `array(value)` | Converts a Set or a single value into an Array. |
+| `set(value)` | Converts an Array or a single value into a Set (removing duplicates). |
+
+### Examples
+
+```lys
+const val = 123;
+io::print(type::of(val)); // "Number"
+
+const str_val = "456";
+const num_val = type::number(str_val); // 456
+```
+</file>
+
+<file path="src/content/docs/guides/advanced.md">
+---
+title: Advanced Concepts
+description: Deep Equality and internal details of Lys.
+---
+
+## Deep Equality
+
+Lys performs deep equality checks for complex types like Arrays, Structs, Sets, and Maps when using `==` or methods like `contains()`.
+
+This means that two different instances are considered equal if all their members are equal.
+
+```lys
+struct Point { x, y }
+const p1 = Point { x: 1, y: 2 };
+const p2 = Point { x: 1, y: 2 };
+
+io::print(p1 == p2); // true
+```
+
+Deep equality is recursively applied, so nested structures are also compared by value.
+
+## Further Reading
+
+- [Modules and Imports](../modules/)
+- [Error Handling](../errors/)
+</file>
+
+<file path="src/content/docs/guides/arrays.md">
+---
+title: Arrays
+description: Working with Arrays in Lys.
+---
+
+Arrays (technically lists) are ordered, variable-sized collections that can hold multiple types.
+
+## Creation
+
+You can create arrays using literal syntax or the `Array::new` method.
+
+```lys
+const empty = [];
+const numbers = [1, 2, 3];
+const mixed = Array::new(1, "two", true);
+```
+
+## Methods
+
+Arrays support various methods using the `::` syntax:
+
+- `add(value)`: Appends an element.
+- `insert(index, value)`: Inserts an element at a specific index.
+- `get(index)`: Returns the element at the index.
+- `set(index, value)`: Sets the element at the index.
+- `length()`: Returns the number of elements.
+- `pop()`: Removes and returns the last element.
+- `contains(value)`: Checks if a value exists (uses deep equality).
+
+## Bracket Syntax
+
+You can also use bracket syntax to get and set values:
+
+```lys
+var list = [1, 2];
+list::add(3);
+io::print(list[0]); // 1
+list[1] = 5;
+```
+
+:::note
+Using `const` to declare an Array makes the Array itself **immutable**. You will not be able to use methods that modify the array (like `add`, `pop`, or `insert`) or use bracket assignment.
+:::
+</file>
+
+<file path="src/content/docs/guides/basics.md">
+---
+title: Language Basics
+description: Variables, Types, and Operators in Lys.
+---
+
+Lys is a dynamically typed language with a clean and modern syntax.
+
+## Variables
+
+Lys supports two types of variable declarations: `const` and `var`.
+
+- `const`: Declares a constant variable that cannot be reassigned.
+- `var`: Declares a mutable variable that can be reassigned.
+
+### Immutability of Complex Types
+
+When you use `const` with complex types like **Arrays, Sets, Maps, and Structs**, the value itself becomes immutable. You cannot modify the contents of the collection or the properties of the struct.
+
+```lys
+const arr = [1, 2, 3];
+// arr::push(4); // Error: Cannot modify a constant array
+
+const user = User { name: "Alice" };
+// user.name = "Bob"; // Error: Cannot modify a constant struct
+```
+
+```lys
+const a = 10;
+var b = 20;
+b = 30; // OK
+// a = 15; // Error
+```
+
+## Data Types
+
+### Primitive Types
+
+- **Number**: 64-bit floating point numbers.
+  ```lys
+  const x = 42;
+  const y = 3.14;
+  ```
+- **String**: Sequences of characters, enclosed in double quotes. Supports escape characters:
+  - `\n` Newline
+  - `\t` Tab
+  - `\r` Carriage return
+  - `\"` Double quote
+  - `\\` Backslash
+  ```lys
+  const name = "Lys Lang";
+  const message = "Hello\nWorld";
+  ```
+- **Boolean**: Logical values `true` or `false`.
+  ```lys
+  const is_active = true;
+  ```
+- **Null**: Represents the absence of a value.
+  ```lys
+  const data = null;
+  ```
+
+### Complex Types
+
+- **Arrays**: Ordered collections of values.
+- **Structs**: Custom data structures with named properties.
+- **Ranges**: Represent a sequence of numbers (e.g., `1..10`). Often used in `for` loops.
+
+## Operators
+
+### Arithmetic Operators
+
+| Operator | Description |
+| :--- | :--- |
+| `+` | Addition (also String concatenation) |
+| `-` | Subtraction |
+| `*` | Multiplication |
+| `/` | Division |
+| `%` | Modulo |
+| `-` (unary) | Negation |
+
+```lys
+const sum = 10 + 5;
+const negative_ten = -10;
+const greeting = "Hello " + "World";
+```
+
+### Assignment Operators
+
+| Operator | Description |
+| :--- | :--- |
+| `=` | Assignment |
+| `+=` | Add and assign |
+| `-=` | Subtract and assign |
+| `*=` | Multiply and assign |
+| `/=` | Divide and assign |
+| `%=` | Modulo and assign |
+
+### Comparison Operators
+
+| Operator | Description |
+| :--- | :--- |
+| `==` | Equal to |
+| `!=` | Not equal to |
+| `<` | Less than |
+| `>` | Greater than |
+| `<=` | Less than or equal to |
+| `>=` | Greater than or equal to |
+
+### Logical Operators
+
+| Operator | Description |
+| :--- | :--- |
+| `and` | Logical AND |
+| `or` | Logical OR |
+| `not` | Logical NOT |
+
+```lys
+if x > 0 and not is_finished {
+    // ...
+}
+```
+</file>
+
+<file path="src/content/docs/guides/control-flow.md">
+---
+title: Control Flow
+description: Conditionals and Loops in Lys.
+---
+
+Lys provides standard control flow structures for branching and iteration.
+
+## Conditionals
+
+### If Statement
+
+The `if` statement allows you to execute code based on a boolean condition.
+
+```lys
+const age = 20;
+
+if age >= 18 {
+    io::print("Adult");
+} else {
+    io::print("Minor");
+}
+```
+
+### When Statement (Pattern Matching)
+
+The `when` statement is a powerful alternative to `switch` or multiple `if-else` blocks. It evaluates an expression and matches it against several cases.
+
+- **Cases**: Each case is defined by a value followed by `=>` and a block of code `{}`.
+- **Else**: An optional `else` case can be provided to handle any values not covered by other cases.
+- **Strict Equality**: Matching uses deep equality for complex types (Arrays, Structs, etc.).
+
+```lys
+const status = 1;
+
+when status {
+    0 => { io::print("Idle"); }
+    1 => { io::print("Running"); }
+    else => { io::print("Unknown"); }
+}
+```
+
+## Loops
+
+### For Loop (Ranges)
+
+`for` loops in Lys primarily operate over **Ranges**. A range is created using the `..` operator.
+
+- **Inclusive**: The range `1..5` includes both 1 and 5.
+- **Automatic Direction**: The loop automatically handles ascending (`1..5`) and descending (`5..1`) ranges.
+
+```lys
+// Ascending range: 1, 2, 3, 4, 5
+for i in 1..5 {
+    io::print(i);
+}
+
+// Descending range: 5, 4, 3, 2, 1
+for i in 5..1 {
+    io::print(i);
+}
+```
+
+### While Loop
+
+The `while` loop continues to execute as long as its condition remains true. The condition is evaluated *before* each iteration.
+
+```lys
+var count = 0;
+while count < 3 {
+    io::print("Count is: ", count);
+    count += 1;
+}
+```
+
+## Error Handling (Try/Catch)
+
+Lys provides a `try/catch` mechanism to handle runtime errors gracefully.
+
+```lys
+try {
+    // Code that might fail
+    throw("Something went wrong!");
+} catch err {
+    // Handle error
+    io::print("Caught error: ", err);
+}
+```
+
+*Note: For more details on Error handling and the `Error` struct, see the [Errors Guide](../errors).*
+</file>
+
+<file path="src/content/docs/guides/errors.md">
+---
+title: Error Handling
+description: Using try-catch and the Error struct in Lys.
+---
+
+Lys uses a `try-catch` mechanism for handling both runtime and custom errors.
+
+## Try-Catch
+
+The `try` block allows you to execute code that might fail, while the `catch` block handles any resulting errors.
+
+```lys
+try {
+    const arr = [1, 2];
+    io::print(arr[99]); // Triggers OutOfBounds error
+} catch err {
+    io::print("Caught error: ", err);
+}
+```
+
+## The Error Struct
+
+Custom errors can be created using the built-in `Error` struct. 
+
+- **Constructor**: `Error::new(message)` returns an Error object.
+- **Throwing**: Use the `::throw()` method on an Error object to halt execution and trigger a `catch` block.
+
+```lys
+func validate_age(age) {
+    if age < 0 {
+        // Create and throw in one chain
+        Error::new("Age cannot be negative")::throw();
+    }
+}
+
+try {
+    validate_age(-5);
+} catch e {
+    // e contains the Error object
+    io::print(e); // Prints: "Age cannot be negative"
+}
+```
+
+## Global `throw()` function
+
+Lys also provides a global `throw(value)` function that can throw any value, not just `Error` structs.
+
+```lys
+try {
+    throw("Fatal Failure");
+} catch e {
+    io::print(e); // "Fatal Failure"
+}
+```
+
+## Common Errors
+
+- `OutOfBounds`: Accessing an index outside the range of an array or set.
+- `KeyNotFound`: Accessing a non-existent key in a map without using the bracket syntax (which returns `null`).
+- `TypeError`: Performing operations on incompatible types.
+</file>
+
+<file path="src/content/docs/guides/example.md">
+---
+title: Example Guide
+description: A guide in my new Starlight docs site.
+---
+
+Guides lead a user through a specific task they want to accomplish, often with a sequence of steps.
+Writing a good guide requires thinking about what your users are trying to do.
+
+## Further reading
+
+- Read [about how-to guides](https://diataxis.fr/how-to-guides/) in the Diátaxis framework
+</file>
+
+<file path="src/content/docs/guides/functions.md">
+---
+title: Functions and Procedures
+description: Defining and using functions and procedures in Lys.
+---
+
+Lys distinguishes between **functions** (which return a value) and **procedures** (which perform an action without returning a value).
+
+## Functions
+
+Functions are defined using the `func` keyword. They typically return a value using the `return` statement.
+
+```lys
+func add(a, b) {
+    return a + b;
+}
+
+const result = add(5, 10);
+io::print(result); // 15
+```
+
+## Procedures
+
+Procedures are defined using the `proc` keyword. They do not return a value.
+
+```lys
+proc greet(name) {
+    io::print("Hello, " + name + "!");
+}
+
+greet("Alex");
+```
+
+## Scoping
+
+Variables declared within a function or procedure are local to that scope.
+
+```lys
+func example() {
+    const local_var = "I'm local";
+    io::print(local_var);
+}
+
+// io::print(local_var); // Error: local_var is not defined
+```
+
+## Implicit Return
+
+If a function does not have a `return` statement, it returns `null` by default.
+</file>
+
+<file path="src/content/docs/guides/getting-started.md">
+---
+title: Getting Started
+description: Learn how to install and run Lys Lang.
+---
+
+Lys is a lightweight scripting language designed for simplicity and performance. It is built on top of Bun and TypeScript.
+
+## Installation
+
+To get started with Lys, you need to have [Bun](https://bun.sh/) installed on your system.
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/lys-lang/lys
+   cd lys
+   ```
+
+2. Install dependencies:
+   ```bash
+   bun install
+   ```
+
+## Running Lys
+
+You can run Lys scripts using the `bun run index.ts` command or use the provided alias if you have it set up.
+
+### Execute a file
+
+To execute a `.lys` file:
+
+```bash
+bun run index.ts run path/to/your/file.lys
+```
+
+### REPL
+
+Lys comes with an interactive REPL (Read-Eval-Print Loop):
+
+```bash
+bun run index.ts repl
+```
+
+### Help
+
+To see all available commands:
+
+```bash
+bun run index.ts help
+```
+
+## Your First Script
+
+Create a file named `hello.lys`:
+
+```lys
+func greet(name) {
+    return "Hello, " + name + "!";
+}
+
+const message = greet("Lys");
+io::print(message);
+```
+
+Run it:
+
+```bash
+bun run index.ts run hello.lys
+```
+
+## IDE Support
+
+For the best development experience, we recommend using an editor that supports basic syntax highlighting. Since Lys uses a C-like syntax, setting your editor to **JavaScript** or **TypeScript** mode usually provides decent highlighting for Lys files.
+</file>
+
+<file path="src/content/docs/guides/maps.md">
+---
+title: Maps
+description: Using the Map data structure in Lys.
+---
+
+Maps in Lys are collections of key-value pairs. They allow you to associate a unique key with a value.
+
+## Creation
+
+You can create a new map using `Map::new()`.
+
+:::note
+Using `const` to declare a Map makes the Map itself **immutable**. You will not be able to modify its values or add/remove keys. Use `var` for a mutable Map.
+:::
+
+```lys
+var inventory = Map::new();
+```
+
+## Basic Operations
+
+- `set(key, value)`: Associates the specified value with the specified key.
+- `get(key)`: Returns the value associated with the key, or `null` if not found.
+- `has(key)`: Returns `true` if the map contains the specified key.
+- `remove(key)`: Removes the mapping for a key.
+- `clear()`: Removes all mappings from the map.
+- `length()`: Returns the number of key-value pairs in the map.
+
+```lys
+var m = Map::new();
+m::set("apple", 5);
+io::print(m::get("apple")); // 5
+io::print(m::has("banana")); // false
+```
+
+## Bracket Syntax
+
+Maps support bracket syntax for getting and setting values, making them feel like native objects or dictionaries.
+
+```lys
+var scores = Map::new();
+scores["Alice"] = 100;
+scores["Bob"] = 90;
+
+io::print(scores["Alice"]); // 100
+```
+
+## Deep Equality Keys
+
+One of the most powerful features of Lys Maps is that **keys use deep equality**. This allows you to use complex structures like structs or arrays as keys.
+
+```lys
+struct Point { x, y }
+
+var grid = Map::new();
+grid[Point { x: 10, y: 20 }] = "Treasure";
+
+// Even a new struct instance with the same values will find the key
+const lookup = Point { x: 10, y: 20 };
+io::print(grid[lookup]); // "Treasure"
+```
+
+## Iteration
+
+You can iterate over the keys or values of a map using `keys()` and `values()` methods.
+
+```lys
+var m = Map::new();
+m["a"] = 1;
+m["b"] = 2;
+
+// Iterate over keys
+for k in m::keys() {
+    io::print("Key: ", k);
+}
+
+// Iterate over values
+for v in m::values() {
+    io::print("Value: ", v);
+}
+```
+</file>
+
+<file path="src/content/docs/guides/modules.md">
+---
+title: Modules and Imports
+description: Organizing Lys code into multiple files.
+---
+
+Lys allows you to split your code into multiple files using a simple module system.
+
+## Exporting
+
+To make a variable, function, or struct available to other files, use the `pub` keyword.
+
+```lys
+// math_utils.lys
+pub const PI = 3.14;
+
+pub func square(x) {
+    return x * x;
+}
+
+pub struct Point { x, y }
+```
+
+## Importing
+
+Use the `import` statement to bring public members from another file into your current scope.
+
+- **Syntax**: `import [Names] in "path";`
+- **Relative Paths**: The source path must be a string and is relative to the current file.
+- **Selective**: You only import what you explicitly list in the brackets.
+
+```lys
+// main.lys
+import [PI, square, Point] in "./utils/math_utils.lys";
+
+io::print(PI);
+io::print(square(4));
+
+const p = Point { x: 0, y: 0 };
+```
+
+### Module Resolution
+
+When you import a file, Lys parses and executes that file in its own scope. Only members marked with `pub` are added to the importing file's scope. 
+
+*Note: The standard library modules (like `io`, `math`, `str`) are globally available and do not need to be imported.*
+</file>
+
+<file path="src/content/docs/guides/sets.md">
+---
+title: Sets
+description: Using the Set data structure in Lys.
+---
+
+Sets in Lys are ordered collections of unique values. They are implemented as arrays that automatically handle duplicate prevention using deep equality.
+
+## Creation
+
+You can create a new set using `Set::new()` or `Set::from()`.
+
+:::note
+Using `const` to declare a Set makes the Set itself **immutable**. You will not be able to use methods that modify the set (like `add`, `remove`, or `clear`). Use `var` for a mutable Set.
+:::
+
+```lys
+// Create an empty set (mutable)
+var my_set = Set::new();
+my_set::add(1);
+
+// Create an immutable set
+const fixed_set = Set::new(1, 2, 3);
+// fixed_set::add(4); // This will cause a runtime error
+```
+
+## Adding and Removing Elements
+
+- `add(value)`: Adds a value to the set if it doesn't already exist.
+- `remove(value)`: Removes a value from the set.
+- `clear()`: Removes all elements from the set.
+
+```lys
+var s = Set::new();
+s::add(1);
+s::add(2);
+s::add(1); // Ignored, 1 is already present
+
+s::remove(1);
+s::clear();
+```
+
+## Inspection
+
+- `contains(value)`: Returns `true` if the value is in the set.
+- `length()`: Returns the number of elements in the set.
+- `index(value)`: Returns the index of the value in the set (since Lys sets are ordered).
+- `first()`: Returns the first element.
+- `last()`: Returns the last element.
+
+```lys
+const s = Set::new("a", "b", "c");
+io::print(s::contains("b")); // true
+io::print(s::length());      // 3
+io::print(s::index("a"));    // 0
+```
+
+## Positional Access
+
+Although sets are conceptually collections of unique items, Lys sets maintain insertion order and allow positional access.
+
+- `get(index)`: Returns the element at the specified index.
+- `set(index, value)`: Updates the value at the specified index (ensuring uniqueness).
+- `insert(index, value)`: Inserts a value at a specific index.
+- `pop()`: Removes and returns the last element.
+
+## Deep Equality
+
+Sets in Lys use deep equality to determine uniqueness. This means you can add complex structures like structs or arrays, and they will be treated as duplicates if their contents are identical.
+
+```lys
+struct Point { x, y }
+const p1 = Point { x: 1, y: 2 };
+const p2 = Point { x: 1, y: 2 };
+
+var complex_set = Set::new();
+complex_set::add(p1);
+complex_set::add(p2); // Ignored: p2 is deeply equal to p1
+
+io::print(complex_set::length()); // 1
+```
+
+## Set Operations
+
+- `concat(other_set)`: Returns a new set containing elements from both sets (maintaining uniqueness).
+
+```lys
+const set1 = Set::new(1, 2);
+const set2 = Set::new(2, 3);
+const combined = set1::concat(set2);
+// Result: [1, 2, 3]
+```
+</file>
+
+<file path="src/content/docs/guides/stdlib.md">
+---
+title: Standard Library Reference
+description: Overview of Lys built-in modules.
+---
+
+Lys comes with several built-in modules to handle I/O, math, strings, and more.
+
+## Modules as Struct Instances
+
+In Lys, standard library modules are actually **instances of structs**. This is why you use the dot `.` operator for properties and the double-colon `::` syntax for methods, as explained in the [Structs Guide](../structs/#accessing-members--vs-).
+
+For example, in the `math` module:
+```lys
+const p = math.PI;      // PI is a property (a value)
+const s = math::sqrt(9); // sqrt is a method (a function)
+```
+
+## Available Modules
+
+- [**`io`**](./stdlib/io/): Basic input and output functionality.
+- [**`math`**](./stdlib/math/): Mathematical constants and functions.
+- [**`str`**](./stdlib/str/): String manipulation utilities.
+- [**`file`**](./stdlib/file/): File system operations.
+- [**`type`**](./stdlib/type/): Type checking and explicit conversion.
+- [**`os`**](./stdlib/os/): Operating system and process information.
+- [**`time`**](./stdlib/time/): Time-related utilities.
+- [**`regex`**](./stdlib/regex/): Regular expression utilities.
+- [**`reflect`**](./stdlib/reflect/): Metaprogramming and introspection for Structs.
+</file>
+
+<file path="src/content/docs/guides/structs.md">
+---
+title: Structs
+description: Custom data structures in Lys.
+---
+
+Structs allow you to define custom data types with named properties and methods.
+
+## Definition and Literal Creation
+
+```lys
+struct Point {
+    x,
+    y
+}
+
+const p = Point { x: 10, y: 20 };
+io::print(p.x); // 10
+```
+
+## Accessing Members: `.` vs `::`
+
+Struct instances use two different operators to access their members:
+
+- **Properties** (Values) are accessed using the dot `.` operator.
+- **Methods** (Functions) are accessed using the double-colon `::` operator.
+
+```lys
+struct Point { x, y }
+Point::move(dx, dy) {
+    this.x += dx;
+    this.y += dy;
+}
+
+var p = Point { x: 10, y: 20 };
+io::print(p.x);    // Access property with .
+p::move(5, 5);     // Call method with ::
+```
+
+## Static Methods and Constructors
+
+Structs support a very limited form of static methods. **Only the `::new` method can be called directly on the Struct definition.** This is typically used as a constructor.
+
+```lys
+User::new(name, age) {
+    return User { name: name, age: age };
+}
+
+// Allowed
+const u = User::new("Alex", 25);
+
+// Not Allowed: You cannot define or call other static methods like User::do_something()
+```
+
+## Instance Methods
+
+Instance methods use `this` to refer to the current struct instance.
+
+```lys
+User::is_adult() {
+    return this.age >= 18;
+}
+
+if u::is_adult() {
+    io::print("Welcome");
+}
+```
+
+:::note
+Using `const` to declare a Struct makes the Struct instance **immutable**. You will not be able to modify its properties or call methods that attempt to modify `this`.
+:::
+</file>
+
+<file path="src/content/docs/index.mdx">
+---
+title: Welcome to Lys Lang
+description: A modern, learning-focused programming language.
+template: splash
+hero:
+  tagline: A minimalistic and powerful scripting language to learn programming concepts.
+  image:
+    file: ../../assets/houston.webp
+  actions:
+    - text: Getting Started
+      link: /guides/getting-started/
+      icon: right-arrow
+    - text: GitHub Repository
+      link: https://github.com/lys-lang/lys
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why Lys?
+
+<CardGrid>
+	<Card title="Easy to learn" icon="pencil">
+		Clean syntax inspired by modern languages, making it easy for beginners to learn but familiar enough for veterans.
+	</Card>
+	<Card title="Basic Data Structures" icon="document">
+		Rich support for Arrays, Sets, Maps, and Structs out of the box.
+	</Card>
+	<Card title="Simple yet effective" icon="add-document">
+		Flexible programming paradigms with functions, procedures, and struct methods to implement whatever you need.
+	</Card>
+	<Card title="Easy types for an easy time" icon="setting">
+		Weakly typed with explicit casting to learn about types without having to rely on type hinting.
+	</Card>
+</CardGrid>
+</file>
+
+<file path="src/styles/custom.css">
+:root {
+  --sl-text-base: 1.125rem; /* Increased from default */
+  --sl-text-sm: 1rem;
+  --sl-text-xs: 0.875rem;
+  --sl-text-lg: 1.25rem;
+  --sl-text-xl: 1.5rem;
+  --sl-text-2xl: 1.75rem;
+  --sl-text-3xl: 2.25rem;
+  --sl-text-4xl: 3rem;
+  --sl-text-5xl: 4rem;
+  scroll-behavior: smooth;
+}
+
+/* Make body text slightly larger and more readable */
+.sl-markdown-content {
+  font-size: var(--sl-text-base);
+  line-height: 1.6;
+}
+</file>
+
+<file path="src/content.config.ts">
+import { defineCollection } from 'astro:content';
+import { docsLoader } from '@astrojs/starlight/loaders';
+import { docsSchema } from '@astrojs/starlight/schema';
+
+export const collections = {
+	docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
+};
+</file>
+
+<file path=".gitignore">
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+</file>
+
+<file path="AGENTS.md">
+## Development
+
+When starting the dev server, use background mode:
+
+```
+astro dev --background
+```
+
+Manage the background server with `astro dev stop`, `astro dev status`, and `astro dev logs`.
+
+## Documentation
+
+Full documentation: https://docs.astro.build
+
+Consult these guides before working on related tasks:
+
+- [Adding pages, dynamic routes, or middleware](https://docs.astro.build/en/guides/routing/)
+- [Working with Astro components](https://docs.astro.build/en/basics/astro-components/)
+- [Using React, Vue, Svelte, or other framework components](https://docs.astro.build/en/guides/framework-components/)
+- [Adding or managing content](https://docs.astro.build/en/guides/content-collections/)
+- [Adding styles or using Tailwind](https://docs.astro.build/en/guides/styling/)
+- [Supporting multiple languages](https://docs.astro.build/en/guides/internationalization/)
+</file>
+
+<file path="astro.config.mjs">
+// @ts-check
+import { defineConfig } from 'astro/config';
+import starlight from '@astrojs/starlight';
+import starlightThemeBlack from 'starlight-theme-black';
+import lys_grammar from './lys.tmLanguage.json';
+
+
+// https://astro.build/config
+export default defineConfig({
+	integrations: [
+		starlight({
+			title: 'Lys Lang',
+			customCss: ['./src/styles/custom.css'],
+			expressiveCode: {
+				shiki: {
+					langs: [lys_grammar],
+				},
+			},
+			plugins: [starlightThemeBlack({})],
+			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/lys-lang/lys' }],
+			sidebar: [
+				{
+					label: 'Guides',
+					items: [
+						{ label: 'Getting Started', slug: 'guides/getting-started' },
+						{ label: 'Language Basics', slug: 'guides/basics' },
+						{ label: 'Control Flow', slug: 'guides/control-flow' },
+						{ label: 'Functions & Procedures', slug: 'guides/functions' },
+						{ label: 'Data Structures', items: [
+							{ label: 'Arrays', slug: 'guides/arrays' },
+							{ label: 'Structs', slug: 'guides/structs' },
+							{ label: 'Sets', slug: 'guides/sets' },
+							{ label: 'Maps', slug: 'guides/maps' },
+						] },
+						{ label: 'Standard Library', items: [
+							{ label: 'Overview', slug: 'guides/stdlib' },
+							{ label: 'io', slug: 'guides/stdlib/io' },
+							{ label: 'math', slug: 'guides/stdlib/math' },
+							{ label: 'str', slug: 'guides/stdlib/str' },
+							{ label: 'file', slug: 'guides/stdlib/file' },
+							{ label: 'type', slug: 'guides/stdlib/type' },
+							{ label: 'os', slug: 'guides/stdlib/os' },
+							{ label: 'time', slug: 'guides/stdlib/time' },
+							{ label: 'regex', slug: 'guides/stdlib/regex' },
+							{ label: 'reflect', slug: 'guides/stdlib/reflect' },
+						] },
+						{ label: 'Advanced Features', items: [
+							{ label: 'Deep Equality', slug: 'guides/advanced' },
+							{ label: 'Modules & Imports', slug: 'guides/modules' },
+							{ label: 'Error Handling', slug: 'guides/errors' },
+						] },
+					],
+				},
+			],
+		}),
+	],
+});
+</file>
+
+<file path="lys.tmLanguage.json">
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "lys",
+  "scopeName": "source.lys",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#keywords" },
+    { "include": "#constants" },
+    { "include": "#numbers" },
+    { "include": "#operators" },
+    { "include": "#functions" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.lys",
+          "match": "//.*$"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.lys",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.lys",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.lys",
+          "match": "\\b(if|else|when|for|in|while|try|catch|return|pub|import)\\b"
+        },
+        {
+          "name": "keyword.other.lys",
+          "match": "\\b(var|const|func|proc|struct)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.lys",
+          "match": "\\b(true|false|null)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.lys",
+          "match": "\\b\\d+(\\.\\d+)?\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.lys",
+          "match": "(\\+|\\-|\\*|/|%|==|!=|<=|>=|<|>|&&|\\|\\||!|=|\\+=|\\-=|\\*=|/=|::|\\.|\\.\\.)"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "entity.name.function.lys",
+          "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\()"
+        }
+      ]
+    }
+  }
+}
+</file>
+
+<file path="package.json">
+{
+  "name": "docs",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.0",
+    "astro": "^7.2.10",
+    "sharp": "^0.35.3",
+    "starlight-theme-black": "^0.7.1"
+  }
+}
+</file>
+
+<file path="README.md">
+# Starlight Starter Kit: Basics
+
+[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+
+```
+bun create astro@latest -- --template starlight
+```
+
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+
+## 🚀 Project Structure
+
+Inside of your Astro + Starlight project, you'll see the following folders and files:
+
+```
+.
+├── public/
+├── src/
+│   ├── assets/
+│   ├── content/
+│   │   └── docs/
+│   └── content.config.ts
+├── astro.config.mjs
+├── package.json
+└── tsconfig.json
+```
+
+Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+
+Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+
+Static assets, like favicons, can be placed in the `public/` directory.
+
+## 🧞 Commands
+
+All commands are run from the root of the project, from a terminal:
+
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `bun install`             | Installs dependencies                            |
+| `bun dev`             | Starts local dev server at `localhost:4321`      |
+| `bun build`           | Build your production site to `./dist/`          |
+| `bun preview`         | Preview your build locally, before deploying     |
+| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `bun astro -- --help` | Get help using the Astro CLI                     |
+
+## 👀 Want to learn more?
+
+Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+</file>
+
+<file path="tsconfig.json">
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [".astro/types.d.ts", "**/*"],
+  "exclude": ["dist"]
+}
+</file>
+
+</files>

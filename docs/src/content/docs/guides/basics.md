@@ -1,0 +1,121 @@
+---
+title: Language Basics
+description: Variables, Types, and Operators in Lys.
+---
+
+Lys is a dynamically typed language with a clean and modern syntax.
+
+## Variables
+
+Lys supports two types of variable declarations: `const` and `var`.
+
+- `const`: Declares a constant variable that cannot be reassigned.
+- `var`: Declares a mutable variable that can be reassigned.
+
+### Immutability of Complex Types
+
+When you use `const` with complex types like **Arrays, Sets, Maps, and Structs**, the value itself becomes immutable. You cannot modify the contents of the collection or the properties of the struct.
+
+```lys
+const arr = [1, 2, 3];
+// arr::push(4); // Error: Cannot modify a constant array
+
+const user = User { name: "Alice" };
+// user.name = "Bob"; // Error: Cannot modify a constant struct
+```
+
+```lys
+const a = 10;
+var b = 20;
+b = 30; // OK
+// a = 15; // Error
+```
+
+## Data Types
+
+### Primitive Types
+
+- **Number**: 64-bit floating point numbers.
+  ```lys
+  const x = 42;
+  const y = 3.14;
+  ```
+- **String**: Sequences of characters, enclosed in double quotes. Supports escape characters:
+  - `\n` Newline
+  - `\t` Tab
+  - `\r` Carriage return
+  - `\"` Double quote
+  - `\\` Backslash
+  ```lys
+  const name = "Lys Lang";
+  const message = "Hello\nWorld";
+  ```
+- **Boolean**: Logical values `true` or `false`.
+  ```lys
+  const is_active = true;
+  ```
+- **Null**: Represents the absence of a value.
+  ```lys
+  const data = null;
+  ```
+
+### Complex Types
+
+- **Arrays**: Ordered collections of values.
+- **Structs**: Custom data structures with named properties.
+- **Ranges**: Represent a sequence of numbers (e.g., `1..10`). Often used in `for` loops.
+
+## Operators
+
+### Arithmetic Operators
+
+| Operator | Description |
+| :--- | :--- |
+| `+` | Addition (also String concatenation) |
+| `-` | Subtraction |
+| `*` | Multiplication |
+| `/` | Division |
+| `%` | Modulo |
+| `-` (unary) | Negation |
+
+```lys
+const sum = 10 + 5;
+const negative_ten = -10;
+const greeting = "Hello " + "World";
+```
+
+### Assignment Operators
+
+| Operator | Description |
+| :--- | :--- |
+| `=` | Assignment |
+| `+=` | Add and assign |
+| `-=` | Subtract and assign |
+| `*=` | Multiply and assign |
+| `/=` | Divide and assign |
+| `%=` | Modulo and assign |
+
+### Comparison Operators
+
+| Operator | Description |
+| :--- | :--- |
+| `==` | Equal to |
+| `!=` | Not equal to |
+| `<` | Less than |
+| `>` | Greater than |
+| `<=` | Less than or equal to |
+| `>=` | Greater than or equal to |
+
+### Logical Operators
+
+| Operator | Description |
+| :--- | :--- |
+| `and` | Logical AND |
+| `or` | Logical OR |
+| `not` | Logical NOT |
+
+```lys
+if x > 0 and not is_finished {
+    // ...
+}
+```

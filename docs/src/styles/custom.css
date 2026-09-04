@@ -1,0 +1,18 @@
+:root {
+  --sl-text-base: 1.125rem; /* Increased from default */
+  --sl-text-sm: 1rem;
+  --sl-text-xs: 0.875rem;
+  --sl-text-lg: 1.25rem;
+  --sl-text-xl: 1.5rem;
+  --sl-text-2xl: 1.75rem;
+  --sl-text-3xl: 2.25rem;
+  --sl-text-4xl: 3rem;
+  --sl-text-5xl: 4rem;
+  scroll-behavior: smooth;
+}
+
+/* Make body text slightly larger and more readable */
+.sl-markdown-content {
+  font-size: var(--sl-text-base);
+  line-height: 1.6;
+}
