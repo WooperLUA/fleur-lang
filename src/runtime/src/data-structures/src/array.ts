@@ -331,42 +331,5 @@ export const array: StructValue = {
                            },
             } as NativeFunctionValue,
         ],
-        [
-            "sort",
-            {
-                type:      RuntimeValueType.NativeFunction,
-                is_method: true,
-                call:      (args: RuntimeValue[]) =>
-                           {
-                               check_args_length(args, 1, "<array>::sort");
-                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::sort");
-                               check_mutability(args[0]!, "<array>::sort");
-
-                               const array = args[0] as ArrayValue;
-
-                               array.elements.toSorted((a, b) =>
-                               {
-                                   if (a.type === RuntimeValueType.Number && b.type === RuntimeValueType.Number)
-                                   {
-                                       return (a as NumberValue).value - (b as NumberValue).value;
-                                   }
-
-                                   if (a.type === RuntimeValueType.String && b.type === RuntimeValueType.String)
-                                   {
-                                       return (a as StringValue).value.localeCompare((b as StringValue).value);
-                                   }
-
-                                   if (a.type === RuntimeValueType.Boolean && b.type === RuntimeValueType.Boolean)
-                                   {
-                                       return Number((a as BooleanValue).value) - Number((b as BooleanValue).value);
-                                   }
-
-                                   return 0;
-                               });
-
-                               return array;
-                           },
-            } as NativeFunctionValue,
-        ],
     ]),
 };

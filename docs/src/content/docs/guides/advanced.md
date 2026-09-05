@@ -19,6 +19,8 @@ io::print(p1 == p2); // true
 
 Deep equality is recursively applied, so nested structures are also compared by value.
 
+If you ever need to compare by reference, use [**`reflect::is`**](/guides/stdlib/reflect/).
+
 ## Further Reading
 
 - [Modules and Imports](../modules/)

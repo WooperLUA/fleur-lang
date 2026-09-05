@@ -5,8 +5,9 @@
   "private": true,
   "scripts": {
     "lys" : "bun run index.ts",
-    "build-windows-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-windows-x64 --outfile=out/lys index.ts",
-    "build-windows-arm64": "bun build --compile --minify --sourcemap --bytecode --target=bun-windows-arm64 --outfile=out/lys index.ts",
+    "docs" : "cd docs && bun run dev",
+    "build-windows-x64": "bun build --compile --windows-icon=./ressources/lys-logo.ico --minify --sourcemap --bytecode --target=bun-windows-x64 --outfile=out/lys index.ts",
+    "build-windows-arm64": "bun build --compile --windows-icon=./ressources/lys-logo.ico --minify --sourcemap --bytecode --target=bun-windows-arm64 --outfile=out/lys index.ts",
     "build-linux-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-linux-x64 --outfile=out/lys index.ts",
     "build-linux-arm64": "bun build --compile --minify --sourcemap --bytecode --target=bun-linux-arm64 --outfile=out/lys index.ts",
     "build-darwin-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-darwin-x64 --outfile=out/lys index.ts",

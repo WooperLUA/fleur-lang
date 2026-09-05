@@ -23,7 +23,7 @@ var inventory = Map::new();
 | :--- | :--- | :--- |
 | `Map::new()` | `Map` | Creates a new, empty map. |
 | `set(key, value)` | `Map` | Associates the specified value with the key. Returns the map. |
-| `get(key)` | `Any` or `Null` | Returns the value associated with the key, or `null` if not found. |
+| `get(key)` | `Any` | Returns the value associated with the key *or null if absent*. |
 | `has(key)` | `Boolean` | Returns `true` if the map contains the specified key. |
 | `remove(key)` | `Map` | Removes the mapping for a key. Returns the map. |
 | `clear()` | `Map` | Removes all mappings from the map. Returns the map. |

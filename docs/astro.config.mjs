@@ -7,6 +7,10 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Lys Lang',
+			logo: {
+				src: './src/assets/lys-logo.png',
+			},
+			favicon: '/favicon.svg',
 			customCss: ['./src/styles/custom.css'],
 			expressiveCode: {
 				shiki: {
@@ -25,9 +29,9 @@ export default defineConfig({
 						{ label: 'Functions & Procedures', slug: 'guides/functions' },
 						{ label: 'Data Structures', items: [
 								{ label: 'Arrays', slug: 'guides/arrays' },
-								{ label: 'Structs', slug: 'guides/structs' },
 								{ label: 'Sets', slug: 'guides/sets' },
 								{ label: 'Maps', slug: 'guides/maps' },
+								{ label: 'Structs', slug: 'guides/structs' },
 							] },
 						{ label: 'Standard Library', items: [
 								{ label: 'Overview', slug: 'guides/stdlib' },

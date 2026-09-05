@@ -5,6 +5,12 @@ description: Reference for the Lys io module.
 
 The `io` module provides basic input and output functionality.
 
+## Properties
+
+| Member | Description |
+| :--- | :--- |
+| `args` | Command line arguments passed during the execution of the lys script. |
+
 ## Methods
 
 | Member | Return Type | Description |

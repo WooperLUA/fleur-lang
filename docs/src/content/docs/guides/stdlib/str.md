@@ -3,7 +3,7 @@ title: String Module
 description: Reference for the Lys str module.
 ---
 
-String manipulation utilities. Note that these are static methods on the `str` module, not methods on string instances.
+String manipulation utilities. Note that these are static methods on the `str` module, not methods on string instances as they are primitives.
 
 ## Methods
 

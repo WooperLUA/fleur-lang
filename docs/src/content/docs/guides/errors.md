@@ -40,21 +40,3 @@ try {
     io::print(e); // Prints: "Age cannot be negative"
 }
 ```
-
-## Global `throw()` function
-
-Lys also provides a global `throw(value)` function that can throw any value, not just `Error` structs.
-
-```lys
-try {
-    throw("Fatal Failure");
-} catch e {
-    io::print(e); // "Fatal Failure"
-}
-```
-
-## Common Errors
-
-- `OutOfBounds`: Accessing an index outside the range of an array or set.
-- `KeyNotFound`: Accessing a non-existent key in a map without using the bracket syntax (which returns `null`).
-- `TypeError`: Performing operations on incompatible types.

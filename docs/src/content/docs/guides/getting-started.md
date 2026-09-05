@@ -3,33 +3,46 @@ title: Getting Started
 description: Learn how to install and run Lys Lang.
 ---
 
-Lys is a lightweight scripting language designed for simplicity and performance. It is built on top of Bun and TypeScript.
+Lys is a minimalistic scripting language designed for simplicity and educational purposes. It is built on top of the Bun runtime.
 
 ## Installation
 
-To get started with Lys, you need to have [Bun](https://bun.sh/) installed on your system.
+### Building from source
+
+To get started with building Lys, you need to have [Bun](https://bun.sh/) installed on your system.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/lys-lang/lys
-   cd lys
+   git clone <the link>
+   cd lys-lang
    ```
 
 2. Install dependencies:
    ```bash
    bun install
    ```
+   
+3. Build Lys to your target:
+   ```bash
+   bun run build-<your_plateform>
+   ```
+   
+4. You can now get the lys runtime in the ./out dir (and optionally add it to you PATH).
+   
+### Getting the runtime from Releases
+
+Download the runtime binaries from [Releases](link) (and optionally add it to you PATH).
 
 ## Running Lys
 
-You can run Lys scripts using the `bun run index.ts` command or use the provided alias if you have it set up.
+You can run Lys commands using the `lys` command followed by the name of the command.
 
 ### Execute a file
 
 To execute a `.lys` file:
 
 ```bash
-bun run index.ts run path/to/your/file.lys
+lys run path/to/your/file.lys
 ```
 
 ### REPL
@@ -37,7 +50,7 @@ bun run index.ts run path/to/your/file.lys
 Lys comes with an interactive REPL (Read-Eval-Print Loop):
 
 ```bash
-bun run index.ts repl
+lys repl
 ```
 
 ### Help
@@ -45,7 +58,7 @@ bun run index.ts repl
 To see all available commands:
 
 ```bash
-bun run index.ts help
+lys help
 ```
 
 ## Your First Script
@@ -53,7 +66,8 @@ bun run index.ts help
 Create a file named `hello.lys`:
 
 ```lys
-func greet(name) {
+func greet(name) 
+{
     return "Hello, " + name + "!";
 }
 
@@ -64,7 +78,7 @@ io::print(message);
 Run it:
 
 ```bash
-bun run index.ts run hello.lys
+lys run hello.lys
 ```
 
 ## IDE Support

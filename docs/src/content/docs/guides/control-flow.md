@@ -43,7 +43,7 @@ when status {
 
 ### For Loop (Ranges)
 
-`for` loops in Lys primarily operate over **Ranges**. A range is created using the `..` operator.
+`for` loops in Lys primarily operate over **Ranges**. A range is created using the `..` operator or `Range::new(start, end)`.
 
 - **Inclusive**: The range `1..5` includes both 1 and 5.
 - **Automatic Direction**: The loop automatically handles ascending (`1..5`) and descending (`5..1`) ranges.
@@ -57,6 +57,20 @@ for i in 1..5 {
 // Descending range: 5, 4, 3, 2, 1
 for i in 5..1 {
     io::print(i);
+}
+```
+
+### For Loop (Arrays and Sets)
+
+`for` loops in Lys can also operate over **Arrays** and **Sets**.
+
+```lys
+for elt in [1,2,3,4,5]{
+    io::print(elt);
+}
+
+for elt in Set::new(1,2,3,4,5){
+    io::print(elt);
 }
 ```
 

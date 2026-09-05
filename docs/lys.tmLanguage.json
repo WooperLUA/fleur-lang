@@ -39,12 +39,8 @@
     "keywords": {
       "patterns": [
         {
-          "name": "keyword.control.lys",
-          "match": "\\b()\\b"
-        },
-        {
           "name": "keyword.other.lys",
-          "match": "\\b(var|const|func|proc|struct|this)\\b"
+          "match": "\\b(var|const|func|proc|struct|this|catch|else|for|if|import|in|pub|return|try|when|while)\\b"
         }
       ]
     },

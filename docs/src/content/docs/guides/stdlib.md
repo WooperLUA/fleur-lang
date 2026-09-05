@@ -17,12 +17,12 @@ const s = math::sqrt(9); // sqrt is a method (a function)
 
 ## Available Modules
 
-- [**`io`**](./stdlib/io/): Basic input and output functionality.
-- [**`math`**](./stdlib/math/): Mathematical constants and functions.
-- [**`str`**](./stdlib/str/): String manipulation utilities.
-- [**`file`**](./stdlib/file/): File system operations.
-- [**`type`**](./stdlib/type/): Type checking and explicit conversion.
-- [**`os`**](./stdlib/os/): Operating system and process information.
-- [**`time`**](./stdlib/time/): Time-related utilities.
-- [**`regex`**](./stdlib/regex/): Regular expression utilities.
-- [**`reflect`**](./stdlib/reflect/): Metaprogramming and introspection for Structs.
+- [**`io`**](./io/): Basic input and output functionality.
+- [**`math`**](./math/): Mathematical constants and functions.
+- [**`str`**](./str/): String manipulation utilities.
+- [**`file`**](./file/): File system operations.
+- [**`type`**](./type/): Type checking and explicit conversion.
+- [**`os`**](./os/): Operating system and process information.
+- [**`time`**](./time/): Time-related utilities.
+- [**`regex`**](./regex/): Regular expression utilities.
+- [**`reflect`**](./reflect/): Metaprogramming and introspection for Structs.

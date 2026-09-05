@@ -10,7 +10,7 @@ Regular expression utilities.
 | Member | Return Type | Description |
 | :--- | :--- | :--- |
 | `test(pattern, s, [flags])` | `Boolean` | Returns `true` if the `pattern` matches anywhere in string `s`. |
-| `match(pattern, s, [flags])` | `Array` or `Null` | Returns an Array of matches found in string `s` using the `pattern`, or `null` if no match. |
+| `match(pattern, s, [flags])` | `Array`,`Null` | Returns an Array of matches found in string `s` using the `pattern` *or `null` if no match*. |
 
 ### Examples
 

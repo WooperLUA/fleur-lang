@@ -24,7 +24,7 @@ Provides mathematical constants and functions.
 | `sin(x)` | `Number` | Returns the sine of `x` (in radians). |
 | `cos(x)` | `Number` | Returns the cosine of `x` (in radians). |
 | `tan(x)` | `Number` | Returns the tangent of `x` (in radians). |
-| `random(range)` | `Number` | Returns a random number within the given `range` (e.g., `0..10`). |
+| `random(range)` | `Number` | Returns a random number within the given `range`, will return integers or floats depending on the extremities of the range. |
 | `float(x)` | `Number` | Formats a number `x` to a single decimal place. |
 | `int(x)` | `Number` | Parses a number `x` into an integer (truncating decimals). |
 | `clamp(x, range)` | `Number` | Clamps the value `x` to be within the `range` (e.g., `math::clamp(15, 0..10)` returns `10`). |

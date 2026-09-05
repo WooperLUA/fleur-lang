@@ -62,6 +62,7 @@ b = 30; // OK
 ### Complex Types
 
 - **Arrays**: Ordered collections of values.
+- **Sets**: Ordered collections of unique values.
 - **Structs**: Custom data structures with named properties.
 - **Ranges**: Represent a sequence of numbers (e.g., `1..10`). Often used in `for` loops.
 

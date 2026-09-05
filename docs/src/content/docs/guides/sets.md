@@ -28,16 +28,16 @@ const fixed_set = Set::new(1, 2, 3);
 | Member | Return Type | Description |
 | :--- | :--- | :--- |
 | `Set::new(...args)` | `Set` | Creates a new set with optional initial `args`. |
-| `Set::from(other)` | `Set` | Creates a new set from an existing Array or Set. |
+| `Set::from(other)` | `Set` | Creates a new set from an existing Set or Range *(that will fill the set with the values of the range)*. |
 | `add(value)` | `Set` | Adds a value to the set if it doesn't already exist. Returns the set. |
 | `remove(value)` | `Set` | Removes a value from the set. Returns the set. |
 | `clear()` | `Set` | Removes all elements from the set. Returns the set. |
 | `contains(value)` | `Boolean` | Returns `true` if the value is in the set. |
 | `length()` | `Number` | Returns the number of elements in the set. |
-| `index(value)` | `Number` | Returns the index of the value in the set (since Lys sets are ordered). |
-| `first()` | `Any` | Returns the first element. |
-| `last()` | `Any` | Returns the last element. |
-| `get(index)` | `Any` | Returns the element at the specified index. |
+| `index(value)` | `Number,Null` | Returns the index of the value in the set (since Lys sets are ordered). |
+| `first()` | `Any` | Returns the first element of the set *or null if absent*. |
+| `last()` | `Any` | Returns the last element of the set *or null if absent*. |
+| `get(index)` | `Any` | Returns the element at the specified index *or null if absent*. |
 | `set(index, value)` | `Set` | Updates the value at the specified index (ensuring uniqueness). Returns the set. |
 | `insert(index, value)` | `Set` | Inserts a value at a specific index. Returns the set. |
 | `pop()` | `Any` | Removes and returns the last element. |

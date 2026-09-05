@@ -7,6 +7,11 @@ Structs allow you to define custom data types with named properties and methods.
 
 ## Definition and Literal Creation
 
+:::note
+Using `const` to declare an instance of struct makes it **immutable**. You will not be able to modify its properties or call methods that attempt to modify `this`.
+:::
+
+
 ```lys
 struct Point {
     x,
@@ -64,7 +69,3 @@ if u::is_adult() {
     io::print("Welcome");
 }
 ```
-
-:::note
-Using `const` to declare a Struct makes the Struct instance **immutable**. You will not be able to modify its properties or call methods that attempt to modify `this`.
-:::
