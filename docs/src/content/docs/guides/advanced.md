@@ -1,15 +1,15 @@
 ---
 title: Advanced Concepts
-description: Deep Equality and internal details of Lys.
+description: Deep Equality and internal details of fleur.
 ---
 
 ## Deep Equality
 
-Lys performs deep equality checks for complex types like Arrays, Structs, Sets, and Maps when using `==` or methods like `contains()`.
+fleur performs deep equality checks for complex types like Arrays, Structs, Sets, and Maps when using `==` or methods like `contains()`.
 
 This means that two different instances are considered equal if all their members are equal.
 
-```lys
+```flr
 struct Point { x, y }
 const p1 = Point { x: 1, y: 2 };
 const p2 = Point { x: 1, y: 2 };
@@ -25,3 +25,4 @@ If you ever need to compare by reference, use [**`reflect::is`**](/guides/stdlib
 
 - [Modules and Imports](../modules/)
 - [Error Handling](../errors/)
+

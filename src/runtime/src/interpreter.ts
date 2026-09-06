@@ -40,7 +40,7 @@ import {
     type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
     type ImportStatement,
 } from "@types";
-import {throw_exception, stringify_value, is_equal, LysError} from "@utils";
+import {throw_exception, stringify_value, is_equal, FleurError} from "@utils";
 import {setup_stdlib} from "./stdlib";
 import {setup_data_structures} from "./data-structures";
 import {setup_other_structs} from "./others";
@@ -440,7 +440,7 @@ const execute_try_statement = (stmt: TryStatement, env: Environment): RuntimeVal
     }
     catch (e)
     {
-        if (e instanceof LysError)
+        if (e instanceof FleurError)
         {
             const catch_env = new Environment(env);
             catch_env.declare(stmt.catch_param, e.value, false);

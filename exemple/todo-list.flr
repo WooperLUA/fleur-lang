@@ -1,0 +1,93 @@
+struct Task
+{
+    description, // string
+    done         // boolean
+}
+Task::new(description) { return Task { description: description, done: false }; }
+Task::edit(new_description) { this.description = new_description; }
+Task::check() { this.done = not this.done; }
+Task::string()
+{
+    var done = "x";
+    if this.done { done = "✓"; }
+    return this.description + " " + done;
+}
+
+proc display_tasks(tasks)
+{
+    io::clear();
+    io::print("+---------Todo list----------+");
+    
+    const total_width = 30;
+
+    if tasks::length() > 0
+    {
+        var i = 1;
+        for task in tasks
+        {
+            const content = type::string(i) + ". " + task::string();
+            const content_len = str::length(content);
+            var padding_len = total_width - 3 - content_len;
+
+            if padding_len < 0
+            {
+                padding_len = 0;
+            }
+
+            var padding = "";
+            for i in 1..padding_len
+            {
+                padding += " ";
+            }
+
+            io::print("| " + content + padding + "|");
+            i += 1;
+        }
+    }
+    else { io::print("|                            |"); }
+    
+    io::print("+----------Actions-----------+");
+    io::print("| 1. Add a new todo.         |");
+    io::print("| 2. Remove a todo.          |");
+    io::print("| 3. Check / Uncheck a todo. |");
+    io::print("| 4. Exit.                   |");
+    io::print("+----------------------------+");
+}
+
+var tasks = [];
+var process_should_run = true;
+
+while process_should_run
+{
+    display_tasks(tasks);
+    const input = io::read("> ");
+    
+    when input
+    {
+        "1" =>
+        {
+            const task_desc = io::read("Description of the todo: ");
+
+            var exists = false;
+            for task in tasks
+            {
+                if task.description == task_desc { exists = true; }
+            }
+
+            if not exists { tasks::add(Task::new(task_desc)); }
+        }
+        "2" =>
+        {
+            const task_number = io::read("Position of the todo: ");
+            const index = type::number(task_number) - 1;
+            tasks::remove(index);
+        }
+        "3" =>
+        {
+            const task_number = io::read("Position of the todo: ");
+            const index = type::number(task_number) - 1;
+            tasks[index]::check();
+        }
+        "4" => { process_should_run = false; }
+    }
+}

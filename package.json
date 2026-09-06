@@ -1,17 +1,17 @@
 {
-  "name": "lys-lang",
+  "name": "fleur-lang",
   "module": "index.ts",
   "type": "module",
   "private": true,
   "scripts": {
-    "lys" : "bun run index.ts",
+    "fleur" : "bun run index.ts",
     "docs" : "cd docs && bun run dev",
-    "build-windows-x64": "bun build --compile --windows-icon=./ressources/lys-logo.ico --minify --sourcemap --bytecode --target=bun-windows-x64 --outfile=out/lys index.ts",
-    "build-windows-arm64": "bun build --compile --windows-icon=./ressources/lys-logo.ico --minify --sourcemap --bytecode --target=bun-windows-arm64 --outfile=out/lys index.ts",
-    "build-linux-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-linux-x64 --outfile=out/lys index.ts",
-    "build-linux-arm64": "bun build --compile --minify --sourcemap --bytecode --target=bun-linux-arm64 --outfile=out/lys index.ts",
-    "build-darwin-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-darwin-x64 --outfile=out/lys index.ts",
-    "build-darwin-arm64": "bun build --compile --minify --sourcemap --bytecode --target=bun-darwin-arm64 --outfile=out/lys index.ts"
+    "build-windows-x64": "bun build --compile --windows-icon=./ressources/fleur-logo.ico --minify --sourcemap --bytecode --target=bun-windows-x64 --outfile=out/fleur index.ts",
+    "build-windows-arm64": "bun build --compile --windows-icon=./ressources/fleur-logo.ico --minify --sourcemap --bytecode --target=bun-windows-arm64 --outfile=out/fleur index.ts",
+    "build-linux-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-linux-x64 --outfile=out/fleur index.ts",
+    "build-linux-arm64": "bun build --compile --minify --sourcemap --bytecode --target=bun-linux-arm64 --outfile=out/fleur index.ts",
+    "build-darwin-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-darwin-x64 --outfile=out/fleur index.ts",
+    "build-darwin-arm64": "bun build --compile --minify --sourcemap --bytecode --target=bun-darwin-arm64 --outfile=out/fleur index.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.0"

@@ -3,4 +3,4 @@ pub const very_important_value = 67;
 pub func foo() { return "bar"; }
 pub proc bar() { io::print("buzz"); }
 pub struct A {}
-// (go see import.lys)
+// (go see import.flr)

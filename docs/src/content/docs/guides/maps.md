@@ -1,9 +1,9 @@
 ---
 title: Maps
-description: Using the Map data structure in Lys.
+description: Using the Map data structure in fleur.
 ---
 
-Maps in Lys are collections of key-value pairs. They allow you to associate a unique key with a value.
+Maps in fleur are collections of key-value pairs. They allow you to associate a unique key with a value.
 
 ## Creation
 
@@ -13,7 +13,7 @@ You can create a new map using `Map::new()`.
 Using `const` to declare a Map makes the Map itself **immutable**. You will not be able to modify its values or add/remove keys. Use `var` for a mutable Map.
 :::
 
-```lys
+```flr
 var inventory = Map::new();
 ```
 
@@ -35,7 +35,7 @@ var inventory = Map::new();
 
 Maps support bracket syntax for getting and setting values, making them feel like native objects or dictionaries.
 
-```lys
+```flr
 var scores = Map::new();
 scores["Alice"] = 100;
 scores["Bob"] = 90;
@@ -45,9 +45,9 @@ io::print(scores["Alice"]); // 100
 
 ## Deep Equality Keys
 
-One of the most powerful features of Lys Maps is that **keys use deep equality**. This allows you to use complex structures like structs or arrays as keys.
+One of the most powerful features of fleur Maps is that **keys use deep equality**. This allows you to use complex structures like structs or arrays as keys.
 
-```lys
+```flr
 struct Point { x, y }
 
 var grid = Map::new();
@@ -62,7 +62,7 @@ io::print(grid[lookup]); // "Treasure"
 
 You can iterate over the keys or values of a map using `keys()` and `values()` methods.
 
-```lys
+```flr
 var m = Map::new();
 m["a"] = 1;
 m["b"] = 2;
@@ -77,3 +77,4 @@ for v in m::values() {
     io::print("Value: ", v);
 }
 ```
+

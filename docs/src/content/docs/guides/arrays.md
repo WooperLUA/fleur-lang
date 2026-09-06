@@ -1,6 +1,6 @@
 ---
 title: Arrays
-description: Working with Arrays in Lys.
+description: Working with Arrays in fleur.
 ---
 
 Arrays (technically lists) are ordered, variable-sized collections that can hold multiple types.
@@ -13,7 +13,7 @@ You can create arrays using literal syntax or the `Array::new` method.
 Using `const` to declare an Array makes the Array itself **immutable**. You will not be able to use methods that modify the array (like `add`, `pop`, or `insert`) or use bracket assignment.
 :::
 
-```lys
+```flr
 const empty = [];
 const numbers = [1, 2, 3];
 const mixed = Array::new(1, "two", true);
@@ -43,9 +43,10 @@ const mixed = Array::new(1, "two", true);
 
 You can also use bracket syntax to get and set values:
 
-```lys
+```flr
 var list = [1, 2];
 list::add(3);
 io::print(list[0]); // 1
 list[1] = 5;
 ```
+

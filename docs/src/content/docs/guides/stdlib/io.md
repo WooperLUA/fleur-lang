@@ -1,6 +1,6 @@
 ---
 title: IO Module
-description: Reference for the Lys io module.
+description: Reference for the fleur io module.
 ---
 
 The `io` module provides basic input and output functionality.
@@ -9,7 +9,7 @@ The `io` module provides basic input and output functionality.
 
 | Member | Description |
 | :--- | :--- |
-| `args` | Command line arguments passed during the execution of the lys script. |
+| `args` | Command line arguments passed during the execution of the fleur script. |
 
 ## Methods
 
@@ -22,7 +22,8 @@ The `io` module provides basic input and output functionality.
 
 ### Examples
 
-```lys
+```flr
 io::print("Hello", "World");
 const name = io::read("Enter your name: ");
 ```
+

@@ -1,12 +1,12 @@
 // File standard library example
 
-const test_file = "lys_test_output.txt";
+const test_file = "fleur_test_output.txt";
 
 // 1. Check if file exists (should be false initially)
 io::print("File exists before creation?", file::exists(test_file));
 
 // 2. Write to a new file
-file::write(test_file, "Hello, Lys File System!\nLine 2.");
+file::write(test_file, "Hello, Fleur File System!\nLine 2.");
 io::print("File written successfully.");
 
 // 3. Check existence again (should be true)
@@ -36,5 +36,5 @@ io::print("File removed.");
 io::print("File exists after deletion?", file::exists(test_file));
 
 // 9. Path Utilities (Cross-platform safe)
-const config_path = file::join_path(os::homedir(), ".config", "lys", "settings.json");
+const config_path = file::join_path(os::homedir(), ".config", "fleur", "settings.json");
 io::print("Joined path:", config_path);

@@ -1,6 +1,6 @@
 // We import the exported things
-// (go see export.lys)
-import [very_important_value, foo, bar, A] in "export.lys";
+// (go see export.flr)
+import [very_important_value, foo, bar, A] in "export.flr";
 io::print("Very important value : ", very_important_value);
 io::print("Result of foo : ", foo());
 io::print("Execution of bar : ");

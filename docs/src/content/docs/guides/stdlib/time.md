@@ -1,6 +1,6 @@
 ---
 title: Time Module
-description: Reference for the Lys time module.
+description: Reference for the fleur time module.
 ---
 
 Time-related utilities.
@@ -14,9 +14,10 @@ Time-related utilities.
 
 ### Examples
 
-```lys
+```flr
 const start = time::now();
 time::wait(1000);
 const end = time::now();
 io::print("Elapsed: ", end - start, "ms");
 ```
+

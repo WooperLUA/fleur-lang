@@ -60,7 +60,7 @@ export const regex: StructValue = {
                               return {type: RuntimeValueType.Null, value: null} as NullValue;
                           }
 
-                          // JS array -> Lys ArrayValue
+                          // JS array -> Fleur ArrayValue
                           return {
                               type:     RuntimeValueType.Array,
                               elements: match_array.map(m => ({

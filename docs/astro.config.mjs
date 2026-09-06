@@ -1,24 +1,27 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightThemeBlack from 'starlight-theme-black';
-import lys_grammar from './lys.tmLanguage.json';
+import fleur_grammar from './fleur.tmLanguage.json';
 
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'Lys Lang',
-			logo: {
-				src: './src/assets/lys-logo.png',
-			},
+			title: 'Fleur',
+   logo: {
+      src: './src/assets/fleur-logo.png',
+    },
 			favicon: '/favicon.svg',
 			customCss: ['./src/styles/custom.css'],
 			expressiveCode: {
 				shiki: {
-					langs: [lys_grammar],
+					langs: [fleur_grammar],
+     langAlias: {
+      'flr': 'fleur'
+     },
 				},
 			},
 			plugins: [starlightThemeBlack({})],
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/lys-lang/lys' }],
+			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/fleur-lang/fleur' }],
 			sidebar: [
 				{
 					label: 'Guides',

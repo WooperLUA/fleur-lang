@@ -1,6 +1,6 @@
 ---
 title: File Module
-description: Reference for the Lys file module.
+description: Reference for the fleur file module.
 ---
 
 File system operations.
@@ -18,10 +18,11 @@ File system operations.
 
 ### Examples
 
-```lys
+```flr
 const config_path = "config.json";
 if file::exists(config_path) {
     const data = file::read(config_path);
     io::print(data);
 }
 ```
+

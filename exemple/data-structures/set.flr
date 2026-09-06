@@ -1,5 +1,5 @@
 // Set data-structure example
-// Sets are ordered in Lys because they are arrays that dont allows duplicates under the hood, this makes
+// Sets are ordered in Fleur because they are arrays that dont allows duplicates under the hood, this makes
 // sets easier to work with but they dont provide any performance gains (if it is even your concern).
 
 // 1. Creation

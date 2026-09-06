@@ -1,13 +1,13 @@
 ---
 title: Language Basics
-description: Variables, Types, and Operators in Lys.
+description: Variables, Types, and Operators in fleur.
 ---
 
-Lys is a dynamically typed language with a clean and modern syntax.
+fleur is a dynamically typed language with a clean and modern syntax.
 
 ## Variables
 
-Lys supports two types of variable declarations: `const` and `var`.
+fleur supports two types of variable declarations: `const` and `var`.
 
 - `const`: Declares a constant variable that cannot be reassigned.
 - `var`: Declares a mutable variable that can be reassigned.
@@ -16,7 +16,7 @@ Lys supports two types of variable declarations: `const` and `var`.
 
 When you use `const` with complex types like **Arrays, Sets, Maps, and Structs**, the value itself becomes immutable. You cannot modify the contents of the collection or the properties of the struct.
 
-```lys
+```flr
 const arr = [1, 2, 3];
 // arr::push(4); // Error: Cannot modify a constant array
 
@@ -24,7 +24,7 @@ const user = User { name: "Alice" };
 // user.name = "Bob"; // Error: Cannot modify a constant struct
 ```
 
-```lys
+```flr
 const a = 10;
 var b = 20;
 b = 30; // OK
@@ -36,7 +36,7 @@ b = 30; // OK
 ### Primitive Types
 
 - **Number**: 64-bit floating point numbers.
-  ```lys
+  ```flr
   const x = 42;
   const y = 3.14;
   ```
@@ -46,16 +46,16 @@ b = 30; // OK
   - `\r` Carriage return
   - `\"` Double quote
   - `\\` Backslash
-  ```lys
-  const name = "Lys Lang";
+  ```flr
+  const name = "fleur Lang";
   const message = "Hello\nWorld";
   ```
 - **Boolean**: Logical values `true` or `false`.
-  ```lys
+  ```flr
   const is_active = true;
   ```
 - **Null**: Represents the absence of a value.
-  ```lys
+  ```flr
   const data = null;
   ```
 
@@ -79,7 +79,7 @@ b = 30; // OK
 | `%` | Modulo |
 | `-` (unary) | Negation |
 
-```lys
+```flr
 const sum = 10 + 5;
 const negative_ten = -10;
 const greeting = "Hello " + "World";
@@ -115,8 +115,9 @@ const greeting = "Hello " + "World";
 | `or` | Logical OR |
 | `not` | Logical NOT |
 
-```lys
+```flr
 if x > 0 and not is_finished {
     // ...
 }
 ```
+

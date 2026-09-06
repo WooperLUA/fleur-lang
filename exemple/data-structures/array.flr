@@ -1,5 +1,5 @@
 // Arrays data-structure example
-// Technically arrays in Lys are lists because they have a variable size and allow for multiples types
+// Technically arrays in Fleur are lists because they have a variable size and allow for multiples types
 // to be in the array but they are called arrays because it's what most people are familiar with.
 
 

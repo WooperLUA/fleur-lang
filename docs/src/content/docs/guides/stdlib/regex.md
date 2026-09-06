@@ -1,6 +1,6 @@
 ---
 title: Regex Module
-description: Reference for the Lys regex module.
+description: Reference for the fleur regex module.
 ---
 
 Regular expression utilities.
@@ -14,7 +14,8 @@ Regular expression utilities.
 
 ### Examples
 
-```lys
+```flr
 const is_valid = regex::test("^[a-z]+$", "hello"); // true
 const matches = regex::match("\\d+", "abc 123 def 456"); // ["123", "456"]
 ```
+

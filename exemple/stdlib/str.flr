@@ -1,6 +1,6 @@
 // String standard library example
 
-const text = "   Hello, Lys Lang!   ";
+const text = "   Hello, Fleur Lang!   ";
 
 // String length
 io::print("Length of '", text, "' is", str::length(text));
@@ -14,6 +14,6 @@ io::print("Upper:", str::upper(trimmed));
 io::print("Lower:", str::lower(trimmed));
 
 // Substring check
-if str::contains(trimmed, "Lys") {
-    io::print("The string contains 'Lys'");
+if str::contains(trimmed, "Fleur") {
+    io::print("The string contains 'Fleur'");
 }

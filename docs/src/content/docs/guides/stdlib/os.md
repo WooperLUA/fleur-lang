@@ -1,6 +1,6 @@
 ---
 title: OS Module
-description: Reference for the Lys os module.
+description: Reference for the fleur os module.
 ---
 
 Operating system and process information.
@@ -23,7 +23,8 @@ Operating system and process information.
 
 ### Examples
 
-```lys
+```flr
 io::print("Running on: ", os.platform);
 const user_home = os.homedir;
 ```
+

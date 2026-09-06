@@ -1,6 +1,6 @@
 ---
 title: Math Module
-description: Reference for the Lys math module.
+description: Reference for the fleur math module.
 ---
 
 Provides mathematical constants and functions.
@@ -31,8 +31,9 @@ Provides mathematical constants and functions.
 
 ### Examples
 
-```lys
+```flr
 const radius = 5;
 const area = math.PI * radius * radius;
 const dice_roll = math::random(1..7); // 1 to 6
 ```
+

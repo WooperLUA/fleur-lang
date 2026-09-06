@@ -1,4 +1,4 @@
-import {LysError, throw_exception} from "@utils";
+import {FleurError, throw_exception} from "@utils";
 import {tokenize, Parser} from "@compiler";
 import {interpret, create_global_env, start_repl} from "@runtime";
 import {type ErrorValue} from "@types";
@@ -16,7 +16,7 @@ const main = async () =>
             {
                 if (!args[1]) return throw_exception({
                     type:    "MissingArgument",
-                    message: "You must provide a .lys file."
+                    message: "You must provide a .flr file."
                 })
 
                 const path = args[1];
@@ -30,9 +30,9 @@ const main = async () =>
                     metadata: `\"${path}\"`
                 })
 
-                if (!(file?.name?.endsWith('.lys'))) return throw_exception({
+                if (!(file?.name?.endsWith('.flr'))) return throw_exception({
                     type:    "InvalidArgument",
-                    message: "You must provide a file with the '.lys' extension.",
+                    message: "You must provide a file with the '.flr' extension.",
                 })
 
                 try
@@ -46,9 +46,9 @@ const main = async () =>
                 }
                 catch (e)
                 {
-                    if (e instanceof LysError)
+                    if (e instanceof FleurError)
                     {
-                        console.error(`\x1b[31m[lys] -> ${(e.value as ErrorValue).message}\x1b[0m`);
+                        console.error(`\x1b[31m[fleur] -> ${(e.value as ErrorValue).message}\x1b[0m`);
                         process.exit(1);
                     }
                     else
@@ -74,7 +74,7 @@ const main = async () =>
                 const BOLD = '\x1b[1m';
 
                 const commands = [
-                    {cmd: ['run', '[.lys file] [arg1, arg2..]', '  Executes a .lys file.'], color: YELLOW},
+                    {cmd: ['run', '[.flr file] [arg1, arg2..]', '  Executes a .flr file.'], color: YELLOW},
                     {cmd: ['repl', '', '\t      Runs a live REPL.'], color: CYAN},
                     {cmd: ['help', '', '\t      Displays all available commands.'], color: GREEN},
                 ];
@@ -94,7 +94,7 @@ const main = async () =>
             {
                 return throw_exception({
                     type:     'InvalidArgument',
-                    message:  "Unknown command. Use lys help to see all available commands.",
+                    message:  "Unknown command. Use fleur help to see all available commands.",
                     metadata: cmd
                 })
             }
@@ -102,9 +102,9 @@ const main = async () =>
     }
     catch (e: any)
     {
-        if (e instanceof LysError)
+        if (e instanceof FleurError)
         {
-            console.error(`\x1b[31m[lys] -> ${(e.value as ErrorValue).message}\x1b[0m`);
+            console.error(`\x1b[31m[fleur] -> ${(e.value as ErrorValue).message}\x1b[0m`);
         }
         else if (e.message)
         {

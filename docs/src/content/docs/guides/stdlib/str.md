@@ -1,6 +1,6 @@
 ---
 title: String Module
-description: Reference for the Lys str module.
+description: Reference for the fleur str module.
 ---
 
 String manipulation utilities. Note that these are static methods on the `str` module, not methods on string instances as they are primitives.
@@ -18,8 +18,9 @@ String manipulation utilities. Note that these are static methods on the `str` m
 
 ### Examples
 
-```lys
-const name = "  Lys Lang  ";
-const trimmed = str::trim(name); // "Lys Lang"
-const is_lys = str::contains(trimmed, "Lys"); // true
+```flr
+const name = "  fleur Lang  ";
+const trimmed = str::trim(name); // "fleur Lang"
+const is_fleur = str::contains(trimmed, "fleur"); // true
 ```
+

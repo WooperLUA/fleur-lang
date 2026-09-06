@@ -1,6 +1,6 @@
 ---
 title: Reflect Module
-description: Reference for the Lys reflect module.
+description: Reference for the fleur reflect module.
 ---
 
 Metaprogramming and introspection for Structs.
@@ -18,10 +18,11 @@ Metaprogramming and introspection for Structs.
 
 ### Examples
 
-```lys
+```flr
 struct Point { x, y }
 const p = Point { x: 1, y: 2 };
 
 io::print(reflect::identifier(p)); // "Point"
 io::print(reflect::has(p, "x"));   // true
 ```
+

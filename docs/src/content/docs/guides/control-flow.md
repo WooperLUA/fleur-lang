@@ -1,9 +1,9 @@
 ---
 title: Control Flow
-description: Conditionals and Loops in Lys.
+description: Conditionals and Loops in fleur.
 ---
 
-Lys provides standard control flow structures for branching and iteration.
+fleur provides standard control flow structures for branching and iteration.
 
 ## Conditionals
 
@@ -11,7 +11,7 @@ Lys provides standard control flow structures for branching and iteration.
 
 The `if` statement allows you to execute code based on a boolean condition.
 
-```lys
+```flr
 const age = 20;
 
 if age >= 18 {
@@ -29,7 +29,7 @@ The `when` statement is a powerful alternative to `switch` or multiple `if-else`
 - **Else**: An optional `else` case can be provided to handle any values not covered by other cases.
 - **Strict Equality**: Matching uses deep equality for complex types (Arrays, Structs, etc.).
 
-```lys
+```flr
 const status = 1;
 
 when status {
@@ -43,12 +43,12 @@ when status {
 
 ### For Loop (Ranges)
 
-`for` loops in Lys primarily operate over **Ranges**. A range is created using the `..` operator or `Range::new(start, end)`.
+`for` loops in fleur primarily operate over **Ranges**. A range is created using the `..` operator or `Range::new(start, end)`.
 
 - **Inclusive**: The range `1..5` includes both 1 and 5.
 - **Automatic Direction**: The loop automatically handles ascending (`1..5`) and descending (`5..1`) ranges.
 
-```lys
+```flr
 // Ascending range: 1, 2, 3, 4, 5
 for i in 1..5 {
     io::print(i);
@@ -62,9 +62,9 @@ for i in 5..1 {
 
 ### For Loop (Arrays and Sets)
 
-`for` loops in Lys can also operate over **Arrays** and **Sets**.
+`for` loops in fleur can also operate over **Arrays** and **Sets**.
 
-```lys
+```flr
 for elt in [1,2,3,4,5]{
     io::print(elt);
 }
@@ -78,7 +78,7 @@ for elt in Set::new(1,2,3,4,5){
 
 The `while` loop continues to execute as long as its condition remains true. The condition is evaluated *before* each iteration.
 
-```lys
+```flr
 var count = 0;
 while count < 3 {
     io::print("Count is: ", count);
@@ -88,9 +88,9 @@ while count < 3 {
 
 ## Error Handling (Try/Catch)
 
-Lys provides a `try/catch` mechanism to handle runtime errors gracefully.
+fleur provides a `try/catch` mechanism to handle runtime errors gracefully.
 
-```lys
+```flr
 try {
     // Code that might fail
     throw("Something went wrong!");
@@ -101,3 +101,4 @@ try {
 ```
 
 *Note: For more details on Error handling and the `Error` struct, see the [Errors Guide](../errors).*
+

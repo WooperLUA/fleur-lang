@@ -1,6 +1,6 @@
 ---
 title: Type Module
-description: Reference for the Lys type module.
+description: Reference for the fleur type module.
 ---
 
 Type checking and explicit conversion.
@@ -18,10 +18,11 @@ Type checking and explicit conversion.
 
 ### Examples
 
-```lys
+```flr
 const val = 123;
 io::print(type::of(val)); // "Number"
 
 const str_val = "456";
 const num_val = type::number(str_val); // 456
 ```
+

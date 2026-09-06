@@ -1,5 +1,5 @@
 import { RuntimeValueType, type StringValue, type ErrorValue } from "@types";
-import { check_args_length, check_arg_type, LysError } from "@utils";
+import { check_args_length, check_arg_type, FleurError } from "@utils";
 import type { RuntimeValue, NativeFunctionValue, StructValue } from "@types";
 
 export const error: StructValue = {
@@ -31,7 +31,7 @@ export const error: StructValue = {
                 is_method: true,
                 call: (args: RuntimeValue[]) =>
                       {
-                          throw new LysError(args[0]!);
+                          throw new FleurError(args[0]!);
                       }
             } as NativeFunctionValue
         ]

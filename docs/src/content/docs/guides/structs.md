@@ -1,6 +1,6 @@
 ---
 title: Structs
-description: Custom data structures in Lys.
+description: Custom data structures in fleur.
 ---
 
 Structs allow you to define custom data types with named properties and methods.
@@ -12,7 +12,7 @@ Using `const` to declare an instance of struct makes it **immutable**. You will 
 :::
 
 
-```lys
+```flr
 struct Point {
     x,
     y
@@ -29,7 +29,7 @@ Struct instances use two different operators to access their members:
 - **Properties** (Values) are accessed using the dot `.` operator.
 - **Methods** (Functions) are accessed using the double-colon `::` operator.
 
-```lys
+```flr
 struct Point { x, y }
 Point::move(dx, dy) {
     this.x += dx;
@@ -45,7 +45,7 @@ p::move(5, 5);     // Call method with ::
 
 Structs support a very limited form of static methods. **Only the `::new` method can be called directly on the Struct definition.** This is typically used as a constructor.
 
-```lys
+```flr
 User::new(name, age) {
     return User { name: name, age: age };
 }
@@ -60,7 +60,7 @@ const u = User::new("Alex", 25);
 
 Instance methods use `this` to refer to the current struct instance.
 
-```lys
+```flr
 User::is_adult() {
     return this.age >= 18;
 }
@@ -69,3 +69,4 @@ if u::is_adult() {
     io::print("Welcome");
 }
 ```
+

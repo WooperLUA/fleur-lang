@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
-  "name": "lys",
-  "displayName": "Lys",
-  "scopeName": "source.lys",
+  "name": "fleur",
+  "displayName": "Fleur",
+  "scopeName": "source.flr",
   "patterns": [
     { "include": "#comments" },
     { "include": "#strings" },
@@ -16,7 +16,7 @@
     "comments": {
       "patterns": [
         {
-          "name": "comment.line.double-slash.lys",
+          "name": "comment.line.double-slash.flr",
           "match": "//.*$"
         }
       ]
@@ -24,12 +24,12 @@
     "strings": {
       "patterns": [
         {
-          "name": "string.quoted.double.lys",
+          "name": "string.quoted.double.flr",
           "begin": "\"",
           "end": "\"",
           "patterns": [
             {
-              "name": "constant.character.escape.lys",
+              "name": "constant.character.escape.flr",
               "match": "\\\\."
             }
           ]
@@ -39,7 +39,7 @@
     "keywords": {
       "patterns": [
         {
-          "name": "keyword.other.lys",
+          "name": "keyword.other.flr",
           "match": "\\b(var|const|func|proc|struct|this|catch|else|for|if|import|in|pub|return|try|when|while)\\b"
         }
       ]
@@ -47,7 +47,7 @@
     "constants": {
       "patterns": [
         {
-          "name": "constant.language.lys",
+          "name": "constant.language.flr",
           "match": "\\b(true|false|null)\\b"
         }
       ]
@@ -55,7 +55,7 @@
     "numbers": {
       "patterns": [
         {
-          "name": "constant.numeric.lys",
+          "name": "constant.numeric.flr",
           "match": "\\b\\d+(\\.\\d+)?\\b"
         }
       ]
@@ -63,19 +63,19 @@
     "operators": {
       "patterns": [
         {
-          "name": "keyword.operator.logical.lys",
+          "name": "keyword.operator.logical.flr",
           "match": "\\b(and|or|not)\\b"
         },
         {
-          "name": "keyword.operator.lys",
-          "match": "(\\+|\\-|\\*|/|%|==|!=|<=|>=|<|>|=|\\+=|\\-=|\\*=|/=|::|\\.|\\.\\.|=>)"
+          "name": "keyword.operator.flr",
+          "match": "(\\+|\\-|\\*|/|%|==|\\[|\\]|\\(|\\)|\\{|\\}|!=|<=|>=|<|>|=|\\+=|\\-=|\\*=|/=|::|\\.|\\.\\.|=>)"
         }
       ]
     },
     "functions": {
       "patterns": [
         {
-          "name": "entity.name.function.lys",
+          "name": "entity.name.function.flr",
           "match": "\\b([a-zA-Z_][a-zA-Z0-9_]*)(?=\\s*\\()"
         }
       ]

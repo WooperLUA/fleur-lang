@@ -1,9 +1,9 @@
 ---
 title: Sets
-description: Using the Set data structure in Lys.
+description: Using the Set data structure in fleur.
 ---
 
-Sets in Lys are ordered collections of unique values. They are implemented as arrays that automatically handle duplicate prevention using deep equality.
+Sets in fleur are ordered collections of unique values. They are implemented as arrays that automatically handle duplicate prevention using deep equality.
 
 ## Creation
 
@@ -13,7 +13,7 @@ You can create a new set using `Set::new()` or `Set::from()`.
 Using `const` to declare a Set makes the Set itself **immutable**. You will not be able to use methods that modify the set (like `add`, `remove`, or `clear`). Use `var` for a mutable Set.
 :::
 
-```lys
+```flr
 // Create an empty set (mutable)
 var my_set = Set::new();
 my_set::add(1);
@@ -34,7 +34,7 @@ const fixed_set = Set::new(1, 2, 3);
 | `clear()` | `Set` | Removes all elements from the set. Returns the set. |
 | `contains(value)` | `Boolean` | Returns `true` if the value is in the set. |
 | `length()` | `Number` | Returns the number of elements in the set. |
-| `index(value)` | `Number,Null` | Returns the index of the value in the set (since Lys sets are ordered). |
+| `index(value)` | `Number,Null` | Returns the index of the value in the set (since fleur sets are ordered). |
 | `first()` | `Any` | Returns the first element of the set *or null if absent*. |
 | `last()` | `Any` | Returns the last element of the set *or null if absent*. |
 | `get(index)` | `Any` | Returns the element at the specified index *or null if absent*. |
@@ -42,3 +42,4 @@ const fixed_set = Set::new(1, 2, 3);
 | `insert(index, value)` | `Set` | Inserts a value at a specific index. Returns the set. |
 | `pop()` | `Any` | Removes and returns the last element. |
 | `concat(other_set)` | `Set` | Returns a new set containing elements from both sets. |
+

@@ -10,8 +10,8 @@ if user != null{ current_user = user; }
 io::print("Current user:", current_user);
 
 // Set a new environment variable for this process
-os::set_env("LYS_CUSTOM_VAR", "Hello from Lys!");
-io::print("Custom var:", os::env("LYS_CUSTOM_VAR"));
+os::set_env("FLEUR_CUSTOM_VAR", "Hello from Fleur!");
+io::print("Custom var:", os::env("FLEUR_CUSTOM_VAR"));
 
 
 // 2. System Information

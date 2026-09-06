@@ -1,20 +1,20 @@
 ---
 title: Getting Started
-description: Learn how to install and run Lys Lang.
+description: Learn how to install and run fleur.
 ---
 
-Lys is a minimalistic scripting language designed for simplicity and educational purposes. It is built on top of the Bun runtime.
+fleur is a minimalistic scripting language designed for simplicity and educational purposes. It is built on top of the Bun runtime.
 
 ## Installation
 
 ### Building from source
 
-To get started with building Lys, you need to have [Bun](https://bun.sh/) installed on your system.
+To get started with building fleur, you need to have [Bun](https://bun.sh/) installed on your system.
 
 1. Clone the repository:
    ```bash
-   git clone <the link>
-   cd lys-lang
+   git clone https://github.com/WooperLUA/fleur-lang
+   cd fleur-lang
    ```
 
 2. Install dependencies:
@@ -22,35 +22,35 @@ To get started with building Lys, you need to have [Bun](https://bun.sh/) instal
    bun install
    ```
    
-3. Build Lys to your target:
+3. Build fleur to your target:
    ```bash
    bun run build-<your_plateform>
    ```
    
-4. You can now get the lys runtime in the ./out dir (and optionally add it to you PATH).
+4. You can now get the fleur runtime in the ./out dir (and optionally add it to you PATH).
    
 ### Getting the runtime from Releases
 
 Download the runtime binaries from [Releases](link) (and optionally add it to you PATH).
 
-## Running Lys
+## Running fleur
 
-You can run Lys commands using the `lys` command followed by the name of the command.
+You can run fleur commands using the `fleur` command followed by the name of the command.
 
 ### Execute a file
 
-To execute a `.lys` file:
+To execute a `.flr` file:
 
 ```bash
-lys run path/to/your/file.lys
+fleur run path/to/your/file.flr
 ```
 
 ### REPL
 
-Lys comes with an interactive REPL (Read-Eval-Print Loop):
+fleur comes with an interactive REPL (Read-Eval-Print Loop):
 
 ```bash
-lys repl
+fleur repl
 ```
 
 ### Help
@@ -58,27 +58,27 @@ lys repl
 To see all available commands:
 
 ```bash
-lys help
+fleur help
 ```
 
 ## Your First Script
 
-Create a file named `hello.lys`:
+Create a file named `hello.flr`:
 
-```lys
+```flr
 func greet(name) 
 {
     return "Hello, " + name + "!";
 }
 
-const message = greet("Lys");
+const message = greet("fleur");
 io::print(message);
 ```
 
 Run it:
 
 ```bash
-lys run hello.lys
+fleur run hello.flr
 ```
 
 ## IDE Support

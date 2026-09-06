@@ -1,12 +1,12 @@
 import type {ErrorValue, Exception, RuntimeValue} from "@types";
 import {RuntimeValueType} from "@types";
 
-export class LysError extends Error
+export class FleurError extends Error
 {
     constructor(public value: RuntimeValue)
     {
-        super((value as any).message || "Lys Runtime Error");
-        this.name = "LysError";
+        super((value as any).message || "Fleur Runtime Error");
+        this.name = "FleurError";
     }
 }
 
@@ -21,5 +21,5 @@ export const throw_exception = (err: Exception) =>
         message: formatted_message,
     };
 
-    throw new LysError(error_val);
+    throw new FleurError(error_val);
 };
