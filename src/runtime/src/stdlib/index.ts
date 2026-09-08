@@ -9,6 +9,7 @@ import {file} from "./src/file.ts";
 import {os} from "./src/os.ts";
 import {reflect} from "./src/reflect.ts";
 import {regex} from "./src/regex.ts";
+import {crypto} from "./src/crypto.ts";
 
 export const setup_stdlib = (env: Environment, args: string[] = []) =>
 {
@@ -27,4 +28,5 @@ export const setup_stdlib = (env: Environment, args: string[] = []) =>
     env.declare("os", os, true);
     env.declare("reflect", reflect, true);
     env.declare("regex", regex, true);
+    env.declare("crypto", crypto, true);
 };

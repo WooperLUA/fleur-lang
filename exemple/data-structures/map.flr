@@ -42,5 +42,10 @@ for k in grid::values() {
     io::print("Value : ", k);
 }
 
+io::print("\n--- All [keys, values] ---");
+for k in grid::iterate() {
+    io::print("Key : ", k[0] ,"Value : ", k[1]);
+}
+
 // 6. Clearing
 grid::clear();

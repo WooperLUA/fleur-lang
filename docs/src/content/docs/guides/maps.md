@@ -27,17 +27,18 @@ const colors = Map::new([
 
 ## Methods
 
-| Member | Return Type | Description |
-| :--- | :--- | :--- |
+| Member               | Return Type | Description                                                                       |
+|:---------------------| :--- |:----------------------------------------------------------------------------------|
 | `Map::new(initial?)` | `Map` | Creates a new map, optionally initialized with an array of `[key, value]` tuples. |
-| `set(key, value)` | `Map` | Associates the specified value with the key. Returns the map. |
-| `get(key)` | `Any` | Returns the value associated with the key *or null if absent*. |
-| `has(key)` | `Boolean` | Returns `true` if the map contains the specified key. |
-| `remove(key)` | `Map` | Removes the mapping for a key. Returns the map. |
-| `clear()` | `Map` | Removes all mappings from the map. Returns the map. |
-| `length()` | `Number` | Returns the number of key-value pairs in the map. |
-| `keys()` | `Array` | Returns an array containing all keys in the map. |
-| `values()` | `Array` | Returns an array containing all values in the map. |
+| `set(key, value)`    | `Map` | Associates the specified value with the key. Returns the map.                     |
+| `get(key)`           | `Any` | Returns the value associated with the key *or null if absent*.                    |
+| `has(key)`           | `Boolean` | Returns `true` if the map contains the specified key.                             |
+| `remove(key)`        | `Map` | Removes the mapping for a key. Returns the map.                                   |
+| `clear()`            | `Map` | Removes all mappings from the map. Returns the map.                               |
+| `length()`           | `Number` | Returns the number of key-value pairs in the map.                                 |
+| `keys()`             | `Array` | Returns an array containing all keys in the map.                                  |
+| `values()`           | `Array` | Returns an array containing all values in the map.                                |
+| `iterate()`          | `Array` | Returns an array of `[key, value]` tuples.                                        |
 
 ## Bracket Syntax
 

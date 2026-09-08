@@ -51,6 +51,7 @@ export default defineConfig({
 								{ label: 'time', slug: 'guides/stdlib/time' },
 								{ label: 'regex', slug: 'guides/stdlib/regex' },
 								{ label: 'reflect', slug: 'guides/stdlib/reflect' },
+								{ label: 'crypto', slug: 'guides/stdlib/crypto' },
 							] },
 						{ label: 'Advanced Features', items: [
 								{ label: 'Deep Equality', slug: 'guides/advanced' },

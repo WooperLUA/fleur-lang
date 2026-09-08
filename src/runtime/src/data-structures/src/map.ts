@@ -9,6 +9,7 @@ import type {
 } from "@types";
 import {RuntimeValueType} from "@types";
 import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception} from "@utils";
+import {type} from "../../stdlib/src/type.ts";
 
 const find_key_index = (elements: { key: RuntimeValue; value: RuntimeValue }[], target: RuntimeValue): number =>
 {
@@ -196,6 +197,26 @@ export const map: StructValue = {
                                    type:     RuntimeValueType.Array,
                                    elements: m.elements.map(el => el.value)
                                } as ArrayValue;
+                           }
+            } as NativeFunctionValue
+        ],
+        [
+            "iterate",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<map>::iterate");
+                               const m = args[0] as MapValue;
+                               const iterator = m.elements.map(el => ({
+                                   type:     RuntimeValueType.Array,
+                                   elements: [el.key, el.value]
+                               } as ArrayValue));
+                               return {
+                                   type:     RuntimeValueType.Array,
+                                   elements: iterator
+                               } as unknown as ArrayValue;
                            }
             } as NativeFunctionValue
         ],

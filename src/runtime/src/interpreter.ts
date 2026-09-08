@@ -249,6 +249,8 @@ const execute_variable_declaration = (stmt: VariableDeclaration, env: Environmen
     {
         if (value.type === RuntimeValueType.Array ||
             value.type === RuntimeValueType.Set ||
+            value.type === RuntimeValueType.Map ||
+            value.type === RuntimeValueType.Range ||
             value.type === RuntimeValueType.Struct)
         {
             (value as any).is_immutable = true;

@@ -1,0 +1,13 @@
+// Crypto standard library example
+
+// sha256
+io::print(crypto::sha256("i\'m hashed"));
+
+// sha512
+io::print(crypto::sha512("i\'m hashed"));
+
+// md5
+io::print(crypto::md5("i\'m hashed"));
+
+// uuid v4
+io::print(crypto::uuid());
