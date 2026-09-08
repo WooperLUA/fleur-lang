@@ -35,7 +35,7 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
 
     // Identifiers and Literals
     [TokenKind.IDENTIFIER]: /^[a-zA-Z_][a-zA-Z0-9_]*/,
-    [TokenKind.NUMBER]:     /^\d+(\.\d+)?/,
+    [TokenKind.NUMBER]:     /^(\d+(_\d+)*(\.\d+(_\d+)*)?|\.\d+(_\d+)*)/,
     [TokenKind.STRING]:     /^"([^"\\]|\\.)*"/,
 
     // Multi-character Operators & Symbols

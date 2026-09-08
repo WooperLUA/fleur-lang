@@ -744,7 +744,7 @@ export class Parser
         {
             case TokenKind.NUMBER:
                 this.eat();
-                return {type: NodeType.NumericLiteral, value: parseFloat(token.value)} as NumericLiteral;
+                return {type: NodeType.NumericLiteral, value: parseFloat(token.value.replace(/_/g, ""))} as NumericLiteral;
             case TokenKind.STRING:
                 this.eat();
 

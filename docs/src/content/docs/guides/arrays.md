@@ -38,6 +38,7 @@ const mixed = Array::new(1, "two", true);
 | `first()` | `Any` | Returns the first element of the array *or null if absent*. |
 | `last()` | `Any` | Returns the last element of the array *or null if absent*. |
 | `concat(other_array)` | `Array` | Returns a new array containing elements from both arrays. |
+| `slice(range)` | `Array` | Returns a new array containing a portion of the original array defined by a `Range`. |
 
 ## Bracket Syntax
 

@@ -1,5 +1,5 @@
 // Primitive Variable Declarations
-const a = 6;                         // Number literal
+const a = 6;                         // Number literal (supports underscores and leading decimal point)
 const b = "7";                      // String literal
 const c = false;                   // Boolean literal
 const d = null;                   // Null literal

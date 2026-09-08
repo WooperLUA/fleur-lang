@@ -35,10 +35,12 @@ b = 30; // OK
 
 ### Primitive Types
 
-- **Number**: 64-bit floating point numbers.
+- **Number**: 64-bit floating point numbers. Supports underscores for readability and leading decimal points.
   ```flr
   const x = 42;
   const y = 3.14;
+  const z = .5;
+  const large = 1_000_000;
   ```
 - **String**: Sequences of characters, enclosed in double quotes. Supports escape characters:
   - `\n` Newline

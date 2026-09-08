@@ -331,5 +331,45 @@ export const array: StructValue = {
                            },
             } as NativeFunctionValue,
         ],
+        [
+            "slice",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::slice");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::slice");
+                               check_arg_type(args[1]!, RuntimeValueType.Range, "<array>::slice");
+
+                               const arr = args[0] as ArrayValue;
+                               const range = args[1] as RangeValue;
+
+                               const startVal = (range.start as NumberValue).value;
+                               const endVal = (range.end as NumberValue).value;
+
+                               const len = arr.elements.length;
+
+                               let start = startVal < 0 ? len + startVal : startVal;
+                               let end = endVal < 0 ? len + endVal : endVal;
+
+                               const elements: RuntimeValue[] = [];
+                               const step = start <= end ? 1 : -1;
+
+                               for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                               {
+                                   if (i >= 0 && i < len)
+                                   {
+                                       elements.push(arr.elements[i]!);
+                                   }
+                               }
+
+                               return {
+                                   type:     RuntimeValueType.Array,
+                                   elements: elements,
+                               } as ArrayValue;
+                           },
+            } as NativeFunctionValue,
+        ],
     ]),
 };
