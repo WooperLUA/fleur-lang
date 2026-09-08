@@ -11,6 +11,24 @@ io::print("Random float (0-1) : ", rand_f);
 // Absolute value
 io::print("abs(-5) =", math::abs(-5));
 
+// Square root of value
+io::print("sqrt(5) =", math::sqrt(5));
+
+// Power of exp to value
+io::print("pow(5,5) =", math::pow(5, 5));
+
+// Logarithm of value
+io::print("log(6) =", math::log(6));
+
+// Logarithm base2 of value
+io::print("log2(6) =", math::log(6, 2));
+
+// Logarithm base10 of value
+io::print("log10(6) =", math::log(6, 10));
+
+// Logarithm base2 of value
+io::print("log1p(6) =", math::log(6, 1));
+
 // Minimum and Maximum
 io::print("min(10, 20) =", math::min(10, 20));
 io::print("max(10, 20) =", math::max(10, 20));

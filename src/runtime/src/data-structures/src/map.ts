@@ -8,7 +8,7 @@ import type {
     StructValue
 } from "@types";
 import {RuntimeValueType} from "@types";
-import {check_args_length, check_mutability, is_equal} from "@utils";
+import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception} from "@utils";
 
 const find_key_index = (elements: { key: RuntimeValue; value: RuntimeValue }[], target: RuntimeValue): number =>
 {
@@ -24,11 +24,53 @@ export const map: StructValue = {
             "new",
             {
                 type: RuntimeValueType.NativeFunction,
-                call: (_: RuntimeValue[]) =>
+                call: (args: RuntimeValue[]) =>
                       {
+                          check_args_length(args, [0, 1], "Map::new");
+                          const elements: { key: RuntimeValue; value: RuntimeValue }[] = [];
+
+                          if (args.length === 1)
+                          {
+                              check_arg_type(args[0]!, RuntimeValueType.Array, "Map::new");
+                              const arr = args[0]! as ArrayValue
+
+                              for (const item of arr.elements)
+                              {
+                                  if (item.type !== RuntimeValueType.Array)
+                                  {
+                                      throw_exception({
+                                          type:    "Runtime",
+                                          message: "Map::new expects an Array of [key, value] tuples."
+                                      });
+                                  }
+
+                                  const tuple = item as ArrayValue;
+                                  if (tuple.elements.length !== 2)
+                                  {
+                                      throw_exception({
+                                          type:    "Runtime",
+                                          message: "Map::new expects tuples of exactly 2 elements [key, value]."
+                                      });
+                                  }
+
+                                  const key = tuple.elements[0]!;
+                                  const value = tuple.elements[1]!;
+
+                                  const idx = find_key_index(elements, key);
+                                  if (idx !== -1)
+                                  {
+                                      elements[idx]!.value = value;
+                                  }
+                                  else
+                                  {
+                                      elements.push({key, value});
+                                  }
+                              }
+                          }
+
                           return {
                               type:     RuntimeValueType.Map,
-                              elements: []
+                              elements: elements
                           } as MapValue;
                       }
             } as NativeFunctionValue

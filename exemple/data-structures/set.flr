@@ -15,6 +15,11 @@ io::print("Set created with Set::new (duplicates ignored):", my_set_alt);
 const my_set_from_range = Set::from(1..10);
 io::print("Set created with Set::from:", my_set_from_range);
 
+// Using Set::from with a set (useful to copy a set)
+const my_set_from_set = Set::from(Set::new(1, 10));
+io::print("Set created with Set::from a set : ", my_set_from_set);
+
+
 // 2. Adding elements
 my_set::add(1);
 my_set::add(2);

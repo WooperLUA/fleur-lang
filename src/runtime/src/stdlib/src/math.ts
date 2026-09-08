@@ -20,6 +20,13 @@ export const math: StructValue = {
                 type:     RuntimeValueType.Number,
                 value: Math.PI
             }
+        ],
+        [
+            "INF",
+            {
+                type:     RuntimeValueType.Number,
+                value: Infinity
+            }
         ]
     ]),
     methods:    new Map<string, any>([
@@ -73,6 +80,81 @@ export const math: StructValue = {
                           check_arg_type(args[0]!, RuntimeValueType.Number, "math::abs");
                           const value = (args[0] as NumberValue).value
                           return {type: RuntimeValueType.Number, value: Math.abs(value)};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "sqrt",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "math::sqrt");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::sqrt");
+                          const value = (args[0] as NumberValue).value
+                          return {type: RuntimeValueType.Number, value: Math.sqrt(value)};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "pow",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "math::sqrt");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::sqrt");
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "math::sqrt");
+                          const base = (args[0] as NumberValue).value
+                          const exp = (args[1] as NumberValue).value
+                          return {type: RuntimeValueType.Number, value: Math.pow(base, exp)};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "log",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, [1, 2], "math::log");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::log");
+
+                          const value = (args[0] as NumberValue).value
+                          let base = null
+
+                          if (args.length === 2)
+                          {
+                              check_arg_type(args[1]!, RuntimeValueType.Number, "math::log");
+                              const potential_base = (args[1] as NumberValue).value
+                              if (![10,2,1].includes(potential_base)) return throw_exception({
+                                  type : "Runtime",
+                                  message : "Base should be either 10, 2 or 1 (for 1p)",
+                              })
+                              base = potential_base
+                          }
+
+                          let ope = Math.log
+                          switch (base)
+                          {
+                              case 10:
+                              {
+                                  ope = Math.log10
+                                  break;
+                              }
+                              case 2:
+                              {
+                                  ope = Math.log2
+                                  break;
+                              }
+                              case 1:
+                              {
+                                  ope = Math.log1p
+                                  break;
+                              }
+                          }
+
+                          return {type: RuntimeValueType.Number, value: ope(value)};
                       },
             } as NativeFunctionValue,
         ],

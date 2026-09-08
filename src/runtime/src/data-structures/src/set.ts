@@ -1,13 +1,14 @@
-import type {
-    ArrayValue,
-    NativeFunctionValue,
-    NumberValue,
-    RangeValue,
-    RuntimeValue,
-    SetValue,
-    StructValue,
+import {
+    type ArrayValue,
+    type BooleanValue,
+    type NativeFunctionValue,
+    type NumberValue,
+    type RangeValue,
+    type RuntimeValue,
+    RuntimeValueType,
+    type SetValue,
+    type StructValue,
 } from "@types";
-import {type BooleanValue, RuntimeValueType,} from "@types";
 import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception,} from "@utils";
 
 export const set: StructValue = {
@@ -45,27 +46,39 @@ export const set: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, 1, "Set::from");
-                          check_arg_type(args[0]!, RuntimeValueType.Range, "Set::from");
+                          check_arg_type(args[0]!, [RuntimeValueType.Range, RuntimeValueType.Set], "Set::from");
 
-                          const elements: RuntimeValue[] = [];
+                          let elements: RuntimeValue[] = [];
                           const arg = args[0]!;
 
-                          const range = arg as RangeValue;
-                          if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
+                          switch (arg.type)
                           {
-                              throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
-                          }
-                          const start = (range.start as NumberValue).value;
-                          const end = (range.end as NumberValue).value;
-                          const step = start <= end ? 1 : -1;
-
-                          for (let i = start; step > 0 ? i <= end : i >= end; i += step)
-                          {
-                              const value : RuntimeValue = {type: RuntimeValueType.Number, value: i};
-                              const exists = elements.some((el) => is_equal(el, value));
-                              if (!exists)
+                              case RuntimeValueType.Range:
                               {
-                                  elements.push(value);
+                                  const range = arg as RangeValue;
+                                  if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
+                                  {
+                                      throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
+                                  }
+                                  const start = (range.start as NumberValue).value;
+                                  const end = (range.end as NumberValue).value;
+                                  const step = start <= end ? 1 : -1;
+
+                                  for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                                  {
+                                      const value: RuntimeValue = {type: RuntimeValueType.Number, value: i};
+                                      const exists = elements.some((el) => is_equal(el, value));
+                                      if (!exists)
+                                      {
+                                          elements.push(value);
+                                      }
+                                  }
+                                  break
+                              }
+                              case RuntimeValueType.Set:
+                              {
+                                  const arr = arg as SetValue;
+                                  elements = Array.from(arr.elements);
                               }
                           }
 

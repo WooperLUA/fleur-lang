@@ -1,9 +1,12 @@
 // Map data-structure example
 
-// 1. Basic Usage
-var inventory = Map::new();
-inventory::set("apples", 5);
-inventory::set("bananas", 10);
+// 1. Basic Usage and Initialization
+var inventory = Map::new([
+    ["apples", 5],
+    ["bananas", 10]
+]);
+
+var empty_inventory = Map::new();
 
 io::print("Apples : ", inventory::get("apples")); // 5
 io::print("Has bananas ? ", inventory::has("bananas")); // true
