@@ -14,6 +14,7 @@ try {
     const arr = [1, 2];
     io::print(arr[99]); // Triggers OutOfBounds error
 } catch err {
+    // err is an Error object
     io::print("Caught error: ", err);
 }
 ```
@@ -22,21 +23,38 @@ try {
 
 Custom errors can be created using the built-in `Error` struct. 
 
-- **Constructor**: `Error::new(message)` returns an Error object.
-- **Throwing**: Use the `::throw()` method on an Error object to halt execution and trigger a `catch` block.
+### Constructor
+
+`Error::new(message)` returns a new Error object with the given message.
+
+```flr
+const my_error = Error::new("Something went wrong");
+```
+
+### Methods
+
+| Method | Returns | Description |
+| :--- | :--- | :--- |
+| `throw()` | `Never` | Halts execution and triggers the nearest `catch` block. |
 
 ```flr
 func validate_age(age) {
     if age < 0 {
-        // Create and throw in one chain
         Error::new("Age cannot be negative")::throw();
     }
 }
+```
 
+## Standard Errors
+
+When fleur encounters an issue during execution, it automatically throws an error *(usually `Runtime` error)*.
+
+These errors are wrapped in an `Error` object, so you can catch them just like custom errors.
+
+```flr
 try {
-    validate_age(-5);
+    const x = undefined_var;
 } catch e {
-    // e contains the Error object
-    io::print(e); // Prints: "Age cannot be negative"
+    io::print(e); // Prints: "Runtime: Variable 'undefined_var' is not defined."
 }
 ```

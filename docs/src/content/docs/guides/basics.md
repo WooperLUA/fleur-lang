@@ -64,7 +64,8 @@ b = 30; // OK
 - **Arrays**: Ordered collections of values.
 - **Sets**: Ordered collections of unique values.
 - **Structs**: Custom data structures with named properties.
-- **Ranges**: Represent a sequence of numbers (e.g., `1..10`). Often used in `for` loops.
+- **Ranges**: Represent a sequence of numbers (e.g., `1..10`). See the [Ranges Guide](../ranges).
+- **Errors**: Represent a error that exits the program unless caught. See the [Errors Guide](../errors).
 
 ## Operators
 

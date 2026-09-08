@@ -36,6 +36,10 @@ export default defineConfig({
 								{ label: 'Maps', slug: 'guides/maps' },
 								{ label: 'Structs', slug: 'guides/structs' },
 							] },
+						{ label: 'Built-in Structs / Literals', items: [
+								{ label: 'Ranges', slug: 'guides/ranges' },
+								{ label: 'Errors', slug: 'guides/errors' },
+							] },
 						{ label: 'Standard Library', items: [
 								{ label: 'Overview', slug: 'guides/stdlib' },
 								{ label: 'io', slug: 'guides/stdlib/io' },

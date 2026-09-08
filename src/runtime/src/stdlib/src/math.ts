@@ -1,17 +1,14 @@
 import {
-    type NumberValue, type RangeValue,
+    type ArrayValue,
+    type NativeFunctionValue,
+    type NumberValue,
+    type RangeValue,
+    type RuntimeValue,
     RuntimeValueType,
+    type SetValue,
+    type StructValue,
 } from "@types";
-import {
-    throw_exception,
-    check_args_length,
-    check_arg_type
-} from "@utils";
-import type {
-    RuntimeValue,
-    NativeFunctionValue,
-    StructValue,
-} from "@types";
+import {check_arg_type, check_args_length, throw_exception} from "@utils";
 
 export const math: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -228,7 +225,48 @@ export const math: StructValue = {
                           return {type: RuntimeValueType.Number, value: Math.min(Math.max(value, start), end)}
                       }
             }
-        ]
+        ],
+        [
+            "sum",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "math::sum");
+                          check_arg_type(args[0]!, [RuntimeValueType.Array, RuntimeValueType.Set, RuntimeValueType.Range], "math::sum");
+                          switch ((args[0] as any).type)
+                          {
+                              case RuntimeValueType.Array:
+                              case RuntimeValueType.Set:
+                              {
+                                  const array_or_set = (args[0] as ArrayValue | SetValue)
+                                  for (const elt of array_or_set.elements)
+                                  {
+                                      if (elt.type !== RuntimeValueType.Number) return throw_exception({
+                                          type : "Runtime",
+                                          message: `Elements of the ${array_or_set.type.split('.')} must be numbers`,
+                                      })
+                                  }
+                                  const ds = array_or_set.elements as NumberValue[];
+                                  const sum = ds.map(x => x.value).reduce((a, b) => a + b, 0)
 
+                                  return {type: RuntimeValueType.Number, value: sum}
+                              }
+                              case RuntimeValueType.Range:
+                              {
+                                  const range = args[0] as RangeValue;
+                                  const start = (range.start as NumberValue).value;
+                                  const end = (range.end as NumberValue).value;
+                                  let sum = 0;
+                                  for (let i = start; i <= end; i++)
+                                  {
+                                      sum += i;
+                                  }
+                                  return {type: RuntimeValueType.Number, value: sum}
+                              }
+                          }
+                      }
+            }
+        ]
     ]),
 };

@@ -25,4 +25,5 @@ If you ever need to compare by reference, use [**`reflect::is`**](/guides/stdlib
 
 - [Modules and Imports](../modules/)
 - [Error Handling](../errors/)
+- [Ranges](../ranges/)
 

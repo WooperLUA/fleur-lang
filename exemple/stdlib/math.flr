@@ -44,3 +44,8 @@ io::print("1.5 as an Integer : ", math::int(1.5));
 // Clamping
 io::print("Clamping 50 + 60 from 0..100 : ", math::clamp(50 + 60, 0..100));
 io::print("Clamping 50 - 60 from 0..100 : ", math::clamp(50 - 60, 0..100));
+
+// Sum
+io::print("Sum of [1,2,3] : ", math::sum([1,2,3]));
+io::print("Sum of Set(4,5,6) : ", math::sum(Set::new(4,5,6)));
+io::print("Sum of 1..6 : ", math::sum(1..6));
