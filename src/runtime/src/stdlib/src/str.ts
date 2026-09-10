@@ -1,5 +1,6 @@
 import {
-    type NumberValue,
+    type ArrayValue,
+    type NumberValue, type RangeValue,
     RuntimeValueType, type StringValue,
 } from "@types";
 import {
@@ -95,6 +96,45 @@ export const str: StructValue = {
                           const index = (args[1] as NumberValue).value;
                           return {type: RuntimeValueType.String, value: value.at(index)};
                       },
+            } as NativeFunctionValue,
+        ],
+        [
+            "slice",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "str::slice");
+                               check_arg_type(args[0]!, RuntimeValueType.String, "str::slice");
+                               check_arg_type(args[1]!, RuntimeValueType.Range, "str::slice");
+
+                               const str = (args[0] as StringValue).value;
+                               const range = args[1] as RangeValue;
+
+                               const startVal = (range.start as NumberValue).value;
+                               const endVal = (range.end as NumberValue).value;
+
+                               const len = str.length;
+
+                               let start = startVal < 0 ? len + startVal : startVal;
+                               let end = endVal < 0 ? len + endVal : endVal;
+
+                               const elements: string[] = [];
+                               const step = start <= end ? 1 : -1;
+
+                               for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                               {
+                                   if (i >= 0 && i < len)
+                                   {
+                                       elements.push(str[i]!);
+                                   }
+                               }
+
+                               return {
+                                   type:     RuntimeValueType.String,
+                                   value: elements.join(''),
+                               } as StringValue;
+                           },
             } as NativeFunctionValue,
         ],
     ]),
