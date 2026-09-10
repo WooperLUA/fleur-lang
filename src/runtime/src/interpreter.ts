@@ -40,7 +40,7 @@ import {
     type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
     type ImportStatement,
 } from "@types";
-import {throw_exception, stringify_value, is_equal, FleurError} from "@utils";
+import {throw_exception, stringify_value, is_equal, FleurError, deep_copy} from "@utils";
 import {setup_stdlib} from "./stdlib";
 import {setup_data_structures} from "./data-structures";
 import {setup_other_structs} from "./others";
@@ -242,19 +242,41 @@ const is_truthy = (val: RuntimeValue): boolean =>
     return true;
 };
 
+const set_immutable_recursive = (val: RuntimeValue): void =>
+{
+    if (!val) return;
+    (val as any).is_immutable = true;
+    switch (val.type)
+    {
+        case RuntimeValueType.Array:
+        case RuntimeValueType.Set:
+            for (const el of (val as any).elements)
+            {
+                set_immutable_recursive(el);
+            }
+            break;
+        case RuntimeValueType.Map:
+            for (const el of (val as any).elements)
+            {
+                set_immutable_recursive(el.key);
+                set_immutable_recursive(el.value);
+            }
+            break;
+        case RuntimeValueType.Struct:
+            for (const [, v] of (val as any).properties)
+            {
+                set_immutable_recursive(v);
+            }
+            break;
+    }
+};
+
 const execute_variable_declaration = (stmt: VariableDeclaration, env: Environment): RuntimeValue =>
 {
     const value = evaluate(stmt.value, env);
     if (stmt.is_const)
     {
-        if (value.type === RuntimeValueType.Array ||
-            value.type === RuntimeValueType.Set ||
-            value.type === RuntimeValueType.Map ||
-            value.type === RuntimeValueType.Range ||
-            value.type === RuntimeValueType.Struct)
-        {
-            (value as any).is_immutable = true;
-        }
+        set_immutable_recursive(value);
     }
     return env.declare(stmt.identifier, value, stmt.is_const);
 };
@@ -627,9 +649,25 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
         case "*":
             return {type: RuntimeValueType.Number, value: (left as NumberValue).value * (right as NumberValue).value};
         case "/":
-            return {type: RuntimeValueType.Number, value: (left as NumberValue).value / (right as NumberValue).value};
+        {
+            const left_val = (left as NumberValue).value
+            const right_val = (right as NumberValue).value
+            if (right_val === 0) return throw_exception({
+                type:    "Runtime",
+                message: "Impossible to divide by 0"
+            })
+            return {type: RuntimeValueType.Number, value: left_val / right_val};
+        }
         case "%":
-            return {type: RuntimeValueType.Number, value: (left as NumberValue).value % (right as NumberValue).value};
+        {
+            const left_val = (left as NumberValue).value
+            const right_val = (right as NumberValue).value
+            if (right_val === 0) return throw_exception({
+                type:    "Runtime",
+                message: "Impossible to % by 0"
+            })
+            return {type: RuntimeValueType.Number, value: left_val % right_val};
+        }
         case "==":
             return {type: RuntimeValueType.Boolean, value: is_equal(left, right)};
         case "!=":
@@ -675,12 +713,30 @@ const evaluate_unary_expression = (expr: UnaryExpression, env: Environment): Run
 
 const evaluate_struct_literal = (expr: StructLiteral, env: Environment): RuntimeValue =>
 {
-    const fields = structs.get(expr.identifier);
-    if (!fields)
+    const expected_fields = structs.get(expr.identifier);
+    if (!expected_fields)
     {
         throw_exception({
             type:    "Runtime",
             message: `Struct '${expr.identifier}' is not defined.`
+        });
+    }
+
+    const provided_fields = new Set(expr.properties.map(p => p.name));
+    const missing_fields = new Set()
+    for (const field of expected_fields!)
+    {
+        if (!provided_fields.has(field))
+        {
+            missing_fields.add(field);
+        }
+    }
+
+    if (missing_fields)
+    {
+        return throw_exception({
+            type:    "Runtime",
+            message: `Missing required ${missing_fields.size > 1 ? 'properties' : 'property'} '${[...missing_fields].join(', ')}' when instantiating struct '${expr.identifier}'.`
         });
     }
 
@@ -1210,7 +1266,7 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
                 message: `Cannot assign to key of immutable map.`
             });
 
-            const key = index;
+            const key = deep_copy(index);
             const idx = m.elements.findIndex(el => is_equal(el.key, key));
 
             if (idx !== -1)

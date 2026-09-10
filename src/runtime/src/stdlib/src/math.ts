@@ -17,14 +17,14 @@ export const math: StructValue = {
         [
             "PI",
             {
-                type:     RuntimeValueType.Number,
+                type:  RuntimeValueType.Number,
                 value: Math.PI
             }
         ],
         [
             "INF",
             {
-                type:     RuntimeValueType.Number,
+                type:  RuntimeValueType.Number,
                 value: Infinity
             }
         ]
@@ -127,9 +127,9 @@ export const math: StructValue = {
                           {
                               check_arg_type(args[1]!, RuntimeValueType.Number, "math::log");
                               const potential_base = (args[1] as NumberValue).value
-                              if (![10,2,1].includes(potential_base)) return throw_exception({
-                                  type : "Runtime",
-                                  message : "Base should be either 10, 2 or 1 (for 1p)",
+                              if (![10, 2, 1].includes(potential_base)) return throw_exception({
+                                  type:    "Runtime",
+                                  message: "Base should be either 10, 2 or 1 (for 1p)",
                               })
                               base = potential_base
                           }
@@ -325,7 +325,7 @@ export const math: StructValue = {
                                   for (const elt of array_or_set.elements)
                                   {
                                       if (elt.type !== RuntimeValueType.Number) return throw_exception({
-                                          type : "Runtime",
+                                          type:    "Runtime",
                                           message: `Elements of the ${array_or_set.type.split('.')} must be numbers`,
                                       })
                                   }
@@ -340,11 +340,12 @@ export const math: StructValue = {
                                   const start = (range.start as NumberValue).value;
                                   const end = (range.end as NumberValue).value;
                                   let sum = 0;
-                                  for (let i = start; i <= end; i++)
+                                  const step = start <= end ? 1 : -1;
+                                  for (let i = start; step > 0 ? i <= end : i >= end; i += step)
                                   {
                                       sum += i;
                                   }
-                                  return {type: RuntimeValueType.Number, value: sum}
+                                  return {type: RuntimeValueType.Number, value: Math.min(Math.max(sum, start), end)}
                               }
                           }
                       }

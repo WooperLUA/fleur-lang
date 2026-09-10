@@ -8,8 +8,7 @@ import type {
     StructValue
 } from "@types";
 import {RuntimeValueType} from "@types";
-import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception} from "@utils";
-import {type} from "../../stdlib/src/type.ts";
+import {check_arg_type, check_args_length, check_mutability, deep_copy, is_equal, throw_exception} from "@utils";
 
 const find_key_index = (elements: { key: RuntimeValue; value: RuntimeValue }[], target: RuntimeValue): number =>
 {
@@ -54,7 +53,7 @@ export const map: StructValue = {
                                       });
                                   }
 
-                                  const key = tuple.elements[0]!;
+                                  const key = deep_copy(tuple.elements[0]!);
                                   const value = tuple.elements[1]!;
 
                                   const idx = find_key_index(elements, key);
@@ -86,7 +85,7 @@ export const map: StructValue = {
                                check_args_length(args, 3, "<map>::set");
                                check_mutability(args[0]!, "<map>::set");
                                const m = args[0] as MapValue;
-                               const key = args[1]!;
+                               const key = deep_copy(args[1]!);
                                const value = args[2]!;
 
                                const idx = find_key_index(m.elements, key);

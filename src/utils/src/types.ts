@@ -1,4 +1,11 @@
-import {type MapValue, type NumberValue, type RangeValue, type RuntimeValue, RuntimeValueType} from "@types";
+import {
+    type MapValue,
+    type NumberValue,
+    type RangeValue,
+    type RuntimeValue,
+    RuntimeValueType,
+    type StructValue
+} from "@types";
 import {throw_exception} from "./exception";
 
 export const check_arg_type = (arg: RuntimeValue, expected: RuntimeValueType | RuntimeValueType[], name: string): void =>
@@ -104,3 +111,67 @@ export const check_mutability = (val: RuntimeValue, operation: string): void =>
         });
     }
 }
+
+export const deep_copy = (val: RuntimeValue): RuntimeValue =>
+{
+    if (!val) return val;
+    switch (val.type)
+    {
+        case RuntimeValueType.Number:
+        case RuntimeValueType.String:
+        case RuntimeValueType.Boolean:
+        case RuntimeValueType.Null:
+        case RuntimeValueType.Function:
+        case RuntimeValueType.Procedure:
+        case RuntimeValueType.NativeFunction:
+        case RuntimeValueType.Error:
+            return val;
+        case RuntimeValueType.Array:
+            return {
+                type:         RuntimeValueType.Array,
+                elements:     (val as any).elements.map(deep_copy),
+                is_immutable: (val as any).is_immutable
+            };
+        case RuntimeValueType.Set:
+            return {
+                type:         RuntimeValueType.Set,
+                elements:     (val as any).elements.map(deep_copy),
+                is_immutable: (val as any).is_immutable
+            };
+        case RuntimeValueType.Map:
+            return {
+                type:         RuntimeValueType.Map,
+                elements:     (val as any).elements.map((el: { key: RuntimeValue; value: any; }) => ({
+                    key:   deep_copy(el.key),
+                    value: el.value
+                })),
+                is_immutable: (val as any).is_immutable
+            };
+        case RuntimeValueType.Struct:
+            const s = val as StructValue;
+            const copiedProps = new Map<string, RuntimeValue>();
+            for (const [k, v] of s.properties.entries())
+            {
+                copiedProps.set(k, deep_copy(v));
+            }
+            return {
+                type:       RuntimeValueType.Struct,
+                identifier: s.identifier,
+                properties: copiedProps,
+                get methods()
+                {
+                    return s.methods;
+                },
+                is_declaration: s.is_declaration,
+                is_immutable:   s.is_immutable
+            };
+        case RuntimeValueType.Range:
+            return {
+                type:  RuntimeValueType.Range,
+                start: deep_copy((val as any).start),
+                end:   deep_copy((val as any).end)
+            };
+        default:
+            return val;
+    }
+};

@@ -194,6 +194,7 @@ export type Identifier = Node & {
 export type NumericLiteral = Node & {
     type: NodeType.NumericLiteral;
     value: number;
+    is_float?: boolean;
 };
 
 export type StringLiteral = Node & {

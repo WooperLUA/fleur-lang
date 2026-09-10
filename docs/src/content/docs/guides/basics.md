@@ -15,6 +15,7 @@ fleur supports two types of variable declarations: `const` and `var`.
 ### Immutability of Complex Types
 
 When you use `const` with complex types like **Arrays, Sets, Maps, and Structs**, the value itself becomes immutable. You cannot modify the contents of the collection or the properties of the struct.
+Immutability is `deep`, meaning you cannot mutate complex types inside a complex type.
 
 ```flr
 const arr = [1, 2, 3];
@@ -73,14 +74,14 @@ b = 30; // OK
 
 ### Arithmetic Operators
 
-| Operator | Description |
-| :--- | :--- |
-| `+` | Addition (also String concatenation) |
-| `-` | Subtraction |
-| `*` | Multiplication |
-| `/` | Division |
-| `%` | Modulo |
-| `-` (unary) | Negation |
+| Operator | Description                                         |
+| :--- |:----------------------------------------------------|
+| `+` | Addition (also String concatenation)                |
+| `-` | Subtraction                                         |
+| `*` | Multiplication                                      |
+| `/` | Division *(throws an `Error` when dividing by `0`)* |
+| `%` | Modulo *(throws an `Error` when mod by `0`)*        |
+| `-` (unary) | Negation                                            |
 
 ```flr
 const sum = 10 + 5;

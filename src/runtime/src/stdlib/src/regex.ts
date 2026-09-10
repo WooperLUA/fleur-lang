@@ -27,8 +27,18 @@ export const regex: StructValue = {
                               flags = (args[2]! as StringValue).value;
                           }
 
-                          const regexp = new RegExp(pattern, flags);
-                          return {type: RuntimeValueType.Boolean, value: regexp.test(str)} as BooleanValue;
+                          try
+                          {
+                              const regexp = new RegExp(pattern, flags);
+                              return {type: RuntimeValueType.Boolean, value: regexp.test(str)} as BooleanValue;
+                          }
+                          catch(e : any)
+                          {
+                              return throw_exception({
+                                  type : "Runtime",
+                                  message: e.message,
+                              });
+                          }
                       },
             } as NativeFunctionValue,
         ],
@@ -52,22 +62,32 @@ export const regex: StructValue = {
                               flags = (args[2]! as StringValue).value;
                           }
 
-                          const regexp = new RegExp(pattern, flags);
-                          const match_array = regexp.exec(str);
-
-                          if (!match_array)
+                          try
                           {
-                              return {type: RuntimeValueType.Null, value: null} as NullValue;
-                          }
+                              const regexp = new RegExp(pattern, flags);
+                              const match_array = regexp.exec(str);
 
-                          // JS array -> Fleur ArrayValue
-                          return {
-                              type:     RuntimeValueType.Array,
-                              elements: match_array.map(m => ({
-                                  type:  RuntimeValueType.String,
-                                  value: m
-                              }))
-                          } as ArrayValue;
+                              if (!match_array)
+                              {
+                                  return {type: RuntimeValueType.Null, value: null} as NullValue;
+                              }
+
+                              // JS array -> Fleur ArrayValue
+                              return {
+                                  type:     RuntimeValueType.Array,
+                                  elements: match_array.map(m => ({
+                                      type:  RuntimeValueType.String,
+                                      value: m
+                                  }))
+                              } as ArrayValue;
+                          }
+                          catch(e : any)
+                          {
+                              return throw_exception({
+                                  type : "Runtime",
+                                  message: e.message,
+                              });
+                          }
                       },
             } as NativeFunctionValue,
         ],
