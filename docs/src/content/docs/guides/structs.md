@@ -22,7 +22,8 @@ const p = Point { x: 10, y: 20 };
 io::print(p.x); // 10
 ```
 :::note
-Not providing all defined properties when instantiating the Struct will result in an error, usually fixed by using the ::new constructor.
+Not providing all defined properties when instantiating the Struct will result in an error, using the [::new](#static-methods-and-constructors) constructor method is a good way to hide
+properties you don't want the user to define themselves.
 :::
 
 ## Accessing Members: `.` vs `::`

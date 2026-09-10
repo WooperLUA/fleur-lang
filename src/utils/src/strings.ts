@@ -34,6 +34,8 @@ export const stringify_value = (val: any): string =>
             return `[Function: ${val.identifier}]`;
         case RuntimeValueType.Procedure:
             return `[Procedure: ${val.identifier}]`;
+        case RuntimeValueType.NativeFunction:
+            return `[NativeFunction]`;
         case RuntimeValueType.Null:
             return "null";
         case RuntimeValueType.Range:
