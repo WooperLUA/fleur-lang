@@ -22,7 +22,7 @@ export const reflect: StructValue = {
 
                                return {
                                    type:  RuntimeValueType.Boolean,
-                                   value: instance.properties.has(key) || instance.methods.has(key),
+                                   value: instance.properties.has(key),
                                } as BooleanValue;
                            },
             } as NativeFunctionValue,

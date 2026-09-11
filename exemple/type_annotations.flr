@@ -1,0 +1,120 @@
+// 1. Variable Type Annotations
+io::print("--- 1. Variable Annotations ---");
+
+const valid_num: Number = 42;
+const valid_str: String = "hello";
+const valid_bool: Boolean = true;
+const valid_arr: Array = [1, 2, 3];
+
+io::print("Valid variables declared successfully.");
+
+// Test invalid variable assignment
+try {
+    const bad_num: Number = "not a number";
+} catch err {
+    io::print("Caught expected error for bad_num:", err);
+}
+
+
+// 2. Struct Field Annotations
+io::print("\n--- 2. Struct Field Annotations ---");
+
+struct Point {
+    x: Number,
+    y: Number
+}
+
+const valid_point = Point { x: 10, y: 20 };
+io::print("Valid Point created:", valid_point);
+
+// Test invalid struct instantiation
+try {
+    const bad_point = Point { x: 10, y: "twenty" };
+} catch err {
+    io::print("Caught expected error for bad_point:", err);
+}
+
+
+// 3. Function Parameter & Return Annotations
+io::print("\n--- 3. Function Annotations ---");
+
+func add(a: Number, b: Number): Number {
+    return a + b;
+}
+
+const sum = add(5, 10);
+io::print("Valid add(5, 10) =", sum);
+
+// Test invalid parameter type
+try {
+    add(5, "10");
+} catch err {
+    io::print("Caught expected error for add(5, \"10\"):", err);
+}
+
+// Test invalid return type
+func bad_return(x: Number): String {
+    return x; // Returning Number instead of String
+}
+
+try {
+    bad_return(42);
+} catch err {
+    io::print("Caught expected error for bad_return:", err);
+}
+
+
+// 4. Custom Struct as Type Annotation
+io::print("\n--- 4. Custom Struct Annotations ---");
+
+struct User {
+    name: String,
+    age: Number
+}
+
+User::new(name: String, age: Number): User {
+    return User { name: name, age: age };
+}
+
+func greet_user(u: User): String {
+    return "Hello, " + u.name;
+}
+
+const alice = User::new("Alice", 30);
+io::print(greet_user(alice));
+
+// Test passing wrong type (Array instead of User)
+try {
+    greet_user([1, 2, 3]);
+} catch err {
+    io::print(Caught expected error for greet_user with Array:", err);
+}
+
+
+// 5. Procedure Annotations (No Return Type)
+io::print("\n--- 5. Procedure Annotations ---");
+
+proc print_number(n: Number) {
+    io::print("Number is:", n);
+}
+
+print_number(99);
+
+try {
+    print_number("ninety-nine");
+} catch err {
+    io::print("Caught expected error for print_number:", err);
+}
+
+
+// 6. Deep Immutability with Types
+io::print("\n--- 6. Deep Immutability ---");
+
+const matrix: Array = [[1, 2], [3, 4]];
+
+try {
+    // This should fail because const makes the inner arrays immutable too
+    matrix[0][0] = 99;
+} catch err {
+    io::print("Caught expected error for mutating const matrix:", err);
+}

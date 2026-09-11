@@ -30,7 +30,8 @@ export enum NodeType
     AssignmentExpression = "AssignmentExpression",
     RangeExpression = "RangeExpression",
     MethodDeclaration = "MethodDeclaration",
-    StaticMemberExpression = "StaticMemberExpression"
+    StaticMemberExpression = "StaticMemberExpression",
+    TypeAnnotation = "TypeAnnotation"
 }
 
 export type Node = {
@@ -58,26 +59,44 @@ export type Statement =
     | TryStatement
     | ImportStatement;
 
+
+export type TypeAnnotation = Node & {
+    type: NodeType.TypeAnnotation;
+    name: string;
+};
+
+export type Parameter = {
+    name: string;
+    type_annotation?: TypeAnnotation;
+};
+
+export type StructField = {
+    name: string;
+    type_annotation?: TypeAnnotation;
+};
+
 export type VariableDeclaration = Node & {
     type: NodeType.VariableDeclaration;
     identifier: string;
     value: Expression;
     is_const: boolean;
     is_pub: boolean;
+    type_annotation?: TypeAnnotation;
 };
 
 export type FunctionDeclaration = Node & {
     type: NodeType.FunctionDeclaration;
     identifier: string;
-    parameters: string[];
+    parameters: Parameter[];
     body: BlockStatement;
     is_pub: boolean;
+    return_type?: TypeAnnotation;
 };
 
 export type ProcedureDeclaration = Node & {
     type: NodeType.ProcedureDeclaration;
     identifier: string;
-    parameters: string[];
+    parameters: Parameter[];
     body: BlockStatement;
     is_pub: boolean;
 };
@@ -86,14 +105,15 @@ export type MethodDeclaration = Node & {
     type: NodeType.MethodDeclaration;
     struct_name: string;
     identifier: string;
-    parameters: string[];
+    parameters: Parameter[];
     body: BlockStatement;
+    return_type?: TypeAnnotation;
 };
 
 export type StructDeclaration = Node & {
     type: NodeType.StructDeclaration;
     identifier: string;
-    fields: string[];
+    fields: StructField[];
     is_pub: boolean;
 };
 

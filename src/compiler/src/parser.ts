@@ -32,7 +32,7 @@ import {
     type WhenCase,
     type StructProperty,
     type Node, type MethodDeclaration, type StaticMemberExpression, type NullLiteral, type TryStatement,
-    type ImportStatement
+    type ImportStatement, type TypeAnnotation, type Parameter, type StructField
 } from "@types";
 import {throw_exception} from "@utils";
 
@@ -136,10 +136,6 @@ export class Parser
             case TokenKind.IDENTIFIER:
                 if (this.pos + 1 < this.tokens.length && this.tokens[this.pos + 1]?.kind === TokenKind.DOUBLE_COLON)
                 {
-                    // Check if it's a call or a declaration
-                    // A declaration is IDENTIFIER :: IDENTIFIER ( ... ) {
-                    // A call is IDENTIFIER :: IDENTIFIER ( ... ) ; or part of an expression
-                    // Actually, at top level or in a block, we can look ahead
                     let offset = 2; // skip IDENTIFIER and ::
                     if (this.tokens[this.pos + offset]?.kind === TokenKind.IDENTIFIER)
                     {
@@ -154,6 +150,15 @@ export class Parser
                                 if (this.tokens[this.pos + offset]?.kind === TokenKind.RPAREN) parenCount--;
                                 offset++;
                                 if (parenCount === 0) break;
+                            }
+                            // Skip optional return type annotation: `: TypeName`
+                            if (this.tokens[this.pos + offset]?.kind === TokenKind.COLON)
+                            {
+                                offset++; // skip ':'
+                                if (this.tokens[this.pos + offset]?.kind === TokenKind.IDENTIFIER)
+                                {
+                                    offset++; // skip type name
+                                }
                             }
                             if (this.tokens[this.pos + offset]?.kind === TokenKind.LBRACE)
                             {
@@ -174,6 +179,13 @@ export class Parser
         const is_const = this.eat().kind === TokenKind.K_CONST;
         const var_or_const = is_const ? 'constant' : 'variable';
         const identifier = this.expect(TokenKind.IDENTIFIER, `Expected identifier after ${var_or_const} keyword`).value;
+
+        let type_annotation: TypeAnnotation | undefined;
+        if (this.peek().kind === TokenKind.COLON)
+        {
+            type_annotation = this.parse_type_annotation();
+        }
+
         this.expect(TokenKind.ASSIGN, `Expected '=' after identifier in ${var_or_const} declaration`);
         const value = this.parse_expression();
         this.expect(TokenKind.SEMICOLON, `Expected ';' after ${var_or_const} declaration`);
@@ -183,7 +195,8 @@ export class Parser
             identifier,
             value,
             is_const,
-            is_pub
+            is_pub,
+            type_annotation
         };
     }
 
@@ -229,15 +242,16 @@ export class Parser
         this.eat(); // func
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected function name").value;
         this.expect(TokenKind.LPAREN, "Expected '(' after function name");
-        const parameters: string[] = [];
-        if (this.peek().kind !== TokenKind.RPAREN)
-        {
-            do
-            {
-                parameters.push(this.expect(TokenKind.IDENTIFIER, "Expected parameter name").value);
-            } while (this.match(TokenKind.COMMA));
-        }
+
+        const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
+
+        let return_type: TypeAnnotation | undefined;
+        if (this.peek().kind === TokenKind.COLON)
+        {
+            return_type = this.parse_type_annotation();
+        }
+
         const body = this.parse_block_statement();
 
         if (!this.has_return_statement(body))
@@ -255,7 +269,8 @@ export class Parser
             identifier,
             parameters,
             body,
-            is_pub
+            is_pub,
+            return_type
         };
     }
 
@@ -265,15 +280,10 @@ export class Parser
         this.eat(); // proc
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected procedure name").value;
         this.expect(TokenKind.LPAREN, "Expected '(' after procedure name");
-        const parameters: string[] = [];
-        if (this.peek().kind !== TokenKind.RPAREN)
-        {
-            do
-            {
-                parameters.push(this.expect(TokenKind.IDENTIFIER, "Expected parameter name").value);
-            } while (this.match(TokenKind.COMMA));
-        }
+
+        const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
+
         const body = this.parse_block_statement();
 
         if (this.has_return_statement(body))
@@ -301,15 +311,16 @@ export class Parser
         this.expect(TokenKind.DOUBLE_COLON, "Expected '::' after struct name");
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected method name").value;
         this.expect(TokenKind.LPAREN, "Expected '(' after method name");
-        const parameters: string[] = [];
-        if (this.peek().kind !== TokenKind.RPAREN)
-        {
-            do
-            {
-                parameters.push(this.expect(TokenKind.IDENTIFIER, "Expected parameter name").value);
-            } while (this.match(TokenKind.COMMA));
-        }
+
+        const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
+
+        let return_type: TypeAnnotation | undefined;
+        if (this.peek().kind === TokenKind.COLON)
+        {
+            return_type = this.parse_type_annotation();
+        }
+
         const body = this.parse_block_statement();
 
         return {
@@ -317,7 +328,8 @@ export class Parser
             struct_name,
             identifier,
             parameters,
-            body
+            body,
+            return_type
         };
     }
 
@@ -327,12 +339,19 @@ export class Parser
         this.eat(); // struct
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected struct name").value;
         this.expect(TokenKind.LBRACE, "Expected '{' after struct name");
-        const fields: string[] = [];
+
+        const fields: StructField[] = [];
         if (this.peek().kind !== TokenKind.RBRACE)
         {
             do
             {
-                fields.push(this.expect(TokenKind.IDENTIFIER, "Expected field name").value);
+                const name = this.expect(TokenKind.IDENTIFIER, "Expected field name").value;
+                let type_annotation: TypeAnnotation | undefined;
+                if (this.peek().kind === TokenKind.COLON)
+                {
+                    type_annotation = this.parse_type_annotation();
+                }
+                fields.push({name, type_annotation});
             } while (this.match(TokenKind.COMMA));
         }
         this.expect(TokenKind.RBRACE, "Expected '}' after fields");
@@ -744,7 +763,10 @@ export class Parser
         {
             case TokenKind.NUMBER:
                 this.eat();
-                return {type: NodeType.NumericLiteral, value: parseFloat(token.value.replace(/_/g, ""))} as NumericLiteral;
+                return {
+                    type:  NodeType.NumericLiteral,
+                    value: parseFloat(token.value.replace(/_/g, ""))
+                } as NumericLiteral;
             case TokenKind.STRING:
                 this.eat();
 
@@ -818,4 +840,34 @@ export class Parser
                 });
         }
     }
+
+    private parse_type_annotation(): TypeAnnotation
+    {
+        this.expect(TokenKind.COLON, "Expected ':' before type annotation");
+        const type_name = this.expect(TokenKind.IDENTIFIER, "Expected type name after ':'").value;
+        return {
+            type: NodeType.TypeAnnotation,
+            name: type_name
+        } as TypeAnnotation;
+    }
+
+    private parse_parameters(): Parameter[]
+    {
+        const parameters: Parameter[] = [];
+        if (this.peek().kind !== TokenKind.RPAREN)
+        {
+            do
+            {
+                const name = this.expect(TokenKind.IDENTIFIER, "Expected parameter name").value;
+                let type_annotation: TypeAnnotation | undefined;
+                if (this.peek().kind === TokenKind.COLON)
+                {
+                    type_annotation = this.parse_type_annotation();
+                }
+                parameters.push({name, type_annotation});
+            } while (this.match(TokenKind.COMMA));
+        }
+        return parameters;
+    }
+
 }

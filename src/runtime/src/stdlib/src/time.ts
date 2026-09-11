@@ -1,9 +1,8 @@
 import {
     type NumberValue,
-    RuntimeValueType, type StringValue,
+    RuntimeValueType,
 } from "@types";
 import {
-    throw_exception,
     check_args_length,
     check_arg_type
 } from "@utils";

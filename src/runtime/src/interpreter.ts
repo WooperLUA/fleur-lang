@@ -38,7 +38,7 @@ import {
     type StringValue,
     type BooleanValue,
     type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
-    type ImportStatement,
+    type ImportStatement, type StructField,
 } from "@types";
 import {throw_exception, stringify_value, is_equal, FleurError, deep_copy} from "@utils";
 import {setup_stdlib} from "./stdlib";
@@ -47,6 +47,7 @@ import {setup_other_structs} from "./others";
 import * as node_fs from "node:fs";
 import * as node_path from "node:path";
 import {Parser, tokenize} from "@compiler";
+import {validate_runtime_type} from "./type-checker.ts";
 
 export class Environment
 {
@@ -274,6 +275,12 @@ const set_immutable_recursive = (val: RuntimeValue): void =>
 const execute_variable_declaration = (stmt: VariableDeclaration, env: Environment): RuntimeValue =>
 {
     const value = evaluate(stmt.value, env);
+
+    if (stmt.type_annotation)
+    {
+        validate_runtime_type(value, stmt.type_annotation.name, `variable '${stmt.identifier}'`);
+    }
+
     if (stmt.is_const)
     {
         set_immutable_recursive(value);
@@ -320,7 +327,7 @@ const execute_method_declaration = (stmt: MethodDeclaration, env: Environment): 
     return {type: RuntimeValueType.Null, value: null};
 };
 
-const structs = new Map<string, string[]>();
+const structs = new Map<string, StructField[]>();
 const execute_struct_declaration = (stmt: StructDeclaration, env: Environment): RuntimeValue =>
 {
     structs.set(stmt.identifier, stmt.fields);
@@ -723,27 +730,36 @@ const evaluate_struct_literal = (expr: StructLiteral, env: Environment): Runtime
     }
 
     const provided_fields = new Set(expr.properties.map(p => p.name));
-    const missing_fields = new Set()
+    const missing_fields: string[] = [];
+
     for (const field of expected_fields!)
     {
-        if (!provided_fields.has(field))
+        if (!provided_fields.has(field.name))
         {
-            missing_fields.add(field);
+            missing_fields.push(field.name);
         }
     }
 
-    if (missing_fields)
+    if (missing_fields.length > 0)
     {
         return throw_exception({
             type:    "Runtime",
-            message: `Missing required ${missing_fields.size > 1 ? 'properties' : 'property'} '${[...missing_fields].join(', ')}' when instantiating struct '${expr.identifier}'.`
+            message: `Missing required ${missing_fields.length > 1 ? 'properties' : 'property'} '${missing_fields.join(', ')}' when instantiating struct '${expr.identifier}'.`
         });
     }
 
     const properties = new Map<string, RuntimeValue>();
     for (const prop of expr.properties)
     {
-        properties.set(prop.name, evaluate(prop.value, env));
+        const evaluated_val = evaluate(prop.value, env);
+
+        const field_def = expected_fields!.find(f => f.name === prop.name);
+        if (field_def?.type_annotation)
+        {
+            validate_runtime_type(evaluated_val, field_def.type_annotation.name, `struct '${expr.identifier}' property '${prop.name}'`);
+        }
+
+        properties.set(prop.name, evaluated_val);
     }
 
     return {
@@ -907,21 +923,36 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
                 message: `Function '${fn.identifier}' expected ${fn.parameters.length} arguments, got ${args.length}.`
             });
         }
+
         const call_env = new Environment(fn.env);
         if (this_val)
         {
             call_env.declare("this", this_val, true);
         }
+
         for (let i = 0; i < args.length; i++)
         {
-            call_env.declare(fn.parameters[i]!, args[i]!, false);
-        }
+            const param = fn.parameters[i]!;
 
+            if (param.type_annotation)
+            {
+                validate_runtime_type(args[i]!, param.type_annotation.name, `argument '${param.name}'`);
+            }
+
+            call_env.declare(param.name, args[i]!, false);
+        }
         const result = execute(fn.body, call_env);
 
         if (result.type === RuntimeValueType.Return)
         {
-            return (result as ReturnValue).value;
+            const return_val = (result as ReturnValue).value;
+
+            if (fn.type === RuntimeValueType.Function && (fn as any).return_type)
+            {
+                validate_runtime_type(return_val, (fn as any).return_type.name, `return value of '${fn.identifier}'`);
+            }
+
+            return return_val;
         }
 
         if (fn.type === RuntimeValueType.Procedure || (fn as FunctionValue).is_method)

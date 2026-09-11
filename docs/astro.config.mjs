@@ -54,9 +54,10 @@ export default defineConfig({
 								{ label: 'crypto', slug: 'guides/stdlib/crypto' },
 							] },
 						{ label: 'Advanced Features', items: [
-								{ label: 'Deep Equality', slug: 'guides/advanced' },
+								{ label: 'Deep Equality', slug: 'guides/deep-equality' },
 								{ label: 'Modules & Imports', slug: 'guides/modules' },
 								{ label: 'Error Handling', slug: 'guides/errors' },
+								{ label: 'Type Annotations', slug: 'guides/type-annotations' },
 							] },
 					],
 				},

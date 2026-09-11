@@ -1,4 +1,4 @@
-import type {BlockStatement} from "./ast";
+import type {BlockStatement, Parameter, TypeAnnotation} from "./ast";
 
 export enum RuntimeValueType
 {
@@ -79,16 +79,17 @@ export type StructValue = {
 export type FunctionValue = {
     type: RuntimeValueType.Function;
     identifier: string;
-    parameters: string[];
+    parameters: Parameter[];
     body: BlockStatement;
     env: any; // Environment (circular dependency if typed here)
     is_method?: boolean;
+    return_type?: TypeAnnotation;
 };
 
 export type ProcedureValue = {
     type: RuntimeValueType.Procedure;
     identifier: string;
-    parameters: string[];
+    parameters: Parameter[];
     body: BlockStatement;
     env: any; // Environment
 };
