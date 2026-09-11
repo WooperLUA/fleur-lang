@@ -278,7 +278,7 @@ const execute_variable_declaration = (stmt: VariableDeclaration, env: Environmen
 
     if (stmt.type_annotation)
     {
-        validate_runtime_type(value, stmt.type_annotation.name, `variable '${stmt.identifier}'`);
+        validate_runtime_type(value, stmt.type_annotation.names, `variable '${stmt.identifier}'`);
     }
 
     if (stmt.is_const)
@@ -756,7 +756,7 @@ const evaluate_struct_literal = (expr: StructLiteral, env: Environment): Runtime
         const field_def = expected_fields!.find(f => f.name === prop.name);
         if (field_def?.type_annotation)
         {
-            validate_runtime_type(evaluated_val, field_def.type_annotation.name, `struct '${expr.identifier}' property '${prop.name}'`);
+            validate_runtime_type(evaluated_val, field_def.type_annotation.names, `struct '${expr.identifier}' property '${prop.name}'`);
         }
 
         properties.set(prop.name, evaluated_val);
@@ -936,7 +936,7 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
 
             if (param.type_annotation)
             {
-                validate_runtime_type(args[i]!, param.type_annotation.name, `argument '${param.name}'`);
+                validate_runtime_type(args[i]!, param.type_annotation.names, `argument '${param.name}'`);
             }
 
             call_env.declare(param.name, args[i]!, false);
@@ -949,7 +949,7 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
 
             if (fn.type === RuntimeValueType.Function && (fn as any).return_type)
             {
-                validate_runtime_type(return_val, (fn as any).return_type.name, `return value of '${fn.identifier}'`);
+                validate_runtime_type(return_val, (fn as any).return_type.names, `return value of '${fn.identifier}'`);
             }
 
             return return_val;

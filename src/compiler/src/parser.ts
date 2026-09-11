@@ -844,10 +844,18 @@ export class Parser
     private parse_type_annotation(): TypeAnnotation
     {
         this.expect(TokenKind.COLON, "Expected ':' before type annotation");
-        const type_name = this.expect(TokenKind.IDENTIFIER, "Expected type name after ':'").value;
+        const names: string[] = [];
+
+        names.push(this.expect(TokenKind.IDENTIFIER, "Expected type name after ':'").value);
+
+        while (this.match(TokenKind.OR))
+        {
+            names.push(this.expect(TokenKind.IDENTIFIER, "Expected type name after 'or'").value);
+        }
+
         return {
             type: NodeType.TypeAnnotation,
-            name: type_name
+            names: names
         } as TypeAnnotation;
     }
 

@@ -60,3 +60,11 @@ func distance(p: Point): Number {
 }
 ```
 
+### Union Types
+
+By using the `or` operator, you can specify that a value is either a type or another type.
+
+```flr
+const numb_or_str: Number or String = 6; // or "6"
+```
+

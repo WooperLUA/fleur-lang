@@ -62,7 +62,7 @@ export type Statement =
 
 export type TypeAnnotation = Node & {
     type: NodeType.TypeAnnotation;
-    name: string;
+    names: string[];
 };
 
 export type Parameter = {

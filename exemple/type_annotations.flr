@@ -87,7 +87,7 @@ io::print(greet_user(alice));
 try {
     greet_user([1, 2, 3]);
 } catch err {
-    io::print(Caught expected error for greet_user with Array:", err);
+    io::print("Caught expected error for greet_user with Array:", err);
 }
 
 
