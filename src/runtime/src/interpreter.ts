@@ -53,6 +53,7 @@ export class Environment
 {
     private readonly parent?: Environment;
     private readonly variables: Record<string, RuntimeValue>;
+    private readonly types: Record<string, string[]>;
     private constants: Set<string>;
     private methods: Map<string, Map<string, FunctionValue>>;
 
@@ -64,6 +65,7 @@ export class Environment
         // Weird quirk, but I use this instead of {} because then it would have a
         // prototype with methods, but we only want a Map like record
         this.variables = Object.create(null);
+        this.types = Object.create(null);
         this.constants = new Set();
         this.methods = new Map();
         this.base_dir = base_dir ?? parent?.base_dir ?? process.cwd();
@@ -98,13 +100,17 @@ export class Environment
         return all_methods;
     }
 
-    public declare(name: string, value: RuntimeValue, is_const: boolean): RuntimeValue
+    public declare(name: string, value: RuntimeValue, is_const: boolean, type_names?: string[]): RuntimeValue
     {
         if (name in this.variables)
         {
             throw_exception({type: "Runtime", message: `Variable '${name}' is already declared.`});
         }
         this.variables[name] = value;
+        if (type_names)
+        {
+            this.types[name] = type_names;
+        }
         if (is_const) this.constants.add(name);
         return value;
     }
@@ -116,6 +122,10 @@ export class Environment
             type:    "Runtime",
             message: `Cannot assign to constant '${name}'.`
         });
+        if (name in env.types)
+        {
+            validate_runtime_type(value, env.types[name]!, `assignment to variable '${name}'`);
+        }
         env.variables[name] = value;
         return value;
     }
@@ -285,7 +295,7 @@ const execute_variable_declaration = (stmt: VariableDeclaration, env: Environmen
     {
         set_immutable_recursive(value);
     }
-    return env.declare(stmt.identifier, value, stmt.is_const);
+    return env.declare(stmt.identifier, value, stmt.is_const, stmt.type_annotation?.names);
 };
 
 const execute_function_declaration = (stmt: FunctionDeclaration, env: Environment): RuntimeValue =>
@@ -939,7 +949,7 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
                 validate_runtime_type(args[i]!, param.type_annotation.names, `argument '${param.name}'`);
             }
 
-            call_env.declare(param.name, args[i]!, false);
+            call_env.declare(param.name, args[i]!, false, param.type_annotation?.names);
         }
         const result = execute(fn.body, call_env);
 
@@ -1240,14 +1250,27 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
             throw_exception({type: "Runtime", message: `Cannot assign to property of immutable struct.`});
         }
 
+        const struct_def = structs.get(struct.identifier);
+        const field_def = struct_def?.find(f => f.name === member.property.name);
+
         if (operator === "=")
         {
+            if (field_def?.type_annotation)
+            {
+                validate_runtime_type(right, field_def.type_annotation.names, `assignment to struct property '${member.property.name}'`);
+            }
             struct.properties.set(member.property.name, right);
             return right;
         }
 
         const current = struct.properties.get(member.property.name)!;
         const newVal = compute_new_value(current);
+
+        if (field_def?.type_annotation)
+        {
+            validate_runtime_type(newVal, field_def.type_annotation.names, `assignment to struct property '${member.property.name}'`);
+        }
+
         struct.properties.set(member.property.name, newVal);
         return newVal;
     }
@@ -1324,15 +1347,27 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
             });
 
             const key = (index as StringValue).value;
+            const struct_def = structs.get(struct.identifier);
+            const field_def = struct_def?.find(f => f.name === key);
 
             if (operator === "=")
             {
+                if (field_def?.type_annotation)
+                {
+                    validate_runtime_type(right, field_def.type_annotation.names, `assignment to struct property '${key}'`);
+                }
                 struct.properties.set(key, right);
                 return right;
             }
 
             const current = struct.properties.get(key)!;
             const newVal = compute_new_value(current);
+
+            if (field_def?.type_annotation)
+            {
+                validate_runtime_type(newVal, field_def.type_annotation.names, `assignment to struct property '${key}'`);
+            }
+
             struct.properties.set(key, newVal);
             return newVal;
         }
