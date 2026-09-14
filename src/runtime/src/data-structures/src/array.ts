@@ -314,12 +314,11 @@ export const array: StructValue = {
             "concat",
             {
                 type:      RuntimeValueType.NativeFunction,
-                is_method: true,
                 call:      (args: RuntimeValue[]) =>
                            {
-                               check_args_length(args, 2, "<array>::concat");
-                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::concat");
-                               check_arg_type(args[1]!, RuntimeValueType.Array, "<array>::concat");
+                               check_args_length(args, 2, "Array::concat");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "Array::concat");
+                               check_arg_type(args[1]!, RuntimeValueType.Array, "Array::concat");
 
                                const arr1 = args[0] as ArrayValue;
                                const arr2 = args[1] as ArrayValue;
@@ -341,6 +340,46 @@ export const array: StructValue = {
                                check_args_length(args, 2, "<array>::slice");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::slice");
                                check_arg_type(args[1]!, RuntimeValueType.Range, "<array>::slice");
+                               check_mutability(args[0]!, "<array>::slice");
+
+                               const arr = args[0] as ArrayValue;
+                               const range = args[1] as RangeValue;
+
+                               const startVal = (range.start as NumberValue).value;
+                               const endVal = (range.end as NumberValue).value;
+
+                               const len = arr.elements.length;
+
+                               let start = startVal < 0 ? len + startVal : startVal;
+                               let end = endVal < 0 ? len + endVal : endVal;
+
+                               const elements: RuntimeValue[] = [];
+                               const step = start <= end ? 1 : -1;
+
+                               for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                               {
+                                   if (i >= 0 && i < len)
+                                   {
+                                       elements.push(arr.elements[i]!);
+                                   }
+                               }
+
+                               arr.elements = elements;
+
+                               return arr;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "sliced",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::sliced");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::sliced");
+                               check_arg_type(args[1]!, RuntimeValueType.Range, "<array>::sliced");
 
                                const arr = args[0] as ArrayValue;
                                const range = args[1] as RangeValue;
@@ -368,6 +407,72 @@ export const array: StructValue = {
                                    type:     RuntimeValueType.Array,
                                    elements: elements,
                                } as ArrayValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "reverse",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<array>::reverse");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::reverse");
+                               check_mutability(args[0]!, "<array>::reverse");
+
+                               const arr = (args[0] as ArrayValue);
+                               arr.elements.reverse();
+
+                               return arr;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "reversed",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<array>::reversed");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::reversed");
+
+                               const arr = (args[0] as ArrayValue);
+
+                               return {
+                                   type:     RuntimeValueType.Array,
+                                   elements: [...arr.elements].reverse(),
+                               } as ArrayValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "fill",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, [2, 3], "<array>::fill");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::fill");
+                               check_mutability(args[0]!, "<array>::fill");
+
+                               const arr = (args[0] as ArrayValue);
+                               const fill_value = args[1] as RuntimeValue;
+                               const range = (args[2] as RangeValue) ?? null;
+                               if (range)
+                               {
+                                   const start = (range.start as NumberValue).value;
+                                   const end = (range.end as NumberValue).value;
+                                   arr.elements.fill(fill_value, start, end);
+                               }
+                               else
+                               {
+                                   arr.elements.fill(fill_value)
+                               }
+
+                               return arr
                            },
             } as NativeFunctionValue,
         ],

@@ -61,7 +61,7 @@ io::print("Array after clear:", my_array_alt);
 // 9. Concatenation
 const arr1 = [1, 2];
 const arr2 = [3, 4];
-const arr3 = arr1::concat(arr2);
+const arr3 = Array::concat(arr1, arr2);
 io::print("Concatenated array:", arr3);
 
 // 10. Complex types (Structs in Arrays)
@@ -84,20 +84,20 @@ io::print("Last value of arr5", arr5::last());
 const arr_to_slice = [10, 20, 30, 40, 50];
 
 // Basic
-const s1 = arr_to_slice::slice(1..3);
+const s1 = arr_to_slice::sliced(1..3);
 io::print("arr_to_slice::slice(1..3): ", s1);
 
 // Slice with reverse range
-const s2 = arr_to_slice::slice(3..1);
+const s2 = arr_to_slice::sliced(3..1);
 io::print("arr_to_slice::slice(3..1): ", s2);
 
 // Slice with negative indices
-const s3 = arr_to_slice::slice(-3..-1);
+const s3 = arr_to_slice::sliced(-3..-1);
 io::print("arr_to_slice::slice(-3..-1): ", s3);
 
-const s4 = arr_to_slice::slice(-1..-3);
+const s4 = arr_to_slice::sliced(-1..-3);
 io::print("arr_to_slice::slice(-1..-3): ", s4);
 
 // Full array via range
-const s5 = arr_to_slice::slice(0..4);
+const s5 = arr_to_slice::sliced(0..4);
 io::print("arr_to_slice::slice(0..4): ", s5);

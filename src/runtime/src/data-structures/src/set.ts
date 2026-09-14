@@ -333,12 +333,11 @@ export const set: StructValue = {
             "concat",
             {
                 type:      RuntimeValueType.NativeFunction,
-                is_method: true,
                 call:      (args: RuntimeValue[]) =>
                            {
-                               check_args_length(args, 2, "<set>::concat");
-                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::concat");
-                               check_arg_type(args[1]!, RuntimeValueType.Set, "<set>::concat");
+                               check_args_length(args, 2, "Set::concat");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "Set::concat");
+                               check_arg_type(args[1]!, RuntimeValueType.Set, "Set::concat");
 
                                const arr1 = args[0] as SetValue;
                                const arr2 = args[1] as SetValue;
@@ -348,6 +347,123 @@ export const set: StructValue = {
                                    self.findIndex((e) => is_equal(e, el)) === i
                                );
                                return {type: RuntimeValueType.Set, elements: unique} as SetValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "slice",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::slice");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::slice");
+                               check_arg_type(args[1]!, RuntimeValueType.Range, "<set>::slice");
+                               check_mutability(args[0]!, "<set>::slice");
+
+                               const set = args[0] as SetValue;
+                               const range = args[1] as RangeValue;
+
+                               const startVal = (range.start as NumberValue).value;
+                               const endVal = (range.end as NumberValue).value;
+
+                               const len = set.elements.length;
+
+                               let start = startVal < 0 ? len + startVal : startVal;
+                               let end = endVal < 0 ? len + endVal : endVal;
+
+                               const elements: RuntimeValue[] = [];
+                               const step = start <= end ? 1 : -1;
+
+                               for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                               {
+                                   if (i >= 0 && i < len)
+                                   {
+                                       elements.push(set.elements[i]!);
+                                   }
+                               }
+
+                               set.elements = elements;
+
+                               return set;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "sliced",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::sliced");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::sliced");
+                               check_arg_type(args[1]!, RuntimeValueType.Range, "<set>::sliced");
+
+                               const set = args[0] as SetValue;
+                               const range = args[1] as RangeValue;
+
+                               const startVal = (range.start as NumberValue).value;
+                               const endVal = (range.end as NumberValue).value;
+
+                               const len = set.elements.length;
+
+                               let start = startVal < 0 ? len + startVal : startVal;
+                               let end = endVal < 0 ? len + endVal : endVal;
+
+                               const elements: RuntimeValue[] = [];
+                               const step = start <= end ? 1 : -1;
+
+                               for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                               {
+                                   if (i >= 0 && i < len)
+                                   {
+                                       elements.push(set.elements[i]!);
+                                   }
+                               }
+
+                               return {
+                                   type:     RuntimeValueType.Set,
+                                   elements: elements,
+                               } as SetValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "reverse",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<set>::reverse");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::reverse");
+                               check_mutability(args[0]!, "<set>::reverse");
+
+                               const set = (args[0] as SetValue);
+                               set.elements.reverse();
+
+                               return set;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "reversed",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<set>::reversed");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::reversed");
+
+                               const set = (args[0] as SetValue);
+
+                               return {
+                                   type:     RuntimeValueType.Set,
+                                   elements: [...set.elements].reverse(),
+                               } as SetValue;
                            },
             } as NativeFunctionValue,
         ],
