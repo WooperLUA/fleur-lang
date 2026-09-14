@@ -1,0 +1,56 @@
+func map(arr: Array, fns: Array or Function)
+{
+    var new_arr = Array::from(arr);
+    const functions = type::array(fns);
+
+    for fn in functions
+    {
+        const _fn: Function or NativeFunction = fn;
+        for elt in new_arr
+        {
+            const idx = new_arr::index(elt);
+            new_arr::set(idx, _fn(elt));
+        }
+    }
+
+
+    return new_arr;
+}
+
+func filter(arr: Array, fn: Function)
+{
+    var new_arr = [];
+    for elt in arr
+    {
+        if fn(elt)
+        {
+            new_arr::add(elt);
+        }
+    }
+    return new_arr;
+}
+
+func find(arr: Array, fn: Function)
+{
+    for elt in arr
+    {
+        if fn(elt)
+        {
+            return elt;
+        }
+    }
+    return null;
+}
+
+func square(x) { return x*x; }
+func double(x) { return x*2; }
+func is_even(x) { return x%2==0; }
+func is_two(x) { return x == 2; }
+
+const arr = [1,2,3];
+io::print("Map to square : ", map(arr, [square,
+                                        double,
+                                        math::float,
+                                        type::array]));
+//io::print("Filter to even : ", filter(arr, is_even));
+//io::print("Find elt two : ", find(arr, is_two));

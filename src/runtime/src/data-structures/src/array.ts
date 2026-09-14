@@ -1,6 +1,6 @@
 import {
     type ArrayValue,
-    type BooleanValue, type FunctionValue,
+    type BooleanValue,
     type NativeFunctionValue,
     type NumberValue,
     type RangeValue,
@@ -36,7 +36,7 @@ export const array: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, 1, "Array::from");
-                          check_arg_type(args[0]!, [RuntimeValueType.Range, RuntimeValueType.Array], "Array::from");
+                          check_arg_type(args[0]!, [RuntimeValueType.Range, RuntimeValueType.Array, RuntimeValueType.Set], "Array::from");
 
                           let elements: RuntimeValue[] = [];
                           const arg = args[0]!;
@@ -61,9 +61,11 @@ export const array: StructValue = {
                                   break
                               }
                               case RuntimeValueType.Array:
+                              case RuntimeValueType.Set:
                               {
                                   const arr = arg as ArrayValue;
                                   elements = Array.from(arr.elements);
+                                  break;
                               }
                           }
 

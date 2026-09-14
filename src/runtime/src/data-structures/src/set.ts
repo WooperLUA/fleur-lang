@@ -6,7 +6,8 @@ import {
     type RangeValue,
     type RuntimeValue,
     RuntimeValueType,
-    type SetValue, type StringValue,
+    type SetValue,
+    type StringValue,
     type StructValue,
 } from "@types";
 import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception,} from "@utils";
@@ -46,7 +47,7 @@ export const set: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, 1, "Set::from");
-                          check_arg_type(args[0]!, [RuntimeValueType.Range, RuntimeValueType.Set], "Set::from");
+                          check_arg_type(args[0]!, [RuntimeValueType.Range, RuntimeValueType.Set, RuntimeValueType.Array], "Set::from");
 
                           let elements: RuntimeValue[] = [];
                           const arg = args[0]!;
@@ -73,6 +74,14 @@ export const set: StructValue = {
                                           elements.push(value);
                                       }
                                   }
+                                  break
+                              }
+                              case RuntimeValueType.Array:
+                              {
+                                  const arr = arg as ArrayValue;
+                                  elements = arr.elements.filter((el, i, self) =>
+                                      self.findIndex((e) => is_equal(e, el)) === i
+                                  );
                                   break
                               }
                               case RuntimeValueType.Set:
