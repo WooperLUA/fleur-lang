@@ -777,7 +777,9 @@ export class Parser
                     .replace(/\\t/g, '\t')   // Tab
                     .replace(/\\r/g, '\r')   // Carriage return
                     .replace(/\\"/g, '"')    // Double quote
-                    .replace(/\\\\/g, '\\'); // Backslash
+                    .replace(/\\\\/g, '\\') // Backslash
+                    // Hex escape sequences (for ANSI colors/bold)
+                    .replace(/\\x([0-9a-fA-F]{2})/g, (_: any, hex: string) => String.fromCharCode(parseInt(hex, 16)));
 
                 return {
                     type:  NodeType.StringLiteral,
