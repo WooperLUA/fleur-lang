@@ -6,7 +6,7 @@ import {
     type RangeValue,
     type RuntimeValue,
     RuntimeValueType,
-    type SetValue,
+    type SetValue, type StringValue,
     type StructValue,
 } from "@types";
 import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception,} from "@utils";
@@ -360,7 +360,7 @@ export const set: StructValue = {
                                check_args_length(args, 2, "<set>::slice");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::slice");
                                check_arg_type(args[1]!, RuntimeValueType.Range, "<set>::slice");
-                               check_mutability(args[0]!, "<set>::slice");
+                               check_mutability(args[0]!, "<set>::slice", "Use ::sliced for immutable sets");
 
                                const set = args[0] as SetValue;
                                const range = args[1] as RangeValue;
@@ -439,7 +439,7 @@ export const set: StructValue = {
                            {
                                check_args_length(args, 1, "<set>::reverse");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::reverse");
-                               check_mutability(args[0]!, "<set>::reverse");
+                               check_mutability(args[0]!, "<set>::reverse", "Use ::reversed for immutable sets");
 
                                const set = (args[0] as SetValue);
                                set.elements.reverse();
@@ -463,6 +463,159 @@ export const set: StructValue = {
                                return {
                                    type:     RuntimeValueType.Set,
                                    elements: [...set.elements].reverse(),
+                               } as SetValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "sort",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<set>::sort");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::sort");
+                               check_mutability(args[0]!, "<set>::sort", "Use ::sorted for immutable sets");
+
+                               const set = args[0] as SetValue;
+                               let set_type = null
+                               for (const el of set.elements)
+                               {
+                                   if (set_type != null && set_type != el.type) return throw_exception({
+                                       type:    "Runtime",
+                                       message: "Set must have only one type of values to be sorted"
+                                   })
+                                   set_type = el.type
+                               }
+
+                               switch (set_type)
+                               {
+                                   case RuntimeValueType.Number:
+                                   {
+                                       const set_alt = set.elements as NumberValue[];
+                                       set.elements = set_alt.sort((a, b) => a.value - b.value);
+                                       break;
+                                   }
+                                   case RuntimeValueType.String:
+                                   {
+                                       const set_alt = set.elements as StringValue[];
+                                       set.elements = set_alt.sort((a, b) => a.value.localeCompare(b.value));
+                                       break;
+                                   }
+                                   case RuntimeValueType.Boolean:
+                                   {
+                                       const set_alt = set.elements as BooleanValue[];
+                                       // @ts-ignore ts bullshit i dont want to have to deal with
+                                       set.elements = set_alt.sort((a, b) => a.value - b.value);
+                                       break;
+                                   }
+                                   case RuntimeValueType.Range:
+                                   {
+                                       const set_alt = set.elements as RangeValue[];
+                                       set.elements = set_alt.sort((a, b) =>
+                                       {
+                                           const a_start = (a.start as NumberValue).value;
+                                           const b_start = (b.start as NumberValue).value;
+                                           const a_end = (a.end as NumberValue).value;
+                                           const b_end = (b.end as NumberValue).value;
+
+                                           if (a_start !== b_start)
+                                           {
+                                               return a_start - b_start;
+                                           }
+
+                                           return a_end - b_end;
+                                       });
+                                       break;
+                                   }
+                                   default:
+                                   {
+                                       return throw_exception({
+                                           type:    "Runtime",
+                                           message: "You can only sort Sets by Number, String, Booleans or Ranges"
+                                       })
+                                   }
+                               }
+
+                               return set
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "sorted",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<set>::sorted");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::sorted");
+
+                               const set = args[0] as SetValue;
+                               let new_set = [];
+                               let set_type = null
+                               for (const el of set.elements)
+                               {
+                                   if (set_type != null && set_type != el.type) return throw_exception({
+                                       type:    "Runtime",
+                                       message: "Set must have only one type of values to be sorted"
+                                   })
+                                   set_type = el.type
+                               }
+
+                               switch (set_type)
+                               {
+                                   case RuntimeValueType.Number:
+                                   {
+                                       const set_alt = [...set.elements as NumberValue[]];
+                                       new_set = set_alt.sort((a, b) => a.value - b.value);
+                                       break;
+                                   }
+                                   case RuntimeValueType.String:
+                                   {
+                                       const set_alt = [...set.elements as StringValue[]];
+                                       new_set = set_alt.sort((a, b) => a.value.localeCompare(b.value));
+                                       break;
+                                   }
+                                   case RuntimeValueType.Boolean:
+                                   {
+                                       const set_alt = [...set.elements as BooleanValue[]];
+                                       // @ts-ignore ts bullshit i dont want to have to deal with
+                                       new_set = set_alt.sort((a, b) => a.value - b.value);
+                                       break;
+                                   }
+                                   case RuntimeValueType.Range:
+                                   {
+                                       const set_alt = [...set.elements as RangeValue[]];
+                                       new_set = set_alt.sort((a, b) =>
+                                       {
+                                           const a_start = (a.start as NumberValue).value;
+                                           const b_start = (b.start as NumberValue).value;
+                                           const a_end = (a.end as NumberValue).value;
+                                           const b_end = (b.end as NumberValue).value;
+
+                                           if (a_start !== b_start)
+                                           {
+                                               return a_start - b_start;
+                                           }
+
+                                           return a_end - b_end;
+                                       });
+                                       break;
+                                   }
+                                   default:
+                                   {
+                                       return throw_exception({
+                                           type:    "Runtime",
+                                           message: "You can only sort Sets by Number, String, Booleans or Ranges"
+                                       })
+                                   }
+                               }
+
+                               return {
+                                   type : RuntimeValueType.Set,
+                                   elements : new_set
                                } as SetValue;
                            },
             } as NativeFunctionValue,

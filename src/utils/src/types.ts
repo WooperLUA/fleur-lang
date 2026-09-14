@@ -101,13 +101,14 @@ export const is_equal = (left: RuntimeValue, right: RuntimeValue): boolean =>
 };
 
 // Add this to the bottom of the file
-export const check_mutability = (val: RuntimeValue, operation: string): void =>
+export const check_mutability = (val: RuntimeValue, operation: string, recommendation?: string): void =>
 {
     if ((val as any).is_immutable)
     {
         throw_exception({
             type:    "Runtime",
-            message: `Cannot perform '${operation}' on an immutable (const) value.`
+            message: `Cannot perform '${operation}' on an immutable (const) value.`,
+            metadata : recommendation,
         });
     }
 }

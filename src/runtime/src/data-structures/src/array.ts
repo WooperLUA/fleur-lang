@@ -1,6 +1,6 @@
 import {
     type ArrayValue,
-    type BooleanValue,
+    type BooleanValue, type FunctionValue,
     type NativeFunctionValue,
     type NumberValue,
     type RangeValue,
@@ -313,21 +313,21 @@ export const array: StructValue = {
         [
             "concat",
             {
-                type:      RuntimeValueType.NativeFunction,
-                call:      (args: RuntimeValue[]) =>
-                           {
-                               check_args_length(args, 2, "Array::concat");
-                               check_arg_type(args[0]!, RuntimeValueType.Array, "Array::concat");
-                               check_arg_type(args[1]!, RuntimeValueType.Array, "Array::concat");
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "Array::concat");
+                          check_arg_type(args[0]!, RuntimeValueType.Array, "Array::concat");
+                          check_arg_type(args[1]!, RuntimeValueType.Array, "Array::concat");
 
-                               const arr1 = args[0] as ArrayValue;
-                               const arr2 = args[1] as ArrayValue;
+                          const arr1 = args[0] as ArrayValue;
+                          const arr2 = args[1] as ArrayValue;
 
-                               return {
-                                   type:     RuntimeValueType.Array,
-                                   elements: [...arr1.elements, ...arr2.elements],
-                               } as ArrayValue;
-                           },
+                          return {
+                              type:     RuntimeValueType.Array,
+                              elements: [...arr1.elements, ...arr2.elements],
+                          } as ArrayValue;
+                      },
             } as NativeFunctionValue,
         ],
         [
@@ -340,7 +340,7 @@ export const array: StructValue = {
                                check_args_length(args, 2, "<array>::slice");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::slice");
                                check_arg_type(args[1]!, RuntimeValueType.Range, "<array>::slice");
-                               check_mutability(args[0]!, "<array>::slice");
+                               check_mutability(args[0]!, "<array>::slice", "Use ::sliced for immutable arrays");
 
                                const arr = args[0] as ArrayValue;
                                const range = args[1] as RangeValue;
@@ -419,7 +419,7 @@ export const array: StructValue = {
                            {
                                check_args_length(args, 1, "<array>::reverse");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::reverse");
-                               check_mutability(args[0]!, "<array>::reverse");
+                               check_mutability(args[0]!, "<array>::reverse", "Use ::reversed for immutable arrays");
 
                                const arr = (args[0] as ArrayValue);
                                arr.elements.reverse();
@@ -473,6 +473,159 @@ export const array: StructValue = {
                                }
 
                                return arr
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "sort",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<array>::sort");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::sort");
+                               check_mutability(args[0]!, "<array>::sort", "Use ::sorted for immutable arrays");
+
+                               const arr = args[0] as ArrayValue;
+                               let arr_type = null
+                               for (const el of arr.elements)
+                               {
+                                   if (arr_type != null && arr_type != el.type) return throw_exception({
+                                       type:    "Runtime",
+                                       message: "Array must have only one type of values to be sorted"
+                                   })
+                                   arr_type = el.type
+                               }
+
+                               switch (arr_type)
+                               {
+                                   case RuntimeValueType.Number:
+                                   {
+                                       const array = arr.elements as NumberValue[];
+                                       arr.elements = array.sort((a, b) => a.value - b.value);
+                                       break;
+                                   }
+                                   case RuntimeValueType.String:
+                                   {
+                                       const array = arr.elements as StringValue[];
+                                       arr.elements = array.sort((a, b) => a.value.localeCompare(b.value));
+                                       break;
+                                   }
+                                   case RuntimeValueType.Boolean:
+                                   {
+                                       const array = arr.elements as BooleanValue[];
+                                       // @ts-ignore ts bullshit i dont want to have to deal with
+                                       arr.elements = array.sort((a, b) => a.value - b.value);
+                                       break;
+                                   }
+                                   case RuntimeValueType.Range:
+                                   {
+                                       const array = arr.elements as RangeValue[];
+                                       arr.elements = array.sort((a, b) =>
+                                       {
+                                           const a_start = (a.start as NumberValue).value;
+                                           const b_start = (b.start as NumberValue).value;
+                                           const a_end = (a.end as NumberValue).value;
+                                           const b_end = (b.end as NumberValue).value;
+
+                                           if (a_start !== b_start)
+                                           {
+                                               return a_start - b_start;
+                                           }
+
+                                           return a_end - b_end;
+                                       });
+                                       break;
+                                   }
+                                   default:
+                                   {
+                                       return throw_exception({
+                                           type:    "Runtime",
+                                           message: "You can only sort Arrays by Number, String, Booleans or Ranges"
+                                       })
+                                   }
+                               }
+
+                               return arr
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "sorted",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<array>::sorted");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::sorted");
+
+                               const arr = args[0] as ArrayValue;
+                               let new_array = [];
+                               let arr_type = null
+                               for (const el of arr.elements)
+                               {
+                                   if (arr_type != null && arr_type != el.type) return throw_exception({
+                                       type:    "Runtime",
+                                       message: "Array must have only one type of values to be sorted"
+                                   })
+                                   arr_type = el.type
+                               }
+
+                               switch (arr_type)
+                               {
+                                   case RuntimeValueType.Number:
+                                   {
+                                       const array = [...arr.elements as NumberValue[]];
+                                       new_array = array.sort((a, b) => a.value - b.value);
+                                       break;
+                                   }
+                                   case RuntimeValueType.String:
+                                   {
+                                       const array = [...arr.elements as StringValue[]];
+                                       new_array = array.sort((a, b) => a.value.localeCompare(b.value));
+                                       break;
+                                   }
+                                   case RuntimeValueType.Boolean:
+                                   {
+                                       const array = [...arr.elements as BooleanValue[]];
+                                       // @ts-ignore ts bullshit i dont want to have to deal with
+                                       new_array = array.sort((a, b) => a.value - b.value);
+                                       break;
+                                   }
+                                   case RuntimeValueType.Range:
+                                   {
+                                       const array = [...arr.elements as RangeValue[]];
+                                       new_array = array.sort((a, b) =>
+                                       {
+                                           const a_start = (a.start as NumberValue).value;
+                                           const b_start = (b.start as NumberValue).value;
+                                           const a_end = (a.end as NumberValue).value;
+                                           const b_end = (b.end as NumberValue).value;
+
+                                           if (a_start !== b_start)
+                                           {
+                                               return a_start - b_start;
+                                           }
+
+                                           return a_end - b_end;
+                                       });
+                                       break;
+                                   }
+                                   default:
+                                   {
+                                       return throw_exception({
+                                           type:    "Runtime",
+                                           message: "You can only sort Arrays by Number, String, Booleans or Ranges"
+                                       })
+                                   }
+                               }
+
+                               return {
+                                   type : RuntimeValueType.Array,
+                                   elements : new_array
+                               } as ArrayValue;
                            },
             } as NativeFunctionValue,
         ],

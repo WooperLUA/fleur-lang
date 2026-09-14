@@ -31,10 +31,11 @@ const r = Range::new(1, 10);
 
 ### Methods
 
-| Method | Returns | Description |
-| :--- | :--- | :--- |
-| `contains(value)` | `Boolean` | Returns `true` if the `value` is within the range (inclusive). |
-| `reverse()` | `Range` | Reverses the range in-place (swaps start and end) and returns it. |
+| Method            | Returns   | Description                                                                 |
+|:------------------|:----------|:----------------------------------------------------------------------------|
+| `contains(value)` | `Boolean` | Returns `true` if the `value` is within the range (inclusive).              |
+| `reverse()`       | `Range`   | Reverses the range in-place (swaps start and end). Returns the range.       |
+| `reversed()`      | `Range`   | Return a new range being the original range reversed (swaps start and end). |
 
 #### Example: Membership Test
 

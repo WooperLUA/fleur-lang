@@ -75,5 +75,23 @@ export const range: StructValue = {
                       }
             }
         ],
+        [
+            "reversed",
+            {
+                type: RuntimeValueType.NativeFunction,
+                is_method: true,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "<range>::reverse");
+                          const range = args[0]! as RangeValue;
+
+                          return {
+                              type: RuntimeValueType.Range,
+                              start : range.end,
+                              end: range.start,
+                          } as RangeValue;
+                      }
+            }
+        ],
     ])
 };

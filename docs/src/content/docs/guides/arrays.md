@@ -21,28 +21,30 @@ const mixed = Array::new(1, "two", true);
 
 ## Methods
 
-| Member                              | Return Type | Description                                                                                                    |
-|:------------------------------------| :--- |:---------------------------------------------------------------------------------------------------------------|
-| `Array::new(...args)`               | `Array` | Creates a new array with optional initial `args`.                                                              |
-| `Array::from(other)`                | `Array` | Creates a new array from an existing Array or Range *(that will fill the array with the values of the range)*. |
-| `Array::concat(array, other_array)` | `Array` | Returns a new array containing elements from both arrays.                                                      |
-| `add(value)`                        | `Array` | Appends an element to the end. Returns the array.                                                              |
-| `insert(index, value)`              | `Array` | Inserts an element at a specific index. Returns the array.                                                     |
-| `get(index)`                        | `Any` | Returns the element at the index *or null if absent*.                                                          |
-| `set(index, value)`                 | `Array` | Sets the element at the index. Returns the array.                                                              |
-| `length()`                          | `Number` | Returns the number of elements.                                                                                |
-| `pop()`                             | `Any` | Removes and returns the last element.                                                                          |
-| `contains(value)`                   | `Boolean` | Checks if a value exists (uses deep equality).                                                                 |
-| `remove(index)`                     | `Array` | Removes the element at the specified `index`. Returns the array.                                               |
-| `clear()`                           | `Array` | Removes all elements from the array. Returns the array.                                                        |
-| `index(value)`                      | `Number,Null` | Returns the index of the first element from the array *or null if absent*.                                     |
-| `first()`                           | `Any` | Returns the first element of the array *or null if absent*.                                                    |
-| `last()`                            | `Any` | Returns the last element of the array *or null if absent*.                                                     |
-| `slice(range)`                      | `Array` | Mutates the array to a portion of the original array defined by a `Range`. Returns the array.                  |
-| `sliced(range)`                     | `Array` | Returns a new array containing a portion of the original array defined by a `Range`.                           |
-| `reverse()`                         | `Array` | Mutates the array to the original array reversed. Returns the array.                                           |
-| `reversed()`                        | `Array` | Returns a new array being the original array reversed.                                                         |
-| `fill(value, range?)`               | `Array` | Fills the whole array or only the specified `Range` with the provided `value`. Returns the array.              |
+| Member                              | Return Type   | Description                                                                                                                                                    |
+|:------------------------------------|:--------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Array::new(...args)`               | `Array`       | Creates a new array with optional initial `args`.                                                                                                              |
+| `Array::from(other)`                | `Array`       | Creates a new array from an existing Array or Range *(that will fill the array with the values of the range)*.                                                 |
+| `Array::concat(array, other_array)` | `Array`       | Returns a new array containing elements from both arrays.                                                                                                      |
+| `add(value)`                        | `Array`       | Appends an element to the end. Returns the array.                                                                                                              |
+| `insert(index, value)`              | `Array`       | Inserts an element at a specific index. Returns the array.                                                                                                     |
+| `get(index)`                        | `Any`         | Returns the element at the index *or null if absent*.                                                                                                          |
+| `set(index, value)`                 | `Array`       | Sets the element at the index. Returns the array.                                                                                                              |
+| `length()`                          | `Number`      | Returns the number of elements.                                                                                                                                |
+| `pop()`                             | `Any`         | Removes and returns the last element.                                                                                                                          |
+| `contains(value)`                   | `Boolean`     | Checks if a value exists (uses deep equality).                                                                                                                 |
+| `remove(index)`                     | `Array`       | Removes the element at the specified `index`. Returns the array.                                                                                               |
+| `clear()`                           | `Array`       | Removes all elements from the array. Returns the array.                                                                                                        |
+| `index(value)`                      | `Number,Null` | Returns the index of the first element from the array *or null if absent*.                                                                                     |
+| `first()`                           | `Any`         | Returns the first element of the array *or null if absent*.                                                                                                    |
+| `last()`                            | `Any`         | Returns the last element of the array *or null if absent*.                                                                                                     |
+| `slice(range)`                      | `Array`       | Mutates the array to a portion of the original array defined by a `Range`. Returns the array.                                                                  |
+| `sliced(range)`                     | `Array`       | Returns a new array containing a portion of the original array defined by a `Range`.                                                                           |
+| `reverse()`                         | `Array`       | Mutates the array to the original array reversed. Returns the array.                                                                                           |
+| `reversed()`                        | `Array`       | Returns a new array being the original array reversed.                                                                                                         |
+| `fill(value, range?)`               | `Array`       | Fills the whole array or only the specified `Range` with the provided `value`. Returns the array.                                                              |
+| `sort()`                            | `Array`       | Sorts the array in place in ascending order, the array must only contain one `type` that is `Number`,`String`,`Boolean` or `Range`. Returns the array.         |
+| `sorted()`                          | `Array`       | Returns a new array being the original array sorted in ascending order, the array must only contain one `type` that is `Number`,`String`,`Boolean` or `Range`. |
 
 ## Bracket Syntax
 
