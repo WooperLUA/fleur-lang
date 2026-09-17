@@ -43,7 +43,7 @@ To build Fleur from source, you need to have [Bun](https://bun.sh/) installed on
 
 #### Getting the runtime from Releases
 
-Alternatively, you can download the pre-built runtime binaries from the [Releases](https://github.com/your-username/fleur-lang/releases) page.
+Alternatively, you can download the pre-built runtime binaries from the [Releases](https://github.com/WooperLUA/fleur-lang/releases) page.
 
 ## Usage
 
@@ -75,17 +75,17 @@ fleur help
 
 ## Example Code
 
-Here is the proof fleur is a real language :
+Here is the proof Fleur is a real language :
 
 ```flr
 io::print("Hello, Fleur (and also the world)");
 ```
 
-Check the `exemple/` directory for more comprehensive examples of the language features and standard library usage.
+Check the `exemple/` directory for more comprehensive examples of the language features.
 
 ## Documentation
 
-Explore the full language with the [documentation](https://wooperlua.github.io/atlas-docs/).
+Explore the full language with the [documentation](https://wooperlua.github.io/fleur-lang/).
 
 ## License
 
