@@ -1,5 +1,5 @@
 import {RuntimeValueType} from "@types";
-import type {Environment} from "@runtime";
+import {type Environment} from "@runtime";
 import {io} from "./src/io";
 import {math} from "./src/math";
 import {time} from "./src/time";

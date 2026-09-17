@@ -1,7 +1,7 @@
-func map(arr: Array, fns: Array or Function)
+func map(arr: Array, fns: Array)
 {
     var new_arr = Array::from(arr);
-    const functions = type::array(fns);
+    const functions = Array::from(fns);
 
     for fn in functions
     {
@@ -12,7 +12,6 @@ func map(arr: Array, fns: Array or Function)
             new_arr::set(idx, _fn(elt));
         }
     }
-
 
     return new_arr;
 }
@@ -51,6 +50,8 @@ const arr = [1,2,3];
 io::print("Map to square : ", map(arr, [square,
                                         double,
                                         math::float,
-                                        type::array]));
-//io::print("Filter to even : ", filter(arr, is_even));
-//io::print("Find elt two : ", find(arr, is_two));
+                                        Array::new]));
+io::print("Filter to even : ", filter(arr, is_even));
+io::print("Find elt two : ", find(arr, is_two));
+
+

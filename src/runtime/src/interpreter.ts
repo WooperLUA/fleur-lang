@@ -136,6 +136,13 @@ export class Environment
         return env.variables[name]!;
     }
 
+    public has(name: string): boolean
+    {
+        if (name in this.variables) return true;
+        if (this.parent) return this.parent.has(name);
+        return false;
+    }
+
     public assign_or_declare(name: string, value: RuntimeValue): RuntimeValue
     {
         this.variables[name] = value;
@@ -786,7 +793,7 @@ const evaluate_struct_literal = (expr: StructLiteral, env: Environment): Runtime
 
 const evaluate_call_expression = (expr: CallExpression, env: Environment): RuntimeValue =>
 {
-    let func: RuntimeValue;
+    let func: RuntimeValue = {type: RuntimeValueType.Null, value: null};
     let args: RuntimeValue[];
     let this_val: RuntimeValue | null = null;
 
@@ -855,17 +862,22 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
                 }
                 else
                 {
-                    const baseStruct = env.lookup("Struct") as StructValue | undefined;
-                    if (baseStruct && baseStruct.methods.has(member.property.name))
+                    let found = false;
+                    if (env.has("Struct"))
                     {
-                        func = baseStruct.methods.get(member.property.name)!;
-                        this_val = struct;
+                        const baseStruct = env.lookup("Struct") as StructValue;
+                        if (baseStruct.methods.has(member.property.name))
+                        {
+                            func = baseStruct.methods.get(member.property.name)!;
+                            this_val = struct;
+                            found = true;
+                        }
                     }
-                    else
+                    if (!found)
                     {
                         throw_exception({
                             type:    "Runtime",
-                            message: `Method '${member.property.name}' does not exist on struct '${struct.identifier}'.`
+                            message: `Method '${member.property.name}' does not exist on '${struct.identifier}'.`
                         });
                         return {type: RuntimeValueType.Null, value: null};
                     }
@@ -1067,10 +1079,25 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
         {
             throw_exception({
                 type:    "Runtime",
-                message: `Method '${property}' cannot be called on the struct '${struct.identifier}' itself. Only '::new' is allowed as a static method.`
+                message: `Cannot call '${struct.identifier}::${property}'. Only '::new' is allowed on the struct declaration itself.`
             });
         }
     }
+
+    if (struct.methods.has(property))
+    {
+        return struct.methods.get(property)!;
+    }
+
+    if (env.has("Struct"))
+    {
+        const baseStruct = env.lookup("Struct") as StructValue;
+        if (baseStruct.methods.has(property))
+        {
+            return baseStruct.methods.get(property)!;
+        }
+    }
+
 
     if (struct.methods.has(property))
     {
@@ -1087,13 +1114,13 @@ const evaluate_static_member_expression = (expr: StaticMemberExpression, env: En
     {
         throw_exception({
             type:    "Runtime",
-            message: `Property '${property}' is a field on struct '${struct.identifier}'. Use '.' to access it.`
+            message: `'${property}' is a field on '${struct.identifier}', not a method. Use '${struct.identifier}.${property}' instead of '::'.`
         });
     }
 
     throw_exception({
         type:    "Runtime",
-        message: `Method '${property}' does not exist on struct '${struct.identifier}'.`
+        message: `Method '${property}' does not exist on '${struct.identifier}'.`
     });
     return {type: RuntimeValueType.Null, value: null};
 };

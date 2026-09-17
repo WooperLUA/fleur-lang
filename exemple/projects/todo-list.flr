@@ -1,9 +1,9 @@
 struct Task
 {
-    description, // string
-    done         // boolean
+    description: String,
+    done: Boolean
 }
-Task::new(description) { return Task { description: description, done: false }; }
+Task::new(description): Task { return Task { description: description, done: false }; }
 Task::edit(new_description) { this.description = new_description; }
 Task::check() { this.done = not this.done; }
 Task::string()
@@ -13,7 +13,7 @@ Task::string()
     return this.description + " " + done;
 }
 
-proc display_tasks(tasks)
+proc display_tasks(tasks: Array)
 {
     io::clear();
     io::print("+---------Todo list----------+");

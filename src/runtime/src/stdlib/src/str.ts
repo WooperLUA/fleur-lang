@@ -1,10 +1,10 @@
 import {
-    type ArrayValue,
+    type NullValue,
     type NumberValue, type RangeValue,
     RuntimeValueType, type StringValue,
 } from "@types";
 import {
-    check_args_length, check_arg_type,
+    check_args_length, check_arg_type, throw_exception, stringify_value,
 } from "@utils";
 import type {
     RuntimeValue,
@@ -135,6 +135,41 @@ export const str: StructValue = {
                                    value: elements.join(''),
                                } as StringValue;
                            },
+            } as NativeFunctionValue,
+        ],
+        [
+            "join",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          if (args.length < 3) throw_exception({
+                              type:    "Runtime",
+                              message: `str::join expects at least 3 arguments.`
+                          });
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::join");
+                          const separator = (args[0]! as StringValue).value;
+                          const strs = args.slice(1).map(x => stringify_value(x));
+                          return {type: RuntimeValueType.String, value: strs.join(separator)};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "unicode",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "str::unicode");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::unicode");
+                          const value = (args[0] as StringValue).value
+                          if (value.length > 1) return throw_exception({
+                              type: "Runtime",
+                              message: `You must provide a string of length 1 (a character)`
+                          })
+                          const unicode = value.codePointAt(0);
+                          return {type: RuntimeValueType.Number, value: unicode} as NumberValue
+                      },
             } as NativeFunctionValue,
         ],
     ]),

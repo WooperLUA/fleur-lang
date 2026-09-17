@@ -1,13 +1,13 @@
-import type {
-    ArrayValue,
-    BooleanValue,
-    MapValue,
-    NativeFunctionValue,
-    NumberValue,
-    RuntimeValue,
-    StructValue
+import {
+    type ArrayValue,
+    type BooleanValue,
+    type MapValue,
+    type NativeFunctionValue,
+    type NumberValue,
+    type RuntimeValue,
+    RuntimeValueType,
+    type StructValue
 } from "@types";
-import {RuntimeValueType} from "@types";
 import {check_arg_type, check_args_length, check_mutability, deep_copy, is_equal, throw_exception} from "@utils";
 
 const find_key_index = (elements: { key: RuntimeValue; value: RuntimeValue }[], target: RuntimeValue): number =>
@@ -67,6 +67,42 @@ export const map: StructValue = {
                                   }
                               }
                           }
+
+                          return {
+                              type:     RuntimeValueType.Map,
+                              elements: elements
+                          } as MapValue;
+                      }
+            } as NativeFunctionValue
+        ],
+        [
+            "from",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "Map::from");
+                          check_arg_type(args[0]!, RuntimeValueType.Struct, "Map::from");
+
+                          const elements: { key: RuntimeValue; value: RuntimeValue }[] = [];
+                          const struct_instance = args[0]! as StructValue
+
+                          for (const [k, v] of struct_instance.properties.entries())
+                          {
+                              const key = deep_copy({type : RuntimeValueType.String, value : k});
+                              const value = v;
+
+                              const idx = find_key_index(elements, key);
+                              if (idx !== -1)
+                              {
+                                  elements[idx]!.value = value;
+                              }
+                              else
+                              {
+                                  elements.push({key, value});
+                              }
+                          }
+
 
                           return {
                               type:     RuntimeValueType.Map,
@@ -200,13 +236,13 @@ export const map: StructValue = {
             } as NativeFunctionValue
         ],
         [
-            "iterate",
+            "pairs",
             {
                 type:      RuntimeValueType.NativeFunction,
                 is_method: true,
                 call:      (args: RuntimeValue[]) =>
                            {
-                               check_args_length(args, 1, "<map>::iterate");
+                               check_args_length(args, 1, "<map>::pairs");
                                const m = args[0] as MapValue;
                                const iterator = m.elements.map(el => ({
                                    type:     RuntimeValueType.Array,
