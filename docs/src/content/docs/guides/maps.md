@@ -86,5 +86,10 @@ for k in m::keys() {
 for v in m::values() {
     io::print("Value: ", v);
 }
+
+// Iterate over both
+for kv in m {
+    io::print("Key: ", kv[0], "Value: ", kv[1]);
+}
 ```
 

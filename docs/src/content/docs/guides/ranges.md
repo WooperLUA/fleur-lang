@@ -74,13 +74,3 @@ Ranges can be used to quickly fill arrays or sets.
 const arr = Array::from(1..5);  // [1, 2, 3, 4, 5]
 const s = Set::from(1..3);      // Set(1, 2, 3)
 ```
-
-## Math Functions
-
-Some functions in the `math` library also accept ranges.
-
-```flr
-const rand = math::random(1..100);
-const clamped = math::clamp(150, 0..100); // 100
-const total = math::sum(1..10);
-```
