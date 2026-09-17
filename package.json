@@ -6,6 +6,7 @@
   "scripts": {
     "fleur" : "bun run index.ts",
     "docs" : "cd docs && bun run dev",
+    "benchmark-optimization" : "bun run fleur run exemple/optimisation.flr && bun run fleur run exemple/optimisation.flr --optimize",
     "build-windows-x64": "bun build --compile --windows-icon=./ressources/fleur-logo.ico --minify --sourcemap --bytecode --target=bun-windows-x64 --outfile=out/fleur index.ts",
     "build-windows-arm64": "bun build --compile --windows-icon=./ressources/fleur-logo.ico --minify --sourcemap --bytecode --target=bun-windows-arm64 --outfile=out/fleur index.ts",
     "build-linux-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-linux-x64 --outfile=out/fleur index.ts",

@@ -1,4 +1,5 @@
 import {
+    type BooleanValue,
     type NullValue,
     type NumberValue, type RangeValue,
     RuntimeValueType, type StringValue,
@@ -169,6 +170,36 @@ export const str: StructValue = {
                           })
                           const unicode = value.codePointAt(0);
                           return {type: RuntimeValueType.Number, value: unicode} as NumberValue
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "prefixed",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "str::prefixed");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::prefixed");
+                          check_arg_type(args[1]!, RuntimeValueType.String, "str::prefixed");
+                          const value = (args[0] as StringValue).value
+                          const prefix = (args[1] as StringValue).value
+                          return {type: RuntimeValueType.Boolean, value: value.startsWith(prefix)} as BooleanValue
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "suffixed",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "str::suffixed");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::suffixed");
+                          check_arg_type(args[1]!, RuntimeValueType.String, "str::suffixed");
+                          const value = (args[0] as StringValue).value
+                          const prefix = (args[1] as StringValue).value
+                          return {type: RuntimeValueType.Boolean, value: value.endsWith(prefix)} as BooleanValue
                       },
             } as NativeFunctionValue,
         ],
