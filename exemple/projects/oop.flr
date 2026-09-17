@@ -18,10 +18,15 @@ func inherit(parent_class: Struct, children_class: Struct)
 
 struct A { x }
 struct B { y }
-B::new(x,y)
+B::new(x, y)
 {
     return inherit(A {x : x}, B {y : y});
+}
+B::string()
+{
+    return str::join(" -> ", this.x, this.y);
 }
 
 const b = B::new(6,7);
 io::print(b);
+io::print(b::string());
