@@ -131,13 +131,11 @@ export const deep_copy = (val: RuntimeValue): RuntimeValue =>
             return {
                 type:         RuntimeValueType.Array,
                 elements:     (val as any).elements.map(deep_copy),
-                is_immutable: (val as any).is_immutable
             };
         case RuntimeValueType.Set:
             return {
                 type:         RuntimeValueType.Set,
                 elements:     (val as any).elements.map(deep_copy),
-                is_immutable: (val as any).is_immutable
             };
         case RuntimeValueType.Map:
             return {
@@ -146,7 +144,6 @@ export const deep_copy = (val: RuntimeValue): RuntimeValue =>
                     key:   deep_copy(el.key),
                     value: el.value
                 })),
-                is_immutable: (val as any).is_immutable
             };
         case RuntimeValueType.Struct:
             const s = val as StructValue;
@@ -164,7 +161,6 @@ export const deep_copy = (val: RuntimeValue): RuntimeValue =>
                     return s.methods;
                 },
                 is_declaration: s.is_declaration,
-                is_immutable:   s.is_immutable
             };
         case RuntimeValueType.Range:
             return {

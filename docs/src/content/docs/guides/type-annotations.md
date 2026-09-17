@@ -14,6 +14,7 @@ const count: Number = 42;
 const name: String = "fleur";
 const isActive: Boolean = true;
 const values: Array = [1, 2, 3];
+const instance: Struct = A {};
 ```
 
 If a value of a different type is assigned, fleur will throw a runtime error.

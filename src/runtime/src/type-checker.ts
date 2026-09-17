@@ -15,6 +15,8 @@ export const validate_runtime_type = (val: RuntimeValue, type_names: string[], c
         "Function":  RuntimeValueType.Function,
         "Procedure": RuntimeValueType.Procedure,
         "NativeFunction":  RuntimeValueType.NativeFunction,
+        "Struct":         RuntimeValueType.Struct,
+        "Error":     RuntimeValueType.Error,
     };
 
     for (const type_name of type_names)

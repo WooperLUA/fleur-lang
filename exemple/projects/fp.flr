@@ -1,3 +1,6 @@
+// This adds basic fp functions to Fleur
+// Fleur isn't fp focused, but fp concepts can easily be implemented in it
+
 func map(arr: Array, fns: Array)
 {
     var new_arr = Array::from(arr);

@@ -1,0 +1,27 @@
+// This technically adds property inheritance to Fleur
+// This is very gimmicky but it shows how Fleur's reflection is really decent even tho it isn't the main focus of it
+
+func inherit(parent_class: Struct, children_class: Struct)
+{
+    var new_instance = reflect::clone(children_class);
+
+    for prop in parent_class
+    {
+        const k = prop[0];
+        const v = prop[1];
+
+        reflect::set(new_instance, k, v);
+    }
+
+    return new_instance;
+}
+
+struct A { x }
+struct B { y }
+B::new(x,y)
+{
+    return inherit(A {x : x}, B {y : y});
+}
+
+const b = B::new(6,7);
+io::print(b);
