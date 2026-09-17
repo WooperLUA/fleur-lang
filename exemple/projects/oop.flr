@@ -1,5 +1,5 @@
 // This technically adds property inheritance to Fleur
-// This is very gimmicky but it shows how Fleur's reflection is really decent even tho it isn't the main focus of it
+// This is very gimmicky but it shows how Fleur's reflection is really decent even tho it isn't the main focus of the language
 
 func inherit(parent_class: Struct, children_class: Struct)
 {

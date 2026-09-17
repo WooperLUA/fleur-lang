@@ -1,5 +1,5 @@
 import {FleurError, throw_exception} from "@utils";
-import {tokenize, Parser} from "@compiler";
+import {tokenize, Parser, optimize_statement} from "@compiler";
 import {interpret, create_global_env, start_repl} from "@runtime";
 import {type ErrorValue} from "@types";
 import * as node_path from "node:path";
@@ -35,13 +35,34 @@ const main = async () =>
                     message: "You must provide a file with the '.flr' extension.",
                 })
 
+                let should_optimize = false;
+                const fleur_args: string[] = [];
+
+                for (let i = 2; i < args.length; i++)
+                {
+                    if (args[i] === '--optimize')
+                    {
+                        should_optimize = true;
+                    }
+                    else
+                    {
+                        fleur_args.push(args[i]!);
+                    }
+                }
+
                 try
                 {
                     const bytes = await file.text();
                     const tokens = tokenize(bytes);
                     const parser = new Parser(tokens);
                     const ast = parser.parse();
-                    const env = create_global_env(args.slice(2), current_dir);
+
+                    if (should_optimize)
+                    {
+                        ast.body = ast.body.map(stmt => optimize_statement(stmt));
+                    }
+
+                    const env = create_global_env(fleur_args, current_dir);
                     interpret(ast, env);
                 }
                 catch (e)
@@ -74,7 +95,7 @@ const main = async () =>
                 const BOLD = '\x1b[1m';
 
                 const commands = [
-                    {cmd: ['run', '[.flr file] [arg1, arg2..]', '  Executes a .flr file.'], color: YELLOW},
+                    {cmd: ['run', '[.flr file] [--optimize] [args...]', '  Executes a .flr file.'], color: YELLOW},
                     {cmd: ['repl', '', '\t      Runs a live REPL.'], color: CYAN},
                     {cmd: ['help', '', '\t      Displays all available commands.'], color: GREEN},
                 ];
@@ -86,7 +107,7 @@ const main = async () =>
                 {
                     const {cmd, color} = command;
                     const [name, arg, desc] = cmd;
-                    console.log(`  ${color}${name!.padEnd(8)}${GRAY}${arg!.padEnd(14)}${RESET}${desc}`);
+                    console.log(`  ${color}${name!.padEnd(8)}${GRAY}${arg!.padEnd(24)}${RESET}${desc}`);
                 }
                 break;
             }

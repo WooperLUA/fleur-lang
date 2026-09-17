@@ -1,0 +1,18 @@
+const N = 500;
+var results = [];
+for i in 1..N
+{
+    const start1 = time::now();
+
+    for i in 1..1000000
+    {
+       while (false)
+       {
+           io::print("This will never run");
+       }
+    }
+
+    const end1 = time::now();
+    results::add(end1 - start1);
+}
+io::print(" Done. (Time: ", math::sum(results) / N, "ms)");
