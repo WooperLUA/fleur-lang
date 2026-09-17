@@ -52,7 +52,7 @@ You can also use the following flags :
 fleur run path/to/your/file.flr --optimize
 ```
 
-To pass arguments into your fleur script (see [io](./stdlib/io/)):
+To pass arguments into your fleur script (see [io](/guides/stdlib/io/)):
 ```bash
 fleur run path/to/your/file.flr arg1 arg2
 ```

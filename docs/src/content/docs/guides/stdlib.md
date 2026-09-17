@@ -17,14 +17,15 @@ const s = math::sqrt(9); // sqrt is a method (a function)
 
 ## Available Modules
 
+- [**`crypto`**](./crypto/): Hashing and random identifier generation.
+- [**`file`**](./file/): File system operations.
 - [**`io`**](./io/): Basic input and output functionality.
 - [**`math`**](./math/): Mathematical constants and functions.
-- [**`str`**](./str/): String manipulation utilities.
-- [**`file`**](./file/): File system operations.
-- [**`type`**](./type/): Type checking and explicit conversion.
 - [**`os`**](./os/): Operating system and process information.
-- [**`time`**](./time/): Time-related utilities.
-- [**`regex`**](./regex/): Regular expression utilities.
 - [**`reflect`**](./reflect/): Metaprogramming and introspection for Structs.
-- [**`crypto`**](./crypto/): Hashing and random identifier generation.
+- [**`regex`**](./regex/): Regular expression utilities.
+- [**`str`**](./str/): String manipulation utilities.
+- [**`time`**](./time/): Time-related utilities.
+- [**`type`**](./type/): Type checking and explicit conversion.
+
 
