@@ -4,6 +4,8 @@ import starlightThemeBlack from 'starlight-theme-black';
 import fleur_grammar from './fleur.tmLanguage.json';
 
 export default defineConfig({
+	base : '/fleur-lang/',
+	trailingSlash: 'always',
 	integrations: [
 		starlight({
 			title: 'Fleur',
