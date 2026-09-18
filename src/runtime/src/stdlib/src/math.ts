@@ -350,6 +350,26 @@ export const math: StructValue = {
                           }
                       }
             }
+        ],
+        [
+            "length",
+            {
+                type: RuntimeValueType.NativeFunction,
+                is_method: false,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "math::length");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::length");
+
+                          const val = (args[0] as NumberValue).value;
+                          const digitCount = Math.abs(val).toString().replace(".", "").length;
+
+                          return {
+                              type: RuntimeValueType.Number,
+                              value: digitCount,
+                          } as NumberValue;
+                      },
+            } as NativeFunctionValue,
         ]
     ]),
 };

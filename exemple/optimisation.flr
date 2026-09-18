@@ -4,7 +4,7 @@ for i in 1..N
 {
     const start1 = time::now();
 
-    for i in 1..1000000
+    for i in 1..1_000_000
     {
        while (false)
        {

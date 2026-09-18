@@ -47,6 +47,7 @@ export default defineConfig({
 								{ label: 'crypto', slug: 'guides/stdlib/crypto' },
 								{ label: 'file', slug: 'guides/stdlib/file' },
 								{ label: 'io', slug: 'guides/stdlib/io' },
+								{ label: 'json', slug: 'guides/stdlib/json' },
 								{ label: 'math', slug: 'guides/stdlib/math' },
 								{ label: 'os', slug: 'guides/stdlib/os' },
 								{ label: 'reflect', slug: 'guides/stdlib/reflect' },

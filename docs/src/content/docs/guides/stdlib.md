@@ -20,6 +20,7 @@ const s = math::sqrt(9); // sqrt is a method (a function)
 - [**`crypto`**](./crypto/): Hashing and random identifier generation.
 - [**`file`**](./file/): File system operations.
 - [**`io`**](./io/): Basic input and output functionality.
+- [**`json`**](./json/): JSON parser and stringifier.
 - [**`math`**](./math/): Mathematical constants and functions.
 - [**`os`**](./os/): Operating system and process information.
 - [**`reflect`**](./reflect/): Metaprogramming and introspection for Structs.

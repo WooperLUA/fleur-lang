@@ -10,7 +10,7 @@ Task::string()
 {
     var done = "x";
     if this.done { done = "✓"; }
-    return this.description + " " + done;
+    return str::join(" ", this.description, done);
 }
 
 proc display_tasks(tasks: Array)
