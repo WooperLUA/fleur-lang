@@ -469,11 +469,26 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
             last_result = result;
         }
     }
+    else if (iterable.type === RuntimeValueType.Map)
+    {
+        const map = iterable as MapValue;
+        for (const el of map.elements)
+        {
+            const pair: ArrayValue = {
+                type:     RuntimeValueType.Array,
+                elements: [el.key, el.value]
+            };
+            loop_env.assign_or_declare(stmt.identifier, pair);
+            const result = execute(stmt.body, loop_env);
+            if (result.type === RuntimeValueType.Return) return result;
+            last_result = result;
+        }
+    }
     else
     {
         throw_exception({
             type:    "Runtime",
-            message: `Cannot iterate over type '${iterable.type}'. Expected Array, Set, Struct, or Range.`
+            message: `Cannot iterate over type '${iterable.type}'. Expected Array, Set, Map, Struct, or Range.`
         });
     }
 
