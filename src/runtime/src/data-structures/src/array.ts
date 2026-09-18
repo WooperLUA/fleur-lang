@@ -625,11 +625,117 @@ export const array: StructValue = {
                                }
 
                                return {
-                                   type : RuntimeValueType.Array,
-                                   elements : new_array
+                                   type:     RuntimeValueType.Array,
+                                   elements: new_array
                                } as ArrayValue;
                            },
             } as NativeFunctionValue,
         ],
+        [
+            "group",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::group");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::group");
+                               check_arg_type(args[1]!, RuntimeValueType.Number, "<array>::group");
+                               check_mutability(args[0]!, "<array>::group");
+
+                               const arr = (args[0] as ArrayValue);
+                               const group_size = (args[1] as NumberValue).value;
+
+                               if (group_size <= 0)
+                               {
+                                   return throw_exception({
+                                       type : "Runtime",
+                                       message : "Group size must be greater than 0"
+                                   });
+                               }
+
+                               const grouped_array: RuntimeValue[] = [];
+                               let group_buffer: Array<RuntimeValue> = [];
+
+                               for (const el of arr.elements)
+                               {
+                                   if (group_buffer.length === group_size)
+                                   {
+                                       grouped_array.push({
+                                           type:     RuntimeValueType.Array,
+                                           elements: group_buffer,
+                                       } as ArrayValue);
+                                       group_buffer = [];
+                                   }
+                                   group_buffer.push(el);
+                               }
+
+                               if (group_buffer.length > 0)
+                               {
+                                   grouped_array.push({
+                                       type:     RuntimeValueType.Array,
+                                       elements: group_buffer,
+                                   } as ArrayValue);
+                               }
+
+                               arr.elements = grouped_array;
+
+                               return arr;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "grouped",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::grouped");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::grouped");
+                               check_arg_type(args[1]!, RuntimeValueType.Number, "<array>::grouped");
+
+                               const arr = (args[0] as ArrayValue);
+                               const group_size = (args[1] as NumberValue).value;
+
+                               if (group_size <= 0)
+                               {
+                                   return throw_exception({
+                                       type : "Runtime",
+                                       message : "Group size must be greater than 0"
+                                   });
+                               }
+
+                               const grouped_array: RuntimeValue[] = [];
+                               let group_buffer: Array<RuntimeValue> = [];
+
+                               for (const el of arr.elements)
+                               {
+                                   if (group_buffer.length === group_size)
+                                   {
+                                       grouped_array.push({
+                                           type:     RuntimeValueType.Array,
+                                           elements: group_buffer,
+                                       } as ArrayValue);
+                                       group_buffer = [];
+                                   }
+                                   group_buffer.push(el);
+                               }
+
+                               if (group_buffer.length > 0)
+                               {
+                                   grouped_array.push({
+                                       type:     RuntimeValueType.Array,
+                                       elements: group_buffer,
+                                   } as ArrayValue);
+                               }
+
+                               return {
+                                   type :     RuntimeValueType.Array,
+                                   elements: grouped_array,
+                               } as ArrayValue;
+                           },
+            } as NativeFunctionValue,
+        ]
     ]),
 };

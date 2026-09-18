@@ -48,4 +48,6 @@ const fixed_set = Set::new(1, 2, 3);
 | `reversed()`                       | `Set`         | Returns a new set being the original set reversed.                                                                                                       |
 | `sort()`                           | `Set`         | Sorts the set in place in ascending order, the set must only contain one `type` that is `Number`,`String`,`Boolean` or `Range`. Returns the set.         |
 | `sorted()`                         | `Set`         | Returns a new set being the original set sorted in ascending order, the set must only contain one `type` that is `Number`,`String`,`Boolean` or `Range`. |
+| `group(size)`                      | `Set`         | Splits the elements of the set directly in place into sub-sets of a specified group `size`. `size` must be greater than 0                                |
+| `grouped(size)`                    | `Set`         | Returns a new set being the original set splitted into sub-sets of a specified group `size`. `size` must be greater than 0                               |
 

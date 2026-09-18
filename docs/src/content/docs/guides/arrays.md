@@ -45,6 +45,8 @@ const mixed = Array::new(1, "two", true);
 | `fill(value, range?)`               | `Array`       | Fills the whole array or only the specified `Range` with the provided `value`. Returns the array.                                                              |
 | `sort()`                            | `Array`       | Sorts the array in place in ascending order, the array must only contain one `type` that is `Number`,`String`,`Boolean` or `Range`. Returns the array.         |
 | `sorted()`                          | `Array`       | Returns a new array being the original array sorted in ascending order, the array must only contain one `type` that is `Number`,`String`,`Boolean` or `Range`. |
+| `group(size)`                       | `Array`       | Splits the elements of the array directly in place into sub-arrays of a specified group `size`. `size` must be greater than 0                                  |
+| `grouped(size)`                     | `Array`       | Returns a new array being the original array splitted into sub-arrays of a specified group `size`. `size` must be greater than 0                               |
 
 ## Bracket Syntax
 

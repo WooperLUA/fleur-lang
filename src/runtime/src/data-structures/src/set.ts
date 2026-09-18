@@ -629,5 +629,111 @@ export const set: StructValue = {
                            },
             } as NativeFunctionValue,
         ],
+        [
+            "group",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::group");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::group");
+                               check_arg_type(args[1]!, RuntimeValueType.Number, "<set>::group");
+                               check_mutability(args[0]!, "<set>::group");
+
+                               const set = (args[0] as SetValue);
+                               const group_size = (args[1] as NumberValue).value;
+
+                               if (group_size <= 0)
+                               {
+                                   return throw_exception({
+                                       type : "Runtime",
+                                       message : "Group size must be greater than 0"
+                                   });
+                               }
+
+                               const grouped_set: RuntimeValue[] = [];
+                               let group_buffer: Array<RuntimeValue> = [];
+
+                               for (const el of set.elements)
+                               {
+                                   if (group_buffer.length === group_size)
+                                   {
+                                       grouped_set.push({
+                                           type:     RuntimeValueType.Set,
+                                           elements: group_buffer,
+                                       } as SetValue);
+                                       group_buffer = [];
+                                   }
+                                   group_buffer.push(el);
+                               }
+
+                               if (group_buffer.length > 0)
+                               {
+                                   grouped_set.push({
+                                       type:     RuntimeValueType.Set,
+                                       elements: group_buffer,
+                                   } as SetValue);
+                               }
+
+                               set.elements = grouped_set;
+
+                               return set;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "grouped",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::grouped");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::grouped");
+                               check_arg_type(args[1]!, RuntimeValueType.Number, "<set>::grouped");
+
+                               const set = (args[0] as SetValue);
+                               const group_size = (args[1] as NumberValue).value;
+
+                               if (group_size <= 0)
+                               {
+                                   return throw_exception({
+                                       type : "Runtime",
+                                       message : "Group size must be greater than 0"
+                                   });
+                               }
+
+                               const grouped_set: RuntimeValue[] = [];
+                               let group_buffer: Array<RuntimeValue> = [];
+
+                               for (const el of set.elements)
+                               {
+                                   if (group_buffer.length === group_size)
+                                   {
+                                       grouped_set.push({
+                                           type:     RuntimeValueType.Set,
+                                           elements: group_buffer,
+                                       } as SetValue);
+                                       group_buffer = [];
+                                   }
+                                   group_buffer.push(el);
+                               }
+
+                               if (group_buffer.length > 0)
+                               {
+                                   grouped_set.push({
+                                       type:     RuntimeValueType.Set,
+                                       elements: group_buffer,
+                                   } as SetValue);
+                               }
+
+                               return {
+                                   type :     RuntimeValueType.Set,
+                                   elements: grouped_set,
+                               } as SetValue;
+                           },
+            } as NativeFunctionValue,
+        ]
     ]),
 };
