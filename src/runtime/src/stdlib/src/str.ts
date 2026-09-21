@@ -203,5 +203,22 @@ export const str: StructValue = {
                       },
             } as NativeFunctionValue,
         ],
+        [
+            "replace",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 3, "str::replace");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::replace");
+                          check_arg_type(args[1]!, RuntimeValueType.String, "str::replace");
+                          check_arg_type(args[2]!, RuntimeValueType.String, "str::replace");
+                          const string = (args[0] as StringValue).value
+                          const search = (args[1] as StringValue).value
+                          const replacement = (args[2] as StringValue).value
+                          return {type: RuntimeValueType.String, value: string.replace(search, replacement)} as StringValue
+                      },
+            } as NativeFunctionValue,
+        ],
     ]),
 };

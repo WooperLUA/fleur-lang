@@ -52,6 +52,10 @@ if r::contains(5) {
 var r = 1..5;
 r::reverse();
 // r is now 5..1
+
+var r = 1..5;
+io::print(r::reversed()); // 5..1
+// r is still 1..5
 ```
 
 ## Usage in Loops
