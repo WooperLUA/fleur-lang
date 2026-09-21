@@ -1,8 +1,6 @@
 import {RuntimeValueType, type RangeValue, type NumberValue, type BooleanValue} from "@types";
 import {check_args_length, check_arg_type, check_mutability} from "@utils";
 import type { RuntimeValue, NativeFunctionValue, StructValue } from "@types";
-import {array} from "../../data-structures/src/array.ts";
-
 export const range: StructValue = {
     type: RuntimeValueType.Struct,
     identifier: "Range",

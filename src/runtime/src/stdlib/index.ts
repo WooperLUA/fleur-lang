@@ -11,6 +11,7 @@ import {reflect} from "./src/reflect.ts";
 import {regex} from "./src/regex.ts";
 import {crypto} from "./src/crypto.ts";
 import {json} from "./src/json.ts";
+import {http} from "./src/http.ts";
 
 export const setup_stdlib = (env: Environment, args: string[] = []) =>
 {
@@ -31,4 +32,5 @@ export const setup_stdlib = (env: Environment, args: string[] = []) =>
     env.declare("regex", regex, true);
     env.declare("crypto", crypto, true);
     env.declare("json", json, true);
+    env.declare("http", http, true);
 };
