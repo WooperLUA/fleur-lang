@@ -43,14 +43,16 @@ const colors = Map::new([
 
 ## Bracket Syntax
 
-Maps support bracket syntax for getting and setting values, making them feel like native objects or dictionaries.
+Maps support bracket | dot syntax for getting and setting values, making them feel like native objects or dictionaries.
 
 ```flr
 var scores = Map::new();
-scores["Alice"] = 100;
-scores["Bob"] = 90;
+scores.Alice = 100;
+scores.Bob = 90;
+scores["Jean Eude"] = 67;
 
-io::print(scores["Alice"]); // 100
+io::print(scores.Alice); // 100
+io::print(scores["Jean Eude"]); // 67
 ```
 
 ## Deep Equality Keys

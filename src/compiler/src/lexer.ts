@@ -53,6 +53,8 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.SLASH_ASSIGN]: /^\/=/,
     [TokenKind.PERCENT_ASSIGN]: /^%=/,
 
+    [TokenKind.CARET]: /^\^/,
+
     // Single-character Operators
     [TokenKind.ASSIGN]:  /^=/,
     [TokenKind.LESS]:    /^</,

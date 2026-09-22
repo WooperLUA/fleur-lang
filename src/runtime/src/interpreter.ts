@@ -687,6 +687,8 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
             return {type: RuntimeValueType.Null, value: null};
         case "*":
             return {type: RuntimeValueType.Number, value: (left as NumberValue).value * (right as NumberValue).value};
+        case "^":
+            return {type: RuntimeValueType.Number, value: Math.pow((left as NumberValue).value, (right as NumberValue).value)};
         case "/":
         {
             const left_val = (left as NumberValue).value
@@ -1011,6 +1013,23 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
 const evaluate_member_expression = (expr: MemberExpression, env: Environment): RuntimeValue =>
 {
     const object = evaluate(expr.object, env);
+    const valid_members = [RuntimeValueType.Map];
+
+    if (valid_members.includes(object.type))
+    {
+        const map = object as MapValue;
+        const property = map.elements.find(x => (x.key as StringValue).value === expr.property.name);
+        if (property)
+        {
+            return property.value;
+        }
+
+        throw_exception({
+            type:    "Runtime",
+            message: `Key '${expr.property.name}' does not exist on Map.`
+        });
+    }
+
     if (object.type !== RuntimeValueType.Struct)
     {
         throw_exception({
@@ -1276,14 +1295,39 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
         return env.assign(name, compute_new_value(current));
     }
 
-    // Struct Property Assignment
+    // Struct / Map Property Assignment
     else if (expr.left.type === NodeType.MemberExpression)
     {
         const member = expr.left as MemberExpression;
         const object = evaluate(member.object, env);
+
+        const valid_members = [RuntimeValueType.Map];
+
+        if (valid_members.includes(object.type))
+        {
+            const m = object as MapValue;
+            if (m.is_immutable) throw_exception({
+                type:    "Runtime",
+                message: `Cannot assign to key of immutable map.`
+            });
+
+            const key: StringValue = {type: RuntimeValueType.String, value: member.property.name};
+            const idx = m.elements.findIndex(el => is_equal(el.key, key));
+
+            if (idx !== -1)
+            {
+                m.elements[idx]!.value = right;
+            }
+            else
+            {
+                m.elements.push({key, value: right});
+            }
+            return right;
+        }
+
         if (object.type !== RuntimeValueType.Struct)
         {
-            throw_exception({type: "Runtime", message: "Member assignment is only allowed on structs."});
+            throw_exception({type: "Runtime", message: "Member assignment is only allowed on structs or maps."});
         }
 
         const struct = object as StructValue;

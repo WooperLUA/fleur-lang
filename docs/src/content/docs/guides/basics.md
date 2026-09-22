@@ -74,13 +74,14 @@ b = 30; // OK
 
 ### Arithmetic Operators
 
-| Operator | Description                                         |
-| :--- |:----------------------------------------------------|
-| `+` | Addition (also String concatenation)                |
-| `-` | Subtraction                                         |
-| `*` | Multiplication                                      |
-| `/` | Division *(throws an `Error` when dividing by `0`)* |
-| `%` | Modulo *(throws an `Error` when mod by `0`)*        |
+| Operator    | Description                                         |
+|:------------|:----------------------------------------------------|
+| `+`         | Addition (also String concatenation)                |
+| `-`         | Subtraction                                         |
+| `*`         | Multiplication                                      |
+| `/`         | Division *(throws an `Error` when dividing by `0`)* |
+| `%`         | Modulo *(throws an `Error` when mod by `0`)*        |
+| `^`         | Exponentiation                                      |
 | `-` (unary) | Negation                                            |
 
 ```flr

@@ -49,6 +49,7 @@ export enum TokenKind {
     SLASH = "SLASH",
     PERCENT = "PERCENT",
     DOT = "DOT",
+    CARET = "CARET",
 
     LBRACE = "LBRACE",
     RBRACE = "RBRACE",

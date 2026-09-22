@@ -666,7 +666,7 @@ export class Parser
     private parse_multiplicative(allow_struct: boolean = true): Expression
     {
         let left = this.parse_unary(allow_struct);
-        while ([TokenKind.STAR, TokenKind.SLASH, TokenKind.PERCENT].includes(this.peek().kind))
+        while ([TokenKind.STAR, TokenKind.CARET, TokenKind.SLASH, TokenKind.PERCENT].includes(this.peek().kind))
         {
             const operator = this.eat().value;
             const right = this.parse_unary(allow_struct);
