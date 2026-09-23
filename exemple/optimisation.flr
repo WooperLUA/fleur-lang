@@ -1,3 +1,4 @@
+// Run this file with and without --optimize to see the difference
 const N = 200;
 var results = [];
 for i in 1..N

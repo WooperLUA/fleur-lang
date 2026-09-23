@@ -27,6 +27,7 @@ const s = math::sqrt(9); // sqrt is a method (a function)
 - [**`reflect`**](./reflect/): Metaprogramming and introspection for Structs.
 - [**`regex`**](./regex/): Regular expression utilities.
 - [**`str`**](./str/): String manipulation utilities.
+- [**`test`**](./test/): Test-related utilities.
 - [**`time`**](./time/): Time-related utilities.
 - [**`type`**](./type/): Type checking and explicit conversion.
 

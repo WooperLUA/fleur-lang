@@ -59,6 +59,7 @@ export default defineConfig({
                                 {label: 'reflect', slug: 'guides/stdlib/reflect'},
                                 {label: 'regex', slug: 'guides/stdlib/regex'},
                                 {label: 'str', slug: 'guides/stdlib/str'},
+                                {label: 'test', slug: 'guides/stdlib/test'},
                                 {label: 'time', slug: 'guides/stdlib/time'},
                                 {label: 'type', slug: 'guides/stdlib/type'},
                             ]

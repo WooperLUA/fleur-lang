@@ -83,6 +83,10 @@ io::print("Hello, Fleur (and also the world)");
 
 Check the `exemple/` directory for more comprehensive examples of the language features.
 
+## Libraries
+
+Check the `libs/` directory for exemples of libraries built in Fleur by me, they can just be imported by downloading them and importing them with the import module system.
+
 ## Documentation
 
 Explore the full language with the [documentation](https://wooperlua.github.io/fleur-lang/).
