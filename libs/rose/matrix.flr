@@ -1,0 +1,146 @@
+pub struct Matrix
+{
+    rows: Number,
+    cols: Number,
+    data: Array
+}
+
+Matrix::new(rows: Number, cols: Number, fill: Number): Matrix
+{
+    var data = [];
+    const total = rows * cols;
+
+    for i in 0..total - 1
+    {
+        data::add(fill);
+    }
+    return Matrix { rows: rows, cols: cols, data: data };
+}
+
+Matrix::identity(): Matrix
+{
+    if this.rows != this.cols
+    {
+        Error::new("Identity matrix must be squared.")::throw();
+    }
+
+    var result = Matrix::new(this.rows, this.rows, 0);
+
+    for i in 0..this.rows - 1
+    {
+        result.data[i * this.rows + i] = 1;
+    }
+    return result;
+}
+
+Matrix::get(row: Number, col: Number): Number
+{
+    return this.data[row * this.cols + col];
+}
+
+Matrix::set(row: Number, col: Number, value: Number)
+{
+    this.data[row * this.cols + col] = value;
+}
+
+Matrix::add(other: Matrix): Matrix
+{
+    if this.rows != other.rows or this.cols != other.cols
+    {
+        Error::new("Matrix addition failed: Dimensions do not match.")::throw();
+    }
+
+    var result_data = [];
+    const total = this.rows * this.cols;
+
+    for i in 0..total - 1
+    {
+        result_data::add(this.data[i] + other.data[i]);
+    }
+    return Matrix { rows: this.rows, cols: this.cols, data: result_data };
+}
+
+Matrix::subtract(other: Matrix): Matrix
+{
+    if this.rows != other.rows or this.cols != other.cols
+    {
+        Error::new("Matrix subtraction failed: Dimensions do not match.")::throw();
+    }
+
+    var result_data = [];
+    const total = this.rows * this.cols;
+
+    for i in 0..total - 1
+    {
+        result_data::add(this.data[i] - other.data[i]);
+    }
+    return Matrix { rows: this.rows, cols: this.cols, data: result_data };
+}
+
+Matrix::scale(scalar: Number): Matrix
+{
+    var result_data = [];
+    const total = this.rows * this.cols;
+
+    for i in 0..total - 1
+    {
+        result_data::add(this.data[i] * scalar);
+    }
+    return Matrix { rows: this.rows, cols: this.cols, data: result_data };
+}
+
+Matrix::multiply(other: Matrix): Matrix
+{
+    if this.cols != other.rows
+    {
+        Error::new("Matrix multiplication failed: A.cols must equal B.rows.")::throw();
+    }
+
+    var result = Matrix::new(this.rows, other.cols, 0);
+
+    for i in 0..this.rows - 1
+    {
+        for j in 0..other.cols - 1
+        {
+            var sum = 0;
+            for k in 0..this.cols - 1
+            {
+                sum = sum + (this.data[i * this.cols + k] * other.data[k * other.cols + j]);
+            }
+            result.data[i * other.cols + j] = sum;
+        }
+    }
+    return result;
+}
+
+Matrix::transpose(): Matrix
+{
+    var result = Matrix::new(this.cols, this.rows, 0);
+
+    for i in 0..this.rows - 1
+    {
+        for j in 0..this.cols - 1
+        {
+            result.data[j * this.rows + i] = this.data[i * this.cols + j];
+        }
+    }
+    return result;
+}
+
+Matrix::string(): String
+{
+    var res = "";
+    for i in 0..this.rows - 1
+    {
+        res += "[ ";
+        for j in 0..this.cols - 1
+        {
+            res += type::string(this.data[i * this.cols + j]);
+            if j < this.cols - 1 { res += ", "; }
+        }
+        res += " ]\n";
+    }
+    return res;
+}
+
+io::print(Matrix::new(3, 3, 0)::identity()::string());

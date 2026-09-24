@@ -1,0 +1,6 @@
+{
+  "name" :  "rose-lib",
+  "description" : "Rose is a Math library for Fleur providing advanced types for math computing.",
+  "version" : "1.0.0",
+  "dependencies" : {}
+}

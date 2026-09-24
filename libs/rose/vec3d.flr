@@ -1,0 +1,102 @@
+pub struct Vec3D
+{
+    x: Number,
+    y: Number,
+    z: Number
+}
+
+Vec3D::new(x: Number, y: Number, z: Number)
+{
+    return Vec3D { x : x, y : y, z : z };
+}
+
+Vec3D::normalize(): Vec3D
+{
+    const mag = this::magnitude();
+    if mag == 0 { return Vec3D::new(0,0,0); }
+    const inv_mag = 1.0 / mag;
+    return Vec3D::new(this.x * inv_mag, this.y * inv_mag, this.z * inv_mag);
+}
+
+Vec3D::add(vec: Vec3D): Vec3D
+{
+    return Vec3D::new(this.x + vec.x, this.y + vec.y, this.z + vec.z);
+}
+
+Vec3D::sub(vec: Vec3D): Vec3D
+{
+    return Vec3D::new(this.x - vec.x, this.y - vec.y, this.z - vec.y);
+}
+
+Vec3D::scale(scalar: Number): Vec3D
+{
+    return Vec3D::new(this.x * scalar, this.y * scalar, this.z * scalar);
+}
+
+Vec3D::negate(): Vec3D
+{
+    return Vec3D::new(-this.x, -this.y, -this.z);
+}
+
+Vec3D::cross(vec: Vec3D): Number
+{
+    return Vec3D::new(
+            this.y * vec.z - this.z * vec.y,
+            this.z * vec.x - this.x * vec.z,
+            this.x * vec.y - this.y * vec.x
+        );
+}
+
+Vec3D::dot(vec: Vec3D): Number
+{
+      return (this.x * vec.x) + (this.y * vec.y) + (this.z * vec.z);
+}
+
+Vec3D::rotate_axis(axis: Vec3D, radians: Number): Vec3D
+{
+    const k = axis::normalize();
+    const cos_theta = math::cos(radians);
+    const sin_theta = math::sin(radians);
+
+    const term1 = this::scale(cos_theta);
+    const term2 = k::cross(this)::scale(sin_theta);
+    const term3 = k::scale(k::dot(this) * (1.0 - cos_theta));
+
+    return term1::add(term2)::add(term3);
+}
+
+Vec3D::angle(vec: Vec3D): Number
+{
+    const mag_product = this::magnitude() * vec::magnitude();
+    if mag_product == 0 { return 0; }
+    return math::acos(this::dot(vec) / mag_product);
+}
+
+Vec3D::magnitude(): Number
+{
+    return math::sqrt(this.x^2 + this.y^2 + this.z^2);
+}
+
+Vec3D::distance_squared(vec: Vec3D): Number
+{
+    return (vec.x - this.x)^2 + (vec.y - this.y)^2 + (vec.z - this.z)^2;
+}
+
+Vec3D::distance(vec: Vec3D): Number
+{
+    return math::sqrt(this::distance_squared(vec));
+}
+
+Vec3D::lerp(target: Vec3D, t: Number): Vec3D
+{
+    return Vec3D::new(
+        this.x + (target.x - this.x) * t,
+        this.y + (target.y - this.y) * t,
+        this.z + (target.z - this.z) * t
+    );
+}
+
+Vec3D::string()
+{
+    return "(" + this.x + ", " + this.y + ", " + this.z + ")";
+}

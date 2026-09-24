@@ -265,6 +265,45 @@ export const math: StructValue = {
             } as NativeFunctionValue,
         ],
         [
+            "acos",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "math::acos");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::acos");
+                          const value = (args[0] as NumberValue).value
+                          return {type: RuntimeValueType.Number, value: Math.acos(value)};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "asin",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "math::asin");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::asin");
+                          const value = (args[0] as NumberValue).value
+                          return {type: RuntimeValueType.Number, value: Math.asin(value)};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "atan",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "math::atan");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::atan");
+                          const value = (args[0] as NumberValue).value
+                          return {type: RuntimeValueType.Number, value: Math.atan(value)};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
             "float",
             {
                 type: RuntimeValueType.NativeFunction,

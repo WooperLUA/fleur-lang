@@ -22,7 +22,7 @@ Vec2D::add(vec: Vec2D): Vec2D
     return Vec2D::new(this.x + vec.x, this.y + vec.y);
 }
 
-Vec2D::subtract(vec: Vec2D): Vec2D
+Vec2D::sub(vec: Vec2D): Vec2D
 {
     return Vec2D::new(this.x - vec.x, this.y - vec.y);
 }
@@ -66,7 +66,7 @@ Vec2D::angle(vec: Vec2D): Number
 {
     const mag_product = this::magnitude() * vec::magnitude();
     if mag_product == 0 { return 0; }
-    return math::cos(this::dot(vec) / mag_product);
+    return math::acos(this::dot(vec) / mag_product);
 }
 
 Vec2D::magnitude(): Number

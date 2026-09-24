@@ -1,0 +1,42 @@
+pub struct Complex
+{
+    real: Number,
+    imag: Number
+}
+
+Complex::new(real: Number, imag: Number): Complex
+{
+    return Complex { real: real, imag: imag };
+}
+
+Complex::add(other: Complex): Complex
+{
+    return Complex::new(this.real + other.real, this.imag + other.imag);
+}
+
+Complex::sub(other: Complex): Complex
+{
+    return Complex::new(this.real - other.real, this.imag - other.imag);
+}
+
+Complex::multiply(other: Complex): Complex
+{
+    return Complex::new(
+        this.real * other.real - this.imag * other.imag,
+        this.real * other.imag + this.imag * other.real
+    );
+}
+
+Complex::divide(other: Complex): Complex
+{
+    const denominator = other.real^2 + other.imag^2;
+    return Complex::new(
+        (this.real * other.real + this.imag * other.imag) / denominator,
+        (this.imag * other.real + this.real * other.imag) / denominator
+    );
+}
+
+Complex::magnitude(): Number
+{
+    return math::sqrt(this.real^2 + this.imag^2);
+}

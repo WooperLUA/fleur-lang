@@ -28,6 +28,9 @@ Provides mathematical constants and functions.
 | `sin(x)`          | `Number`    | Returns the sine of `x` (in radians).                                                                                                |
 | `cos(x)`          | `Number`    | Returns the cosine of `x` (in radians).                                                                                              |
 | `tan(x)`          | `Number`    | Returns the tangent of `x` (in radians).                                                                                             |
+| `asin(x)`         | `Number`    | Returns the inverse sine of `x` (in radians).                                                                                        |
+| `acos(x)`         | `Number`    | Returns the inverse cosine of `x` (in radians).                                                                                      |
+| `atan(x)`         | `Number`    | Returns the inverse tangent of `x` (in radians).                                                                                     |
 | `random(range)`   | `Number`    | Returns a random number within the given `range`, will return integers or floats depending on the extremities of the range.          |
 | `float(x)`        | `Number`    | Formats a number `x` to a single decimal place.                                                                                      |
 | `int(x)`          | `Number`    | Parses a number `x` into an integer (truncating decimals).                                                                           |
