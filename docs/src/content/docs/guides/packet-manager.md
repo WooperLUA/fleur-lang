@@ -23,25 +23,37 @@ This generates a `fleur.json` file with a default configuration:
 }
 ```
 
-## Configuring Dependencies
+## Adding Packages Quickly
 
-Open your `fleur.json` file and add the libraries you want to use under the `dependencies` object.
+While you can manually edit your `fleur.json` and run `fleur pkg install`, Fleur provides a convenient `add` command that automates the entire process in a single step.
 
-The key is the name you want to give the dependency locally, and the value is the **raw Git repository URL** (ending in `.git`).
+To add a new dependency, run the `add` command followed by the Git repository URL:
+
+```bash
+fleur pkg add https://github.com/..../my-package.git
+```
+
+This single command will automatically:
+1. Clone the repository into your `.fleur_deps/` folder.
+2. Read the `fleur.json` inside that repository to find the official package name.
+3. Rename the local folder to match the official package name.
+4. Add the dependency to your local `fleur.json` file.
+
+### Fallback Behavior
 
 :::note
-Always use the `.git` repository URL, not the GitHub web interface URL (e.g., avoid URLs containing `/tree/main/`). The package manager uses `git clone` under the hood.
+What happens if the repository doesn't have a `fleur.json` file?
 :::
 
-```json
-{
-  "name": "my-fleur-project",
-  "version": "0.1.0",
-  "dependencies": {
-    "dep-example1": "https://github.com/..../.git",
-    "dep-example2": "https://github.com/..../.git"
-  }
-}
+If you try to add a standard GitHub repository that hasn't been configured for Fleur (i.e., it lacks a `fleur.json`), the package manager will gracefully fall back to using the **repository's URL name**.
+
+It will print a warning to let you know, but the installation will still succeed, allowing you to import the files manually.
+
+```bash
+$ fleur pkg add https://github.com/someone/random-scripts.git
+
+Warning: Repository does not have a fleur.json. Falling back to URL name 'random-scripts'.
+Successfully added 'random-scripts' to fleur.json
 ```
 
 ## Installing Packages
