@@ -27,6 +27,7 @@
     "types": ["bun"],
     "paths": {
        "@/" : ["./src/*"],
+       "@packet-manager" : ["./src/packet-manager/index.ts"],
        "@compiler" : ["./src/compiler/index.ts"],
        "@runtime" : ["./src/runtime/index.ts"],
        "@types" : ["./src/types/index.ts"],

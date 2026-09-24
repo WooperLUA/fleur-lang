@@ -32,6 +32,7 @@ export default defineConfig({
                         {label: 'Language Basics', slug: 'guides/basics'},
                         {label: 'Control Flow', slug: 'guides/control-flow'},
                         {label: 'Functions & Procedures', slug: 'guides/functions'},
+                        {label: 'Packet Manager', slug: 'guides/packet-manager'},
                         {
                             label: 'Data Structures', items: [
                                 {label: 'Arrays', slug: 'guides/arrays'},

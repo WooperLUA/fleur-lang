@@ -3,6 +3,8 @@ import {tokenize, Parser, optimize_statement} from "@compiler";
 import {interpret, create_global_env, start_repl} from "@runtime";
 import {type ErrorValue} from "@types";
 import * as node_path from "node:path";
+import {execSync} from "node:child_process";
+import {existsSync, mkdirSync} from "node:fs";
 
 const main = async () =>
 {
@@ -85,6 +87,90 @@ const main = async () =>
                 start_repl();
                 break;
             }
+            case 'pkg':
+            {
+                const sub_cmd = args[1];
+
+                if (!sub_cmd)
+                {
+                    console.warn("Usage: fleur pkg <command>\n\nCommands:\n  init      Create a new fleur.json file\n  install   Download dependencies from fleur.json");
+                    break;
+                }
+
+                if (sub_cmd === 'init')
+                {
+                    const config_path = node_path.join(process.cwd(), 'fleur.json');
+                    const file = Bun.file(config_path);
+                    if (await file.exists())
+                    {
+                        console.error("\x1b[31m[fleur] -> fleur.json already exists in this directory.\x1b[0m");
+                        process.exit(1);
+                    }
+
+                    const default_config = {
+                        name:         node_path.basename(process.cwd()),
+                        version:      "1.0.0",
+                        dependencies: {}
+                    };
+
+                    await Bun.write('fleur.json', JSON.stringify(default_config, null, 2));
+                    console.log("\x1b[32mSuccessfully created fleur.json\x1b[0m");
+                }
+                else if (sub_cmd === 'install')
+                {
+                    const config_path = node_path.join(process.cwd(), 'fleur.json');
+                    const file = Bun.file(config_path);
+                    if (!await file.exists())
+                    {
+                        console.error("\x1b[31m[fleur] -> fleur.json not found. Run 'fleur pkg init' first.\x1b[0m");
+                        process.exit(1);
+                    }
+
+                    const config = JSON.parse(await file.text());
+                    const deps = config.dependencies || {};
+                    const dep_names = Object.keys(deps);
+
+                    if (dep_names.length === 0)
+                    {
+                        console.log("No dependencies to install.");
+                        break;
+                    }
+
+                    const deps_dir = node_path.join(process.cwd(), '.fleur_deps');
+                    if (!existsSync(deps_dir)) mkdirSync(deps_dir);
+
+                    console.log(`\x1b[36mInstalling ${dep_names.length} dependencies...\x1b[0m`);
+
+                    for (const name of dep_names)
+                    {
+                        const url = deps[name];
+                        const target_dir = node_path.join(deps_dir, name);
+
+                        if (existsSync(target_dir))
+                        {
+                            console.warn(`\x1b[90mSkipping ${name} (already installed)\x1b[0m`);
+                            continue;
+                        }
+
+                        console.log(`\x1b[33mFetching ${name} from ${url}...\x1b[0m`);
+
+                        try
+                        {
+                            execSync(`git clone ${url} ${target_dir}`, {stdio: 'inherit'});
+                            console.log(`\x1b[32mSuccessfully installed ${name}\x1b[0m`);
+                        }
+                        catch (e)
+                        {
+                            console.error(`\x1b[31mFailed to install ${name}. Check the URL and your internet connection.\x1b[0m`);
+                        }
+                    }
+                }
+                else
+                {
+                    console.error(`\x1b[31m[fleur] -> Unknown pkg command: '${sub_cmd}'\x1b[0m`);
+                }
+                break;
+            }
             case 'help':
             {
                 const RESET = '\x1b[0m';
@@ -96,6 +182,7 @@ const main = async () =>
 
                 const commands = [
                     {cmd: ['run', '[.flr file] [--optimize] [args...]', '  Executes a .flr file.'], color: YELLOW},
+                    {cmd: ['pkg', '<init | install>', '\t      Manage Fleur packages.'], color: CYAN},
                     {cmd: ['repl', '', '\t      Runs a live REPL.'], color: CYAN},
                     {cmd: ['help', '', '\t      Displays all available commands.'], color: GREEN},
                 ];
