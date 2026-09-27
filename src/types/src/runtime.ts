@@ -118,5 +118,11 @@ export type RangeValue = {
 
 export type ErrorValue = {
     type: RuntimeValueType.Error;
+    error_type: string;
     message: string;
+    metadata?: string;
+    line?: number;
+    column?: number;
+    source?: string;
+    file?: string;
 };

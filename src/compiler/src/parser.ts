@@ -31,8 +31,15 @@ import {
     type RangeExpression,
     type WhenCase,
     type StructProperty,
-    type Node, type MethodDeclaration, type StaticMemberExpression, type NullLiteral, type TryStatement,
-    type ImportStatement, type TypeAnnotation, type Parameter, type StructField
+    type Node,
+    type MethodDeclaration,
+    type StaticMemberExpression,
+    type NullLiteral,
+    type TryStatement,
+    type ImportStatement,
+    type TypeAnnotation,
+    type Parameter,
+    type StructField
 } from "@types";
 import {throw_exception} from "@utils";
 
@@ -81,18 +88,31 @@ export class Parser
         });
     }
 
+    // ── Location helper ──────────────────────────────────────────────
+    // Extracts line/column from a token so we can spread it into any AST node.
+    private loc(token: Token<any>): { line: number; column: number }
+    {
+        return {line: token.line, column: token.column};
+    }
+
+    // ── Top-level ────────────────────────────────────────────────────
+
     public parse(): Program
     {
         const body: Statement[] = [];
+        const startToken = this.peek();
         while (this.peek().kind !== TokenKind.EOF)
         {
             body.push(this.parse_statement());
         }
         return {
             type: NodeType.Program,
+            ...this.loc(startToken),
             body
         };
     }
+
+    // ── Statements ───────────────────────────────────────────────────
 
     private parse_statement(): Statement
     {
@@ -175,6 +195,7 @@ export class Parser
 
     private parse_variable_declaration(): VariableDeclaration
     {
+        const startToken = this.peek();
         const is_pub = this.match(TokenKind.K_PUB);
         const is_const = this.eat().kind === TokenKind.K_CONST;
         const var_or_const = is_const ? 'constant' : 'variable';
@@ -192,6 +213,7 @@ export class Parser
 
         return {
             type: NodeType.VariableDeclaration,
+            ...this.loc(startToken),
             identifier,
             value,
             is_const,
@@ -206,43 +228,37 @@ export class Parser
         {
             return true;
         }
-
         if (node.type === NodeType.BlockStatement)
         {
             return (node as BlockStatement).body.some(stmt => this.has_return_statement(stmt));
         }
-
         if (node.type === NodeType.IfStatement)
         {
             const ifStmt = node as IfStatement;
             return this.has_return_statement(ifStmt.consequent) || (ifStmt.alternate ? this.has_return_statement(ifStmt.alternate) : false);
         }
-
         if (node.type === NodeType.WhenStatement)
         {
             return (node as WhenStatement).cases.some(c => this.has_return_statement(c.body));
         }
-
         if (node.type === NodeType.ForStatement)
         {
             return this.has_return_statement((node as ForStatement).body);
         }
-
         if (node.type === NodeType.WhileStatement)
         {
             return this.has_return_statement((node as WhileStatement).body);
         }
-
         return false;
     }
 
     private parse_function_declaration(): FunctionDeclaration
     {
+        const startToken = this.peek();
         const is_pub = this.match(TokenKind.K_PUB);
         this.eat(); // func
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected function name").value;
         this.expect(TokenKind.LPAREN, "Expected '(' after function name");
-
         const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
 
@@ -259,13 +275,14 @@ export class Parser
             throw_exception({
                 type:    "SyntaxError",
                 message: `Function '${identifier}' must have a return statement.`,
-                line:    this.tokens[this.pos - 1]?.line,
-                column:  this.tokens[this.pos - 1]?.column
+                line:    startToken.line,
+                column:  startToken.column
             });
         }
 
         return {
             type: NodeType.FunctionDeclaration,
+            ...this.loc(startToken),
             identifier,
             parameters,
             body,
@@ -276,14 +293,13 @@ export class Parser
 
     private parse_procedure_declaration(): ProcedureDeclaration
     {
+        const startToken = this.peek();
         const is_pub = this.match(TokenKind.K_PUB);
         this.eat(); // proc
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected procedure name").value;
         this.expect(TokenKind.LPAREN, "Expected '(' after procedure name");
-
         const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
-
         const body = this.parse_block_statement();
 
         if (this.has_return_statement(body))
@@ -291,13 +307,14 @@ export class Parser
             throw_exception({
                 type:    "SyntaxError",
                 message: `Procedure '${identifier}' cannot have a return statement.`,
-                line:    this.tokens[this.pos - 1]?.line,
-                column:  this.tokens[this.pos - 1]?.column
+                line:    startToken.line,
+                column:  startToken.column
             });
         }
 
         return {
             type: NodeType.ProcedureDeclaration,
+            ...this.loc(startToken),
             identifier,
             parameters,
             body,
@@ -307,11 +324,11 @@ export class Parser
 
     private parse_method_declaration(): MethodDeclaration
     {
+        const startToken = this.peek();
         const struct_name = this.expect(TokenKind.IDENTIFIER, "Expected struct name").value;
         this.expect(TokenKind.DOUBLE_COLON, "Expected '::' after struct name");
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected method name").value;
         this.expect(TokenKind.LPAREN, "Expected '(' after method name");
-
         const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
 
@@ -325,6 +342,7 @@ export class Parser
 
         return {
             type: NodeType.MethodDeclaration,
+            ...this.loc(startToken),
             struct_name,
             identifier,
             parameters,
@@ -335,6 +353,7 @@ export class Parser
 
     private parse_struct_declaration(): StructDeclaration
     {
+        const startToken = this.peek();
         const is_pub = this.match(TokenKind.K_PUB);
         this.eat(); // struct
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected struct name").value;
@@ -358,6 +377,7 @@ export class Parser
 
         return {
             type: NodeType.StructDeclaration,
+            ...this.loc(startToken),
             identifier,
             fields,
             is_pub
@@ -366,11 +386,12 @@ export class Parser
 
     private parse_if_statement(): IfStatement
     {
+        const startToken = this.peek();
         this.eat(); // if
         const condition = this.parse_expression(false);
         const consequent = this.parse_block_statement();
-        let alternate: BlockStatement | IfStatement | undefined;
 
+        let alternate: BlockStatement | IfStatement | undefined;
         if (this.match(TokenKind.K_ELSE))
         {
             if (this.peek().kind === TokenKind.K_IF)
@@ -385,6 +406,7 @@ export class Parser
 
         return {
             type: NodeType.IfStatement,
+            ...this.loc(startToken),
             condition,
             consequent,
             alternate
@@ -393,9 +415,11 @@ export class Parser
 
     private parse_when_statement(): WhenStatement
     {
+        const startToken = this.peek();
         this.eat(); // when
         const expression = this.parse_expression(false);
         this.expect(TokenKind.LBRACE, "Expected '{' after when expression");
+
         const cases: WhenCase[] = [];
         while (this.peek().kind !== TokenKind.RBRACE)
         {
@@ -416,6 +440,7 @@ export class Parser
 
         return {
             type: NodeType.WhenStatement,
+            ...this.loc(startToken),
             expression,
             cases
         };
@@ -423,16 +448,16 @@ export class Parser
 
     private parse_for_statement(): ForStatement
     {
+        const startToken = this.peek();
         this.eat(); // for
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected identifier in for loop").value;
         this.expect(TokenKind.K_IN, "Expected 'in' in for loop");
-
-        // FIX: Pass false to tell the parser "do not look for struct literals here"
         const iterable = this.parse_expression(false);
-
         const body = this.parse_block_statement();
+
         return {
             type: NodeType.ForStatement,
+            ...this.loc(startToken),
             identifier,
             iterable,
             body
@@ -441,12 +466,14 @@ export class Parser
 
     private parse_while_statement(): WhileStatement
     {
+        const startToken = this.peek();
         this.eat(); // while
         const condition = this.parse_expression(false);
         const body = this.parse_block_statement();
 
         return {
             type: NodeType.WhileStatement,
+            ...this.loc(startToken),
             condition,
             body
         };
@@ -454,19 +481,23 @@ export class Parser
 
     private parse_return_statement(): ReturnStatement
     {
+        const startToken = this.peek();
         this.eat(); // return
         const value = this.parse_expression();
         this.expect(TokenKind.SEMICOLON, "Expected ';' after return statement");
 
         return {
             type: NodeType.ReturnStatement,
+            ...this.loc(startToken),
             value
         };
     }
 
     private parse_block_statement(): BlockStatement
     {
+        const startToken = this.peek();
         this.expect(TokenKind.LBRACE, "Expected '{' at start of block");
+
         const body: Statement[] = [];
         while (this.peek().kind !== TokenKind.RBRACE && this.peek().kind !== TokenKind.EOF)
         {
@@ -476,6 +507,7 @@ export class Parser
 
         return {
             type: NodeType.BlockStatement,
+            ...this.loc(startToken),
             body
         };
     }
@@ -484,11 +516,62 @@ export class Parser
     {
         const expression = this.parse_expression();
         this.expect(TokenKind.SEMICOLON, "Expected ';' after expression statement");
+
         return {
-            type: NodeType.ExpressionStatement,
+            type:   NodeType.ExpressionStatement,
+            line:   expression.line,
+            column: expression.column,
             expression
         };
     }
+
+    private parse_try_statement(): TryStatement
+    {
+        const startToken = this.peek();
+        this.eat(); // try
+        const body = this.parse_block_statement();
+        this.expect(TokenKind.K_CATCH, "Expected 'catch' after 'try' block");
+        const catch_param = this.expect(TokenKind.IDENTIFIER, "Expected identifier after 'catch'").value;
+        const catch_body = this.parse_block_statement();
+
+        return {
+            type: NodeType.TryStatement,
+            ...this.loc(startToken),
+            body,
+            catch_param,
+            catch_body
+        };
+    }
+
+    private parse_import_statement(): ImportStatement
+    {
+        const startToken = this.peek();
+        this.eat(); // consume 'import'
+        this.expect(TokenKind.LBRACKET, "Expected '[' after import");
+
+        const specifiers: string[] = [];
+        if (this.peek().kind !== TokenKind.RBRACKET)
+        {
+            do
+            {
+                specifiers.push(this.expect(TokenKind.IDENTIFIER, "Expected identifier in import list").value);
+            } while (this.match(TokenKind.COMMA));
+        }
+        this.expect(TokenKind.RBRACKET, "Expected ']' after import list");
+        this.expect(TokenKind.K_IN, "Expected 'in' after import list");
+        const source_token = this.expect(TokenKind.STRING, "Expected module path string");
+        const source = source_token.value.slice(1, -1); // Remove quotes
+        this.expect(TokenKind.SEMICOLON, "Expected ';' after import statement");
+
+        return {
+            type: NodeType.ImportStatement,
+            ...this.loc(startToken),
+            specifiers,
+            source
+        };
+    }
+
+    // ── Expressions ──────────────────────────────────────────────────
 
     private parse_expression(allow_struct: boolean = true): Expression
     {
@@ -508,9 +591,10 @@ export class Parser
         {
             const operator = this.eat().value;
             const right = this.parse_assignment(allow_struct);
-
             return {
-                type: NodeType.AssignmentExpression,
+                type:   NodeType.AssignmentExpression,
+                line:   left.line,
+                column: left.column,
                 operator,
                 left,
                 right,
@@ -523,175 +607,161 @@ export class Parser
     private parse_or(allow_struct: boolean = true): Expression
     {
         let left = this.parse_and(allow_struct);
+
         while (this.match(TokenKind.OR))
         {
             const right = this.parse_and(allow_struct);
             left = {
                 type:     NodeType.BinaryExpression,
+                line:     left.line,
+                column:   left.column,
                 left,
                 right,
                 operator: "or"
             } as BinaryExpression;
         }
+
         return left;
     }
 
     private parse_and(allow_struct: boolean = true): Expression
     {
         let left = this.parse_equality(allow_struct);
+
         while (this.match(TokenKind.AND))
         {
             const right = this.parse_equality(allow_struct);
             left = {
                 type:     NodeType.BinaryExpression,
+                line:     left.line,
+                column:   left.column,
                 left,
                 right,
                 operator: "and"
             } as BinaryExpression;
         }
+
         return left;
     }
 
     private parse_equality(allow_struct: boolean = true): Expression
     {
         let left = this.parse_relational(allow_struct);
+
         while (this.peek().kind === TokenKind.EQUAL || this.peek().kind === TokenKind.NOT_EQUAL)
         {
             const operator = this.eat().value;
             const right = this.parse_relational(allow_struct);
             left = {
-                type: NodeType.BinaryExpression,
+                type:   NodeType.BinaryExpression,
+                line:   left.line,
+                column: left.column,
                 left,
                 right,
                 operator
             } as BinaryExpression;
         }
+
         return left;
     }
 
     private parse_relational(allow_struct: boolean = true): Expression
     {
         let left = this.parse_range(allow_struct);
+
         while ([TokenKind.LESS, TokenKind.GREATER, TokenKind.LESS_EQUAL, TokenKind.GREATER_EQUAL].includes(this.peek().kind))
         {
             const operator = this.eat().value;
             const right = this.parse_range(allow_struct);
             left = {
-                type: NodeType.BinaryExpression,
+                type:   NodeType.BinaryExpression,
+                line:   left.line,
+                column: left.column,
                 left,
                 right,
                 operator
             } as BinaryExpression;
         }
+
         return left;
     }
 
     private parse_range(allow_struct: boolean = true): Expression
     {
         let left = this.parse_additive(allow_struct);
+
         if (this.match(TokenKind.DOT_DOT))
         {
             const end = this.parse_additive(allow_struct);
             return {
-                type:  NodeType.RangeExpression,
-                start: left,
+                type:   NodeType.RangeExpression,
+                line:   left.line,
+                column: left.column,
+                start:  left,
                 end
             } as RangeExpression;
         }
+
         return left;
-    }
-
-    private parse_try_statement(): TryStatement
-    {
-        this.eat(); // try
-        const body = this.parse_block_statement();
-        this.expect(TokenKind.K_CATCH, "Expected 'catch' after 'try' block");
-        const catch_param = this.expect(TokenKind.IDENTIFIER, "Expected identifier after 'catch'").value;
-        const catch_body = this.parse_block_statement();
-
-        return {
-            type: NodeType.TryStatement,
-            body,
-            catch_param,
-            catch_body
-        };
-    }
-
-    private parse_import_statement(): ImportStatement
-    {
-        this.eat(); // consume 'import'
-        this.expect(TokenKind.LBRACKET, "Expected '[' after import");
-
-        const specifiers: string[] = [];
-        if (this.peek().kind !== TokenKind.RBRACKET)
-        {
-            do
-            {
-                specifiers.push(this.expect(TokenKind.IDENTIFIER, "Expected identifier in import list").value);
-            } while (this.match(TokenKind.COMMA));
-        }
-
-        this.expect(TokenKind.RBRACKET, "Expected ']' after import list");
-        this.expect(TokenKind.K_IN, "Expected 'in' after import list");
-
-        const source_token = this.expect(TokenKind.STRING, "Expected module path string");
-        const source = source_token.value.slice(1, -1); // Remove quotes
-
-        this.expect(TokenKind.SEMICOLON, "Expected ';' after import statement");
-
-        return {
-            type: NodeType.ImportStatement,
-            specifiers,
-            source
-        };
     }
 
     private parse_additive(allow_struct: boolean = true): Expression
     {
         let left = this.parse_multiplicative(allow_struct);
+
         while (this.peek().kind === TokenKind.PLUS || this.peek().kind === TokenKind.MINUS)
         {
             const operator = this.eat().value;
             const right = this.parse_multiplicative(allow_struct);
             left = {
-                type: NodeType.BinaryExpression,
+                type:   NodeType.BinaryExpression,
+                line:   left.line,
+                column: left.column,
                 left,
                 right,
                 operator
             } as BinaryExpression;
         }
+
         return left;
     }
 
     private parse_multiplicative(allow_struct: boolean = true): Expression
     {
         let left = this.parse_unary(allow_struct);
+
         while ([TokenKind.STAR, TokenKind.CARET, TokenKind.SLASH, TokenKind.PERCENT].includes(this.peek().kind))
         {
             const operator = this.eat().value;
             const right = this.parse_unary(allow_struct);
             left = {
-                type: NodeType.BinaryExpression,
+                type:   NodeType.BinaryExpression,
+                line:   left.line,
+                column: left.column,
                 left,
                 right,
                 operator
             } as BinaryExpression;
         }
+
         return left;
     }
 
     private parse_unary(allow_struct: boolean = true): Expression
     {
-        if (this.match(TokenKind.NOT) || this.match(TokenKind.MINUS))
+        if (this.peek().kind === TokenKind.NOT || this.peek().kind === TokenKind.MINUS)
         {
-            const operator = this.tokens[this.pos - 1]!.value;
+            const opToken = this.eat();
+            const operator = opToken.value;
             const argument = this.parse_unary(allow_struct);
             return {
                 type: NodeType.UnaryExpression,
+                ...this.loc(opToken),
                 operator,
                 argument
             } as UnaryExpression;
         }
+
         return this.parse_postfix(allow_struct);
     }
 
@@ -714,6 +784,8 @@ export class Parser
                 this.expect(TokenKind.RPAREN, "Expected ')' after arguments");
                 left = {
                     type:      NodeType.CallExpression,
+                    line:      left.line,
+                    column:    left.column,
                     callee:    left,
                     arguments: args
                 } as CallExpression;
@@ -724,6 +796,8 @@ export class Parser
                 this.expect(TokenKind.RBRACKET, "Expected ']' after index");
                 left = {
                     type:   NodeType.IndexExpression,
+                    line:   left.line,
+                    column: left.column,
                     object: left,
                     index
                 } as IndexExpression;
@@ -733,6 +807,8 @@ export class Parser
                 const property = this.expect(TokenKind.IDENTIFIER, "Expected identifier after '.'").value;
                 left = {
                     type:     NodeType.MemberExpression,
+                    line:     left.line,
+                    column:   left.column,
                     object:   left,
                     property: {type: NodeType.Identifier, name: property} as Identifier
                 } as MemberExpression;
@@ -742,6 +818,8 @@ export class Parser
                 const property = this.expect(TokenKind.IDENTIFIER, "Expected identifier after '::'").value;
                 left = {
                     type:     NodeType.StaticMemberExpression,
+                    line:     left.line,
+                    column:   left.column,
                     object:   left,
                     property: {type: NodeType.Identifier, name: property} as Identifier
                 } as StaticMemberExpression;
@@ -764,34 +842,43 @@ export class Parser
             case TokenKind.NUMBER:
                 this.eat();
                 return {
-                    type:  NodeType.NumericLiteral,
+                    type: NodeType.NumericLiteral,
+                    ...this.loc(token),
                     value: parseFloat(token.value.replace(/_/g, ""))
                 } as NumericLiteral;
+
             case TokenKind.STRING:
                 this.eat();
-
                 const rawValue = token.value.slice(1, -1);
-
                 const unescapedValue = rawValue
-                    .replace(/\\n/g, '\n')   // Newline
-                    .replace(/\\t/g, '\t')   // Tab
-                    .replace(/\\r/g, '\r')   // Carriage return
-                    .replace(/\\"/g, '"')    // Double quote
-                    .replace(/\\\\/g, '\\') // Backslash
-                    // Hex escape sequences (for ANSI colors/bold)
+                    .replace(/\\n/g, '\n')
+                    .replace(/\\t/g, '\t')
+                    .replace(/\\r/g, '\r')
+                    .replace(/\\"/g, '"')
+                    .replace(/\\\\/g, '\\')
                     .replace(/\\x([0-9a-fA-F]{2})/g, (_: any, hex: string) => String.fromCharCode(parseInt(hex, 16)));
-
                 return {
-                    type:  NodeType.StringLiteral,
+                    type: NodeType.StringLiteral,
+                    ...this.loc(token),
                     value: unescapedValue
                 } as StringLiteral;
+
             case TokenKind.K_TRUE:
             case TokenKind.K_FALSE:
                 this.eat();
-                return {type: NodeType.BooleanLiteral, value: token.kind === TokenKind.K_TRUE} as BooleanLiteral;
+                return {
+                    type: NodeType.BooleanLiteral,
+                    ...this.loc(token),
+                    value: token.kind === TokenKind.K_TRUE
+                } as BooleanLiteral;
+
             case TokenKind.K_NULL:
                 this.eat();
-                return {type: NodeType.NullLiteral} as NullLiteral;
+                return {
+                    type: NodeType.NullLiteral,
+                    ...this.loc(token)
+                } as NullLiteral;
+
             case TokenKind.K_STRUCT:
             case TokenKind.IDENTIFIER:
                 this.eat();
@@ -812,17 +899,25 @@ export class Parser
                     }
                     this.expect(TokenKind.RBRACE, "Expected '}' after struct properties");
                     return {
-                        type:       NodeType.StructLiteral,
+                        type: NodeType.StructLiteral,
+                        ...this.loc(token),
                         identifier: token.value,
                         properties
                     } as StructLiteral;
                 }
-                return {type: NodeType.Identifier, name: token.value} as Identifier;
+                return {
+                    type: NodeType.Identifier,
+                    ...this.loc(token),
+                    name: token.value
+                } as Identifier;
+
             case TokenKind.LPAREN:
                 this.eat();
                 const expression = this.parse_expression(true);
                 this.expect(TokenKind.RPAREN, "Expected ')' after expression");
+                // Parenthesized expression keeps the inner expression's location
                 return expression;
+
             case TokenKind.LBRACKET:
                 this.eat();
                 const elements: Expression[] = [];
@@ -834,20 +929,30 @@ export class Parser
                     } while (this.match(TokenKind.COMMA));
                 }
                 this.expect(TokenKind.RBRACKET, "Expected ']' after array elements");
-                return {type: NodeType.ArrayLiteral, elements} as ArrayLiteral;
+                return {
+                    type: NodeType.ArrayLiteral,
+                    ...this.loc(token),
+                    elements
+                } as ArrayLiteral;
+
             default:
                 return throw_exception({
                     type:    'Parser',
-                    message: `Unexpected token ${token.kind} at position ${this.pos}`
+                    message: `Unexpected token ${token.kind} at position ${this.pos}`,
+                    line:    token.line,
+                    column:  token.column
                 });
         }
     }
 
+    // ── Type Annotations & Parameters ────────────────────────────────
+
     private parse_type_annotation(): TypeAnnotation
     {
+        const startToken = this.peek();
         this.expect(TokenKind.COLON, "Expected ':' before type annotation");
-        const names: string[] = [];
 
+        const names: string[] = [];
         names.push(this.expect(TokenKind.IDENTIFIER, "Expected type name after ':'").value);
 
         while (this.match(TokenKind.OR))
@@ -857,6 +962,7 @@ export class Parser
 
         return {
             type: NodeType.TypeAnnotation,
+            ...this.loc(startToken),
             names: names
         } as TypeAnnotation;
     }
@@ -879,5 +985,4 @@ export class Parser
         }
         return parameters;
     }
-
 }

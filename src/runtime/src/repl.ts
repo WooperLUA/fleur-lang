@@ -1,6 +1,6 @@
 import {tokenize, Parser} from "@compiler";
 import {interpret, create_global_env} from "./interpreter";
-import {FleurError, stringify_value} from "@utils";
+import {FleurError, format_pretty_error, stringify_value} from "@utils";
 import {type ErrorValue, RuntimeValueType} from "@types";
 
 export const start_repl = () =>
@@ -41,7 +41,7 @@ export const start_repl = () =>
         {
             if (e instanceof FleurError)
             {
-                console.error(`\x1b[31m[fleur] -> ${(e.value as ErrorValue).message}\x1b[0m`);
+                console.error(format_pretty_error(e.value as ErrorValue));
             }
             else if (e.message)
             {

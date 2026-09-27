@@ -38,7 +38,7 @@ import {
     type StringValue,
     type BooleanValue,
     type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
-    type ImportStatement, type StructField,
+    type ImportStatement, type StructField, type ErrorValue,
 } from "@types";
 import {throw_exception, stringify_value, is_equal, FleurError, deep_copy} from "@utils";
 import {setup_stdlib} from "./stdlib";
@@ -56,6 +56,8 @@ export class Environment
     private readonly types: Record<string, string[]>;
     private constants: Set<string>;
     private methods: Map<string, Map<string, FunctionValue>>;
+    public source?: string;
+    public file?: string;
 
     public readonly base_dir: string;
 
@@ -69,6 +71,8 @@ export class Environment
         this.constants = new Set();
         this.methods = new Map();
         this.base_dir = base_dir ?? parent?.base_dir ?? process.cwd();
+        this.source = parent?.source;
+        this.file = parent?.file;
     }
 
     public register_method(struct_name: string, method_name: string, value: FunctionValue)
@@ -195,45 +199,62 @@ export const interpret = (ast: Program, env: Environment) =>
 
 const execute = (stmt: Statement, env: Environment): RuntimeValue =>
 {
-    switch (stmt.type)
+    try
     {
-        case NodeType.VariableDeclaration:
-            return execute_variable_declaration(stmt as VariableDeclaration, env);
-        case NodeType.FunctionDeclaration:
-            return execute_function_declaration(stmt as FunctionDeclaration, env);
-        case NodeType.ProcedureDeclaration:
-            return execute_procedure_declaration(stmt as ProcedureDeclaration, env);
-        case NodeType.MethodDeclaration:
-            return execute_method_declaration(stmt as MethodDeclaration, env);
-        case NodeType.StructDeclaration:
-            return execute_struct_declaration(stmt as StructDeclaration, env);
-        case NodeType.IfStatement:
-            return execute_if_statement(stmt as IfStatement, env);
-        case NodeType.WhenStatement:
-            return execute_when_statement(stmt as WhenStatement, env);
-        case NodeType.ForStatement:
-            return execute_for_statement(stmt as ForStatement, env);
-        case NodeType.WhileStatement:
-            return execute_while_statement(stmt as WhileStatement, env);
-        case NodeType.ReturnStatement:
-            return {
-                type:  RuntimeValueType.Return,
-                value: evaluate((stmt as ReturnStatement).value, env)
-            } as ReturnValue;
-        case NodeType.TryStatement:
-            return execute_try_statement(stmt as TryStatement, env);
-        case NodeType.ImportStatement:
-            return execute_import_statement(stmt as ImportStatement, env);
-        case NodeType.BlockStatement:
-            return execute_block_statement(stmt as BlockStatement, new Environment(env));
-        case NodeType.ExpressionStatement:
-            return evaluate((stmt as ExpressionStatement).expression, env);
-        default:
-            throw_exception({
-                type:    "Runtime",
-                message: `Unknown statement type: ${(stmt as any).type}`
-            });
-            return {type: RuntimeValueType.Null, value: null};
+        switch (stmt.type)
+        {
+            case NodeType.VariableDeclaration:
+                return execute_variable_declaration(stmt as VariableDeclaration, env);
+            case NodeType.FunctionDeclaration:
+                return execute_function_declaration(stmt as FunctionDeclaration, env);
+            case NodeType.ProcedureDeclaration:
+                return execute_procedure_declaration(stmt as ProcedureDeclaration, env);
+            case NodeType.MethodDeclaration:
+                return execute_method_declaration(stmt as MethodDeclaration, env);
+            case NodeType.StructDeclaration:
+                return execute_struct_declaration(stmt as StructDeclaration, env);
+            case NodeType.IfStatement:
+                return execute_if_statement(stmt as IfStatement, env);
+            case NodeType.WhenStatement:
+                return execute_when_statement(stmt as WhenStatement, env);
+            case NodeType.ForStatement:
+                return execute_for_statement(stmt as ForStatement, env);
+            case NodeType.WhileStatement:
+                return execute_while_statement(stmt as WhileStatement, env);
+            case NodeType.ReturnStatement:
+                return {
+                    type:  RuntimeValueType.Return,
+                    value: evaluate((stmt as ReturnStatement).value, env)
+                } as ReturnValue;
+            case NodeType.TryStatement:
+                return execute_try_statement(stmt as TryStatement, env);
+            case NodeType.ImportStatement:
+                return execute_import_statement(stmt as ImportStatement, env);
+            case NodeType.BlockStatement:
+                return execute_block_statement(stmt as BlockStatement, new Environment(env));
+            case NodeType.ExpressionStatement:
+                return evaluate((stmt as ExpressionStatement).expression, env);
+            default:
+                throw_exception({
+                    type:    "Runtime",
+                    message: `Unknown statement type: ${(stmt as any).type}`
+                });
+                return {type: RuntimeValueType.Null, value: null};
+        }
+    }
+    catch (e)
+    {
+        if (e instanceof FleurError)
+        {
+            const errVal = e.value as ErrorValue;
+            // Inject location from the AST node if it doesn't have one
+            if (!errVal.line && stmt.line) errVal.line = Number(stmt.line);
+            if (!errVal.column && stmt.column) errVal.column = Number(stmt.column);
+            // Inject source code and file path from the Environment
+            if (!errVal.source && env.source) errVal.source = env.source;
+            if (!errVal.file && env.file) errVal.file = env.file;
+        }
+        throw e;
     }
 };
 
@@ -539,6 +560,8 @@ const execute_import_statement = (stmt: ImportStatement, env: Environment): Runt
     const ast = new Parser(tokens).parse();
 
     const module_env = new Environment(env, target_dir);
+    module_env.source = code;
+    module_env.file = target_path;
 
     interpret(ast, module_env);
 
@@ -596,51 +619,66 @@ const execute_while_statement = (stmt: WhileStatement, env: Environment): Runtim
 
 const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
 {
-    switch (expr.type)
+    try
     {
-        case NodeType.NumericLiteral:
-            return {type: RuntimeValueType.Number, value: (expr as NumericLiteral).value};
-        case NodeType.StringLiteral:
-            return {type: RuntimeValueType.String, value: (expr as StringLiteral).value};
-        case NodeType.BooleanLiteral:
-            return {type: RuntimeValueType.Boolean, value: (expr as BooleanLiteral).value};
-        case NodeType.NullLiteral:
-            return {type: RuntimeValueType.Null, value: null};
-        case NodeType.Identifier:
-            return env.lookup((expr as Identifier).name);
-        case NodeType.BinaryExpression:
-            return evaluate_binary_expression(expr as BinaryExpression, env);
-        case NodeType.UnaryExpression:
-            return evaluate_unary_expression(expr as UnaryExpression, env);
-        case NodeType.ArrayLiteral:
-            return {
-                type:     RuntimeValueType.Array,
-                elements: (expr as ArrayLiteral).elements.map(e => evaluate(e, env))
-            };
-        case NodeType.StructLiteral:
-            return evaluate_struct_literal(expr as StructLiteral, env);
-        case NodeType.CallExpression:
-            return evaluate_call_expression(expr as CallExpression, env);
-        case NodeType.MemberExpression:
-            return evaluate_member_expression(expr as MemberExpression, env);
-        case NodeType.StaticMemberExpression:
-            return evaluate_static_member_expression(expr as StaticMemberExpression, env);
-        case NodeType.IndexExpression:
-            return evaluate_index_expression(expr as IndexExpression, env);
-        case NodeType.AssignmentExpression:
-            return evaluate_assignment_expression(expr as AssignmentExpression, env);
-        case NodeType.RangeExpression:
-            return {
-                type:  RuntimeValueType.Range,
-                start: evaluate((expr as RangeExpression).start, env),
-                end:   evaluate((expr as RangeExpression).end, env)
-            } as RangeValue;
-        default:
-            throw_exception({
-                type:    "Runtime",
-                message: `Unknown expression type: ${(expr as any).type}`
-            });
-            return {type: RuntimeValueType.Null, value: null};
+        switch (expr.type)
+        {
+            case NodeType.NumericLiteral:
+                return {type: RuntimeValueType.Number, value: (expr as NumericLiteral).value};
+            case NodeType.StringLiteral:
+                return {type: RuntimeValueType.String, value: (expr as StringLiteral).value};
+            case NodeType.BooleanLiteral:
+                return {type: RuntimeValueType.Boolean, value: (expr as BooleanLiteral).value};
+            case NodeType.NullLiteral:
+                return {type: RuntimeValueType.Null, value: null};
+            case NodeType.Identifier:
+                return env.lookup((expr as Identifier).name);
+            case NodeType.BinaryExpression:
+                return evaluate_binary_expression(expr as BinaryExpression, env);
+            case NodeType.UnaryExpression:
+                return evaluate_unary_expression(expr as UnaryExpression, env);
+            case NodeType.ArrayLiteral:
+                return {
+                    type:     RuntimeValueType.Array,
+                    elements: (expr as ArrayLiteral).elements.map(e => evaluate(e, env))
+                };
+            case NodeType.StructLiteral:
+                return evaluate_struct_literal(expr as StructLiteral, env);
+            case NodeType.CallExpression:
+                return evaluate_call_expression(expr as CallExpression, env);
+            case NodeType.MemberExpression:
+                return evaluate_member_expression(expr as MemberExpression, env);
+            case NodeType.StaticMemberExpression:
+                return evaluate_static_member_expression(expr as StaticMemberExpression, env);
+            case NodeType.IndexExpression:
+                return evaluate_index_expression(expr as IndexExpression, env);
+            case NodeType.AssignmentExpression:
+                return evaluate_assignment_expression(expr as AssignmentExpression, env);
+            case NodeType.RangeExpression:
+                return {
+                    type:  RuntimeValueType.Range,
+                    start: evaluate((expr as RangeExpression).start, env),
+                    end:   evaluate((expr as RangeExpression).end, env)
+                } as RangeValue;
+            default:
+                throw_exception({
+                    type:    "Runtime",
+                    message: `Unknown expression type: ${(expr as any).type}`
+                });
+                return {type: RuntimeValueType.Null, value: null};
+        }
+    }
+    catch (e)
+    {
+        if (e instanceof FleurError)
+        {
+            const errVal = e.value as ErrorValue;
+            if (!errVal.line && expr.line) errVal.line = Number(expr.line);
+            if (!errVal.column && expr.column) errVal.column = Number(expr.column);
+            if (!errVal.source && env.source) errVal.source = env.source;
+            if (!errVal.file && env.file) errVal.file = env.file;
+        }
+        throw e;
     }
 };
 
@@ -688,7 +726,10 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
         case "*":
             return {type: RuntimeValueType.Number, value: (left as NumberValue).value * (right as NumberValue).value};
         case "^":
-            return {type: RuntimeValueType.Number, value: Math.pow((left as NumberValue).value, (right as NumberValue).value)};
+            return {
+                type:  RuntimeValueType.Number,
+                value: Math.pow((left as NumberValue).value, (right as NumberValue).value)
+            };
         case "/":
         {
             const left_val = (left as NumberValue).value
@@ -764,8 +805,8 @@ const evaluate_struct_literal = (expr: StructLiteral, env: Environment): Runtime
     }
 
     const provided_fields = new Set(expr.properties.map(p => p.name));
-    const missing_fields: string[] = [];
 
+    const missing_fields: string[] = [];
     for (const field of expected_fields!)
     {
         if (!provided_fields.has(field.name))
@@ -773,7 +814,6 @@ const evaluate_struct_literal = (expr: StructLiteral, env: Environment): Runtime
             missing_fields.push(field.name);
         }
     }
-
     if (missing_fields.length > 0)
     {
         return throw_exception({
@@ -782,17 +822,32 @@ const evaluate_struct_literal = (expr: StructLiteral, env: Environment): Runtime
         });
     }
 
+    const unknown_fields: string[] = [];
+    for (const prop of expr.properties)
+    {
+        const field_def = expected_fields!.find(f => f.name === prop.name);
+        if (!field_def)
+        {
+            unknown_fields.push(prop.name);
+        }
+    }
+    if (unknown_fields.length > 0)
+    {
+        return throw_exception({
+            type:    "Runtime",
+            message: `Unknown ${unknown_fields.length > 1 ? 'properties' : 'property'} '${unknown_fields.join(', ')}' when instantiating struct '${expr.identifier}'.`
+        });
+    }
+
     const properties = new Map<string, RuntimeValue>();
     for (const prop of expr.properties)
     {
         const evaluated_val = evaluate(prop.value, env);
-
         const field_def = expected_fields!.find(f => f.name === prop.name);
         if (field_def?.type_annotation)
         {
             validate_runtime_type(evaluated_val, field_def.type_annotation.names, `struct '${expr.identifier}' property '${prop.name}'`);
         }
-
         properties.set(prop.name, evaluated_val);
     }
 
@@ -1436,11 +1491,19 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
             const struct_def = structs.get(struct.identifier);
             const field_def = struct_def?.find(f => f.name === key);
 
+            if (!field_def)
+            {
+                throw_exception({
+                    type:    "Runtime",
+                    message: `Property '${key}' does not exist on struct '${struct.identifier}'.`
+                });
+            }
+
             if (operator === "=")
             {
-                if (field_def?.type_annotation)
+                if (field_def!.type_annotation)
                 {
-                    validate_runtime_type(right, field_def.type_annotation.names, `assignment to struct property '${key}'`);
+                    validate_runtime_type(right, field_def!.type_annotation.names, `assignment to struct property '${key}'`);
                 }
                 struct.properties.set(key, right);
                 return right;
@@ -1448,12 +1511,10 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
 
             const current = struct.properties.get(key)!;
             const newVal = compute_new_value(current);
-
-            if (field_def?.type_annotation)
+            if (field_def!.type_annotation)
             {
-                validate_runtime_type(newVal, field_def.type_annotation.names, `assignment to struct property '${key}'`);
+                validate_runtime_type(newVal, field_def!.type_annotation.names, `assignment to struct property '${key}'`);
             }
-
             struct.properties.set(key, newVal);
             return newVal;
         }

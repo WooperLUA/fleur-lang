@@ -36,6 +36,8 @@ export enum NodeType
 
 export type Node = {
     type: NodeType;
+    line?: Number;
+    column?: Number;
 };
 
 export type Program = Node & {

@@ -1,4 +1,4 @@
-import {FleurError, throw_exception} from "@utils";
+import {FleurError, format_pretty_error, throw_exception} from "@utils";
 import {tokenize, Parser, optimize_statement} from "@compiler";
 import {interpret, create_global_env, start_repl} from "@runtime";
 import {type ErrorValue} from "@types";
@@ -66,13 +66,15 @@ const main = async () =>
                     }
 
                     const env = create_global_env(fleur_args, current_dir);
+                    env.source = bytes;
+                    env.file = absolute_path;
                     interpret(ast, env);
                 }
                 catch (e)
                 {
                     if (e instanceof FleurError)
                     {
-                        console.error(`\x1b[31m[fleur] -> ${(e.value as ErrorValue).message}\x1b[0m`);
+                        console.error(format_pretty_error(e.value as ErrorValue));
                         process.exit(1);
                     }
                     else
