@@ -47,7 +47,7 @@ What happens if the repository doesn't have a `fleur.json` file?
 
 If you try to add a standard GitHub repository that hasn't been configured for Fleur (i.e., it lacks a `fleur.json`), the package manager will gracefully fall back to using the **repository's URL name**.
 
-It will print a warning to let you know, but the installation will still succeed, allowing you to import the files manually.
+It will print a warning to let you know, but the installation will still succeed.
 
 ```bash
 $ fleur pkg add https://github.com/someone/random-scripts.git
@@ -78,6 +78,15 @@ Because the package manager downloads libraries into the `.fleur_deps/` director
 // Import specific components from the cloned repository
 import [A, B] in ".fleur_deps/..../example.flr";
 ```
+
+## Managing the project's version
+
+Running the `version` command followed by the type `major | minor | patch` allows you to quickly update the `version` property of `fleur.json`.
+
+```bash
+fleur pkg version major
+```
+
 
 ## Best Practices
 

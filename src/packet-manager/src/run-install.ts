@@ -1,19 +1,11 @@
 import {execSync} from "node:child_process";
 import {existsSync, mkdirSync} from "node:fs";
 import * as node_path from "node:path";
+import {parse_project_config} from "@utils";
 
 export const run_install = async () =>
 {
-    const config_path = node_path.join(process.cwd(), 'fleur.json');
-    const file = Bun.file(config_path);
-
-    if (!await file.exists())
-    {
-        console.error("\x1b[31m[fleur] -> fleur.json not found. Run 'fleur pkg init' first.\x1b[0m");
-        process.exit(1);
-    }
-
-    const config = JSON.parse(await file.text());
+    const [config, _] = await parse_project_config();
     const deps = config.dependencies || {};
     const dep_names = Object.keys(deps);
 

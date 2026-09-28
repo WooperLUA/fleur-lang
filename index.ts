@@ -1,4 +1,4 @@
-import {FleurError, format_pretty_error, throw_exception} from "@utils";
+import {FleurError, format_pretty_error, parse_project_config, throw_exception} from "@utils";
 import {tokenize, Parser, optimize_statement} from "@compiler";
 import {interpret, create_global_env, start_repl} from "@runtime";
 import {type ErrorValue} from "@types";
@@ -103,6 +103,7 @@ const main = async () =>
                 if (sub_cmd === 'init')
                 {
                     const config_path = node_path.join(process.cwd(), 'fleur.json');
+                    const src_path = node_path.join(process.cwd(), 'src');
                     const file = Bun.file(config_path);
 
                     if (await file.exists())
@@ -118,7 +119,8 @@ const main = async () =>
                     };
 
                     await Bun.write(config_path, JSON.stringify(default_config, null, 2));
-                    console.log("\x1b[32mSuccessfully created fleur.json\x1b[0m");
+                    if (!existsSync(src_path)) mkdirSync(src_path, { recursive: true })
+                    console.log("\x1b[32mSuccessfully created the fleur project\x1b[0m");
                 }
                 else if (sub_cmd === 'install')
                 {
@@ -194,22 +196,43 @@ const main = async () =>
                         }
                     }
 
-                    const config_path = node_path.join(process.cwd(), 'fleur.json');
-                    const file = Bun.file(config_path);
-
-                    if (!await file.exists())
-                    {
-                        console.error("\x1b[31m[fleur] -> Local fleur.json not found. Run 'fleur pkg init' first.\x1b[0m");
-                        process.exit(1);
-                    }
-
-                    const config = JSON.parse(await file.text());
+                    const [config, config_path] = await parse_project_config();
                     if (!config.dependencies) config.dependencies = {};
 
                     config.dependencies[final_name] = pkg_url;
                     await Bun.write(config_path, JSON.stringify(config, null, 2));
 
                     console.log(`\x1b[32mSuccessfully added '${final_name}' to fleur.json\x1b[0m`);
+                }
+                else if (sub_cmd === 'version')
+                {
+                    if (!args[2])
+                    {
+                        console.error("\x1b[31m[fleur] -> Usage: fleur pkg version <major|minor|patch>\x1b[0m");
+                        process.exit(1);
+                    }
+
+                    const version_selector = args[2]!;
+                    const [config, config_path] = await parse_project_config();
+                    const current_version = (config.version as string).split('.').map(s => Number(s)); // [1, 0, 0]
+                    let index_to_change = -1;
+                    switch (version_selector)
+                    {
+                        case 'major': index_to_change = 0; break;
+                        case 'minor': index_to_change = 1; break;
+                        case 'patch': index_to_change = 2; break;
+                    }
+                    if (index_to_change === -1)
+                    {
+                        console.error("\x1b[31m[fleur] -> Usage: fleur pkg version <major|minor|patch>\x1b[0m");
+                        process.exit(1);
+                    }
+                    current_version[index_to_change]! = current_version[index_to_change]! + 1;
+                    const formated_version = current_version.join('.');
+                    config.version = formated_version;
+
+                    await Bun.write(config_path, JSON.stringify(config, null, 2));
+                    console.log(`\x1b[32mSuccessfully updated the project's version to '${formated_version}'\x1b[0m`);
                 }
                 else
                 {
@@ -229,7 +252,7 @@ const main = async () =>
 
                 const commands = [
                     {cmd: ['run', '[.flr file] [--optimize] [args...]', '  Executes a .flr file.'], color: YELLOW},
-                    {cmd: ['pkg', '<init | install | add>', '\t      Manage Fleur packages.'], color: CYAN},
+                    {cmd: ['pkg', '[init | install | add | version]', '    Manage Fleur packages.'], color: CYAN},
                     {cmd: ['repl', '', '\t      Runs a live REPL.'], color: CYAN},
                     {cmd: ['help', '', '\t      Displays all available commands.'], color: GREEN},
                 ];
