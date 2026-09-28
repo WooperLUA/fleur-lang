@@ -5,7 +5,7 @@ import {
     type RangeValue,
     type RuntimeValue,
     RuntimeValueType,
-    type SetValue,
+    type SetValue, type StringValue,
     type StructValue,
 } from "@types";
 import {check_arg_type, check_args_length, throw_exception} from "@utils";
@@ -29,7 +29,8 @@ export const math: StructValue = {
             }
         ]
     ]),
-    methods:    new Map<string, any>([
+
+    methods: new Map<string, any>([
         [
             "random",
             {
@@ -38,7 +39,6 @@ export const math: StructValue = {
                       {
                           check_args_length(args, 1, "math::random");
                           check_arg_type(args[0]!, RuntimeValueType.Range, "math::random");
-
                           const range = args[0] as RangeValue;
                           const start = (range.start as NumberValue).value;
                           const end = (range.end as NumberValue).value;
@@ -310,11 +310,42 @@ export const math: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, 1, "math::float");
-                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::float");
-                          const value = (args[0] as NumberValue).value
-                          return {type: RuntimeValueType.Number, value: value.toFixed(1)}
+                          check_arg_type(args[0]!, [RuntimeValueType.Number, RuntimeValueType.String], "math::float");
+
+                          let num_value: number;
+                          const arg = args[0]!;
+
+                          if (arg.type === RuntimeValueType.Number)
+                          {
+                              num_value = (arg as NumberValue).value;
+                          }
+                          else
+                          {
+                              const str_val = (arg as StringValue).value.trim();
+
+                              if (str_val === "")
+                              {
+                                  throw_exception({
+                                      type:    "Runtime",
+                                      message: `Cannot parse empty string into a float.`
+                                  });
+                              }
+
+                              // Number() natively understands 0x, 0b, 0o prefixes
+                              num_value = Number(str_val);
+
+                              if (Number.isNaN(num_value))
+                              {
+                                  throw_exception({
+                                      type:    "Runtime",
+                                      message: `Cannot parse "${str_val}" into a float.`
+                                  });
+                              }
+                          }
+
+                          return {type: RuntimeValueType.Number, value: Number(num_value.toFixed(1))};
                       }
-            }
+            } as NativeFunctionValue
         ],
         [
             "int",
@@ -323,11 +354,117 @@ export const math: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, 1, "math::int");
-                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::int");
-                          const value = String((args[0] as NumberValue).value)
-                          return {type: RuntimeValueType.Number, value: parseInt(value)}
+                          check_arg_type(args[0]!, [RuntimeValueType.Number, RuntimeValueType.String], "math::int");
+
+                          let num_value: number;
+                          const arg = args[0]!;
+
+                          if (arg.type === RuntimeValueType.Number)
+                          {
+                              num_value = (arg as NumberValue).value;
+                          }
+                          else
+                          {
+                              const str_val = (arg as StringValue).value.trim();
+
+                              if (str_val === "")
+                              {
+                                  throw_exception({
+                                      type:    "Runtime",
+                                      message: `Cannot parse empty string into an integer.`
+                                  });
+                              }
+
+                              num_value = Number(str_val);
+
+                              if (Number.isNaN(num_value))
+                              {
+                                  throw_exception({
+                                      type:    "Runtime",
+                                      message: `Cannot parse "${str_val}" into an integer.`
+                                  });
+                              }
+                          }
+
+                          // Truncate decimals to ensure it's a true integer
+                          return {type: RuntimeValueType.Number, value: Math.trunc(num_value)};
                       }
-            }
+            } as NativeFunctionValue
+        ],
+        [
+            "bin",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, [1, 2], "math::bin");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::bin");
+
+                          const raw_value = (args[0] as NumberValue).value;
+                          const is_negative = raw_value < 0;
+                          let value = Math.abs(raw_value).toString(2);
+
+                          if (args.length === 2)
+                          {
+                              check_arg_type(args[1]!, RuntimeValueType.Number, "math::bin");
+                              const padding = (args[1] as NumberValue).value;
+                              value = value.padStart(padding, '0');
+                          }
+
+                          const prefix = is_negative ? "-0b" : "0b";
+                          return {type: RuntimeValueType.String, value: prefix + value};
+                      }
+            } as NativeFunctionValue
+        ],
+        [
+            "oct",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, [1, 2], "math::oct");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::oct");
+
+                          const raw_value = (args[0] as NumberValue).value;
+                          const is_negative = raw_value < 0;
+                          let value = Math.abs(raw_value).toString(8);
+
+                          if (args.length === 2)
+                          {
+                              check_arg_type(args[1]!, RuntimeValueType.Number, "math::oct");
+                              const padding = (args[1] as NumberValue).value;
+                              value = value.padStart(padding, '0');
+                          }
+
+                          const prefix = is_negative ? "-0o" : "0o";
+                          return {type: RuntimeValueType.String, value: prefix + value};
+                      }
+            } as NativeFunctionValue
+        ],
+        [
+            "hex",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, [1, 2], "math::hex");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::hex");
+
+                          const raw_value = (args[0] as NumberValue).value;
+                          const is_negative = raw_value < 0;
+                          let value = Math.abs(raw_value).toString(16).toUpperCase();
+
+                          if (args.length === 2)
+                          {
+                              check_arg_type(args[1]!, RuntimeValueType.Number, "math::hex");
+                              const padding = (args[1] as NumberValue).value;
+                              value = value.padStart(padding, '0');
+                          }
+
+                          const prefix = is_negative ? "-0x" : "0x";
+                          return {type: RuntimeValueType.String, value: prefix + value};
+                      }
+            } as NativeFunctionValue
         ],
         [
             "clamp",
@@ -393,21 +530,21 @@ export const math: StructValue = {
         [
             "length",
             {
-                type: RuntimeValueType.NativeFunction,
+                type:      RuntimeValueType.NativeFunction,
                 is_method: false,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          check_args_length(args, 1, "math::length");
-                          check_arg_type(args[0]!, RuntimeValueType.Number, "math::length");
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "math::length");
+                               check_arg_type(args[0]!, RuntimeValueType.Number, "math::length");
 
-                          const val = (args[0] as NumberValue).value;
-                          const digitCount = Math.abs(val).toString().replace(".", "").length;
+                               const val = (args[0] as NumberValue).value;
+                               const digitCount = Math.abs(val).toString().replace(".", "").length;
 
-                          return {
-                              type: RuntimeValueType.Number,
-                              value: digitCount,
-                          } as NumberValue;
-                      },
+                               return {
+                                   type:  RuntimeValueType.Number,
+                                   value: digitCount,
+                               } as NumberValue;
+                           },
             } as NativeFunctionValue,
         ]
     ]),
