@@ -173,6 +173,24 @@ export const array: StructValue = {
             } as NativeFunctionValue,
         ],
         [
+            "shift",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<array>::shift");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::shift");
+                               check_mutability(args[0]!, "<array>::shift");
+
+                               const arr = args[0] as ArrayValue;
+                               const val = arr.elements.shift();
+
+                               return val ?? {type: RuntimeValueType.Null, value: null};
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
             "index",
             {
                 type:      RuntimeValueType.NativeFunction,
@@ -649,8 +667,8 @@ export const array: StructValue = {
                                if (group_size <= 0)
                                {
                                    return throw_exception({
-                                       type : "Runtime",
-                                       message : "Group size must be greater than 0"
+                                       type:    "Runtime",
+                                       message: "Group size must be greater than 0"
                                    });
                                }
 
@@ -701,8 +719,8 @@ export const array: StructValue = {
                                if (group_size <= 0)
                                {
                                    return throw_exception({
-                                       type : "Runtime",
-                                       message : "Group size must be greater than 0"
+                                       type:    "Runtime",
+                                       message: "Group size must be greater than 0"
                                    });
                                }
 
@@ -731,7 +749,7 @@ export const array: StructValue = {
                                }
 
                                return {
-                                   type :     RuntimeValueType.Array,
+                                   type:     RuntimeValueType.Array,
                                    elements: grouped_array,
                                } as ArrayValue;
                            },

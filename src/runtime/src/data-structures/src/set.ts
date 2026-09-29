@@ -252,6 +252,24 @@ export const set: StructValue = {
             } as NativeFunctionValue,
         ],
         [
+            "shift",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<set>::shift");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::shift");
+                               check_mutability(args[0]!, "<set>::shift");
+
+                               const set = args[0] as SetValue;
+                               const val = set.elements.shift();
+
+                               return val ?? {type: RuntimeValueType.Null, value: null};
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
             "index",
             {
                 type:      RuntimeValueType.NativeFunction,

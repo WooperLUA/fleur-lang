@@ -21,26 +21,24 @@ try {
 
 ## The Error Struct
 
-Custom errors can be created using the built-in `Error` struct. 
-
-### Constructor
-
-`Error::new(message)` returns a new Error object with the given message.
+Custom errors can be created using the built-in `Error` type. 
 
 ```flr
-const my_error = Error::new("Something went wrong");
+const my_error = Error::new("Something went wrong"); // Runtime
+const my_precise_error = Error::new("Something went wrong again", "PreciseError"); // PreciseError
 ```
 
 ### Methods
 
-| Method | Returns | Description |
-| :--- | :--- | :--- |
-| `throw()` | `Never` | Halts execution and triggers the nearest `catch` block. |
+| Method                   | Returns | Description                                                                              |
+|:-------------------------|:--------|:-----------------------------------------------------------------------------------------|
+| `Error::new(msg, type?)` | `Error` | Creates a new Error with a message `msg` and an optional `type` *(defaults to Runtime)*. |
+| `throw()`                | `Never` | Halts execution and triggers the nearest `catch` block.                                  |
 
 ```flr
 func validate_age(age) {
     if age < 0 {
-        Error::new("Age cannot be negative")::throw();
+        Error::new("Age cannot be negative", "InvalidArgument")::throw();
     }
 }
 ```

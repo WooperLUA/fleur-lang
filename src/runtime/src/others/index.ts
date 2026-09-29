@@ -1,6 +1,6 @@
 import {error} from './src/error'
 import type {Environment} from "@runtime";
-import {range} from "./src/range.ts";
+import {range} from "./src/range";
 
 export const setup_other_structs = (env: Environment, args: string[] = []) =>
 {
