@@ -18,6 +18,7 @@ const s = math::sqrt(9); // sqrt is a method (a function)
 ## Available Modules
 
 - [**`crypto`**](./crypto/): Hashing and random identifier generation.
+- [**`encoding`**](./encoding/): Encoding and decoding utilities.
 - [**`file`**](./file/): File system operations.
 - [**`http`**](./http/): Synchronous HTTP requests.
 - [**`io`**](./io/): Basic input and output functionality.

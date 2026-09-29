@@ -6,6 +6,7 @@ import {time} from "./src/time";
 import {str} from "./src/str";
 import {type} from "./src/type.ts";
 import {file} from "./src/file.ts";
+import {encoding} from "./src/encoding.ts";
 import {os} from "./src/os.ts";
 import {reflect} from "./src/reflect.ts";
 import {regex} from "./src/regex.ts";
@@ -28,6 +29,7 @@ export const setup_stdlib = (env: Environment, args: string[] = []) =>
     env.declare("str", str, true);
     env.declare("time", time, true);
     env.declare("file", file, true);
+    env.declare("encoding", encoding, true);
     env.declare("os", os, true);
     env.declare("reflect", reflect, true);
     env.declare("regex", regex, true);

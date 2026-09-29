@@ -27,7 +27,13 @@ if file::exists(config_path) {
 
 const image_path = "image.png";
 if file::exists(image_path) {
-    const data: Array = file::read(config_path, "bytes"); // "bytes" returns an array of bytes
+    const data: Array = file::read(image_path, "bytes"); // "bytes" returns an array of bytes
+    io::print(data); 
+}
+
+const text_path = "file.txt";
+if file::exists(text_path) {
+    const data: Array = file::read(text_path, encoding.base64; // if the encoding is anything other than bytes use the encoding's properties
     io::print(data); 
 }
 ```
