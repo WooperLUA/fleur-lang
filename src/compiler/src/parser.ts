@@ -972,6 +972,7 @@ export class Parser
         const parameters: Parameter[] = [];
         if (this.peek().kind !== TokenKind.RPAREN)
         {
+            let has_seen_optional = false;
             do
             {
                 const name = this.expect(TokenKind.IDENTIFIER, "Expected parameter name").value;
@@ -980,7 +981,24 @@ export class Parser
                 {
                     type_annotation = this.parse_type_annotation();
                 }
-                parameters.push({name, type_annotation});
+
+                let default_value: Expression | undefined;
+                if (this.match(TokenKind.ASSIGN))
+                {
+                    has_seen_optional = true;
+                    default_value = this.parse_expression();
+                }
+                else if (has_seen_optional)
+                {
+                    return throw_exception({
+                        type:    "SyntaxError",
+                        message: `Required parameter '${name}' cannot follow an optional parameter.`,
+                        line:    this.peek().line,
+                        column:  this.peek().column
+                    });
+                }
+
+                parameters.push({name, type_annotation, default_value});
             } while (this.match(TokenKind.COMMA));
         }
         return parameters;

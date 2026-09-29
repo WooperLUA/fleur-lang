@@ -70,6 +70,7 @@ export type TypeAnnotation = Node & {
 export type Parameter = {
     name: string;
     type_annotation?: TypeAnnotation;
+    default_value?: Expression;
 };
 
 export type StructField = {

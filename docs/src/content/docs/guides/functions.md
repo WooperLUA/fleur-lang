@@ -43,6 +43,19 @@ func example() {
 // io::print(local_var); // Error: local_var is not defined
 ```
 
+## Optional parameters
+
+Parameters with the `=` operator can be assigned a default value and so become **optional** parameters.
+
+```flr
+func foo(a, b = "b") {
+    return [a, b]
+}
+
+io::print(foo("a")); // ["a", "b"] 
+io::print(foo("a", "c")); // ["a", "c"] 
+```
+
 ## Implicit Return
 
 If a function does not have a `return` statement, it returns `null` by default.

@@ -1010,11 +1010,11 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
     if (func.type === RuntimeValueType.Function || func.type === RuntimeValueType.Procedure)
     {
         const fn = func as (FunctionValue | ProcedureValue);
-        if (args.length !== fn.parameters.length)
+        if (args.length > fn.parameters.length)
         {
             throw_exception({
                 type:    "Runtime",
-                message: `Function '${fn.identifier}' expected ${fn.parameters.length} arguments, got ${args.length}.`
+                message: `Function '${fn.identifier}' expected at most ${fn.parameters.length} arguments, got ${args.length}.`
             });
         }
 
@@ -1024,17 +1024,35 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
             call_env.declare("this", this_val, true);
         }
 
-        for (let i = 0; i < args.length; i++)
+        for (let i = 0; i < fn.parameters.length; i++)
         {
             const param = fn.parameters[i]!;
+            let arg_val = args[i];
+
+            // argument was not provided by the caller
+            if (arg_val === undefined)
+            {
+                if (param.default_value)
+                {
+                    arg_val = evaluate(param.default_value, fn.env);
+                }
+                else
+                {
+                    throw_exception({
+                        type:    "Runtime",
+                        message: `Missing required argument '${param.name}' in call to '${fn.identifier}'.`
+                    });
+                }
+            }
 
             if (param.type_annotation)
             {
-                validate_runtime_type(args[i]!, param.type_annotation.names, `argument '${param.name}'`);
+                validate_runtime_type(arg_val!, param.type_annotation.names, `argument '${param.name}'`);
             }
 
-            call_env.declare(param.name, args[i]!, false, param.type_annotation?.names);
+            call_env.declare(param.name, arg_val!, false, param.type_annotation?.names);
         }
+
         const result = execute(fn.body, call_env);
 
         if (result.type === RuntimeValueType.Return)
