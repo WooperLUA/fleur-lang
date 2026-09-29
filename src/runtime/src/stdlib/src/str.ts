@@ -1,6 +1,5 @@
 import {
     type BooleanValue,
-    type NullValue,
     type NumberValue, type RangeValue,
     RuntimeValueType, type StringValue,
 } from "@types";
