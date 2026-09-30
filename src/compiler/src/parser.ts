@@ -39,7 +39,7 @@ import {
     type ImportStatement,
     type TypeAnnotation,
     type Parameter,
-    type StructField
+    type StructField, type BreakStatement, type ContinueStatement
 } from "@types";
 import {throw_exception} from "@utils";
 
@@ -151,6 +151,10 @@ export class Parser
                 return this.parse_try_statement();
             case TokenKind.K_IMPORT:
                 return this.parse_import_statement();
+            case TokenKind.K_BREAK:
+                return this.parse_break_statement();
+            case TokenKind.K_CONTINUE:
+                return this.parse_continue_statement();
             case TokenKind.LBRACE:
                 return this.parse_block_statement();
             case TokenKind.IDENTIFIER:
@@ -569,6 +573,18 @@ export class Parser
             specifiers,
             source
         };
+    }
+
+    private parse_break_statement(): BreakStatement {
+        this.eat(); // consume 'break'
+        this.expect(TokenKind.SEMICOLON, "Expected ';' after break");
+        return { type: NodeType.BreakStatement };
+    }
+
+    private parse_continue_statement(): ContinueStatement {
+        this.eat(); // consume 'continue'
+        this.expect(TokenKind.SEMICOLON, "Expected ';' after continue");
+        return { type: NodeType.ContinueStatement };
     }
 
     // ── Expressions ──────────────────────────────────────────────────

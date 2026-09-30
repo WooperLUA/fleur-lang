@@ -91,7 +91,9 @@ for i in 1..10
 }
 for i in 10..1
 {
-    // Descending print loop
+    // if i == 3 { break; }        would exit the loop at i = 3
+    // if i % 2 == 0 { continue; } would continue the loop anyways
+    io::print(i);
 }
 
 // While Loop

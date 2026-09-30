@@ -33,8 +33,9 @@ Encoding and decoding utilities.
 
 ```flr
 const base64_value = encoding::to("value", encoding.base64);
-io::print(base64_value);
+io::print(base64_value); // "dmFsdWU="
+
 const utf8_value = encoding::from(base64_value, encoding.base64);
-io::print(utf8_value);
+io::print(utf8_value); // "value"
 ```
 

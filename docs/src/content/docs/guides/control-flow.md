@@ -71,6 +71,18 @@ while count < 3 {
 }
 ```
 
+### Breaking and continuing
+
+You can use the `break` or `continue` keyword to exit or continue iteration.
+
+```flr
+for i in 1..10
+{
+    continue;
+    break; // will exit on first iteration
+}
+```
+
 ## Error Handling (Try/Catch)
 
 fleur provides a `try/catch` mechanism to handle runtime errors gracefully.

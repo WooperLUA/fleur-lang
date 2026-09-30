@@ -230,6 +230,10 @@ const execute = (stmt: Statement, env: Environment): RuntimeValue =>
                 return execute_try_statement(stmt as TryStatement, env);
             case NodeType.ImportStatement:
                 return execute_import_statement(stmt as ImportStatement, env);
+            case NodeType.BreakStatement:
+                return {type: RuntimeValueType.Break};
+            case NodeType.ContinueStatement:
+                return {type: RuntimeValueType.Continue};
             case NodeType.BlockStatement:
                 return execute_block_statement(stmt as BlockStatement, new Environment(env));
             case NodeType.ExpressionStatement:
@@ -264,7 +268,9 @@ const execute_block_statement = (block: BlockStatement, env: Environment): Runti
     for (const stmt of block.body)
     {
         const result = execute(stmt, env);
-        if (result.type === RuntimeValueType.Return)
+        if (result.type === RuntimeValueType.Return ||
+            result.type === RuntimeValueType.Break ||
+            result.type === RuntimeValueType.Continue)
         {
             return result;
         }
@@ -446,6 +452,8 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
             loop_env.assign_or_declare(stmt.identifier, {type: RuntimeValueType.Number, value: i});
             const result = execute(stmt.body, loop_env);
             if (result.type === RuntimeValueType.Return) return result;
+            if (result.type === RuntimeValueType.Break) break;
+            if (result.type === RuntimeValueType.Continue) continue;
             last_result = result;
         }
     }
@@ -457,6 +465,8 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
             loop_env.assign_or_declare(stmt.identifier, el);
             const result = execute(stmt.body, loop_env);
             if (result.type === RuntimeValueType.Return) return result;
+            if (result.type === RuntimeValueType.Break) break;
+            if (result.type === RuntimeValueType.Continue) continue;
             last_result = result;
         }
     }
@@ -468,6 +478,8 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
             loop_env.assign_or_declare(stmt.identifier, el);
             const result = execute(stmt.body, loop_env);
             if (result.type === RuntimeValueType.Return) return result;
+            if (result.type === RuntimeValueType.Break) break;
+            if (result.type === RuntimeValueType.Continue) continue;
             last_result = result;
         }
     }
@@ -487,6 +499,8 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
             loop_env.assign_or_declare(stmt.identifier, pair);
             const result = execute(stmt.body, loop_env);
             if (result.type === RuntimeValueType.Return) return result;
+            if (result.type === RuntimeValueType.Break) break;
+            if (result.type === RuntimeValueType.Continue) continue;
             last_result = result;
         }
     }
@@ -502,6 +516,8 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
             loop_env.assign_or_declare(stmt.identifier, pair);
             const result = execute(stmt.body, loop_env);
             if (result.type === RuntimeValueType.Return) return result;
+            if (result.type === RuntimeValueType.Break) break;
+            if (result.type === RuntimeValueType.Continue) continue;
             last_result = result;
         }
     }
@@ -612,6 +628,8 @@ const execute_while_statement = (stmt: WhileStatement, env: Environment): Runtim
 
         const result = execute(stmt.body, env);
         if (result.type === RuntimeValueType.Return) return result;
+        if (result.type === RuntimeValueType.Break) break;
+        if (result.type === RuntimeValueType.Continue) continue;
         last_result = result;
     }
     return last_result;
@@ -1054,6 +1072,14 @@ const evaluate_call_expression = (expr: CallExpression, env: Environment): Runti
         }
 
         const result = execute(fn.body, call_env);
+        if (result.type === RuntimeValueType.Break || result.type === RuntimeValueType.Continue)
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: "break and continue cannot be used inside functions or procedures."
+            });
+        }
+
 
         if (result.type === RuntimeValueType.Return)
         {

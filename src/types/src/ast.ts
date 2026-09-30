@@ -14,6 +14,8 @@ export enum NodeType
     ExpressionStatement = "ExpressionStatement",
     TryStatement = "TryStatement",
     ImportStatement = "ImportStatement",
+    BreakStatement = "BreakStatement",
+    ContinueStatement = "ContinueStatement",
 
     BinaryExpression = "BinaryExpression",
     UnaryExpression = "UnaryExpression",
@@ -59,7 +61,9 @@ export type Statement =
     | BlockStatement
     | ExpressionStatement
     | TryStatement
-    | ImportStatement;
+    | ImportStatement
+    | BreakStatement
+    | ContinueStatement;
 
 
 export type TypeAnnotation = Node & {
@@ -177,6 +181,14 @@ export type ImportStatement = Node & {
     type: NodeType.ImportStatement;
     specifiers: string[]; // the things you want to import
     source: string;       // file path
+};
+
+export type BreakStatement = Node & {
+    type: NodeType.BreakStatement;
+};
+
+export type ContinueStatement = Node & {
+    type: NodeType.ContinueStatement;
 };
 
 export type Expression =

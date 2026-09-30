@@ -18,6 +18,8 @@ export enum TokenKind {
     K_CATCH = "CATCH",
     K_IMPORT = "IMPORT",
     K_PUB = "PUB",
+    K_BREAK = "BREAK",
+    K_CONTINUE = "CONTINUE",
 
     AND = "AND",
     OR = "OR",

@@ -27,6 +27,8 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.K_CATCH]: /^catch\b/,
     [TokenKind.K_IMPORT]: /^import\b/,
     [TokenKind.K_PUB]: /^pub\b/,
+    [TokenKind.K_BREAK]: /^break\b/,
+    [TokenKind.K_CONTINUE]: /^continue\b/,
 
     // Logical Operators
     [TokenKind.AND]: /^and\b/,
