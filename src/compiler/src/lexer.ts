@@ -8,26 +8,26 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.LINE_COMMENT]: /^\/\/[^\n]*/,
 
     // Language Keywords
-    [TokenKind.K_VAR]:    /^var\b/,
-    [TokenKind.K_CONST]:  /^const\b/,
-    [TokenKind.K_IF]:     /^if\b/,
-    [TokenKind.K_ELSE]:   /^else\b/,
-    [TokenKind.K_WHEN]:   /^when\b/,
-    [TokenKind.K_FOR]:    /^for\b/,
-    [TokenKind.K_WHILE]:  /^while\b/,
-    [TokenKind.K_FUNC]:   /^func\b/,
-    [TokenKind.K_PROC]:   /^proc\b/,
-    [TokenKind.K_STRUCT]: /^struct\b/,
-    [TokenKind.K_RETURN]: /^return\b/,
-    [TokenKind.K_TRUE]:   /^true\b/,
-    [TokenKind.K_FALSE]:  /^false\b/,
-    [TokenKind.K_NULL]:   /^null\b/,
-    [TokenKind.K_IN]: /^in\b/,
-    [TokenKind.K_TRY]:   /^try\b/,
-    [TokenKind.K_CATCH]: /^catch\b/,
-    [TokenKind.K_IMPORT]: /^import\b/,
-    [TokenKind.K_PUB]: /^pub\b/,
-    [TokenKind.K_BREAK]: /^break\b/,
+    [TokenKind.K_VAR]:      /^var\b/,
+    [TokenKind.K_CONST]:    /^const\b/,
+    [TokenKind.K_IF]:       /^if\b/,
+    [TokenKind.K_ELSE]:     /^else\b/,
+    [TokenKind.K_WHEN]:     /^when\b/,
+    [TokenKind.K_FOR]:      /^for\b/,
+    [TokenKind.K_WHILE]:    /^while\b/,
+    [TokenKind.K_FUNC]:     /^func\b/,
+    [TokenKind.K_PROC]:     /^proc\b/,
+    [TokenKind.K_STRUCT]:   /^struct\b/,
+    [TokenKind.K_RETURN]:   /^return\b/,
+    [TokenKind.K_TRUE]:     /^true\b/,
+    [TokenKind.K_FALSE]:    /^false\b/,
+    [TokenKind.K_NULL]:     /^null\b/,
+    [TokenKind.K_IN]:       /^in\b/,
+    [TokenKind.K_TRY]:      /^try\b/,
+    [TokenKind.K_CATCH]:    /^catch\b/,
+    [TokenKind.K_IMPORT]:   /^import\b/,
+    [TokenKind.K_PUB]:      /^pub\b/,
+    [TokenKind.K_BREAK]:    /^break\b/,
     [TokenKind.K_CONTINUE]: /^continue\b/,
 
     // Logical Operators
@@ -49,10 +49,10 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.DOT_DOT]:       /^\.\./,
     [TokenKind.DOUBLE_COLON]:  /^::/,
 
-    [TokenKind.PLUS_ASSIGN]: /^\+=/,
-    [TokenKind.MINUS_ASSIGN]: /^-=/,
-    [TokenKind.STAR_ASSIGN]: /^\*=/,
-    [TokenKind.SLASH_ASSIGN]: /^\/=/,
+    [TokenKind.PLUS_ASSIGN]:    /^\+=/,
+    [TokenKind.MINUS_ASSIGN]:   /^-=/,
+    [TokenKind.STAR_ASSIGN]:    /^\*=/,
+    [TokenKind.SLASH_ASSIGN]:   /^\/=/,
     [TokenKind.PERCENT_ASSIGN]: /^%=/,
 
     [TokenKind.CARET]: /^\^/,
@@ -141,13 +141,13 @@ export const tokenize = (source: string): Tokens =>
                 }
 
                 tokens.push({
-                    kind: token_kind, 
+                    kind:   token_kind,
                     value,
                     line,
                     column,
                     offset: cursor
                 });
-                
+
                 cursor += value.length;
                 column += value.length;
                 matched = true;
@@ -159,15 +159,15 @@ export const tokenize = (source: string): Tokens =>
         {
             // This should not happen because of ILLEGAL rule, but for safety:
             return throw_exception({
-                type: 'Lexer',
+                type:    'Lexer',
                 message: `Failed to match any token at line ${line}, column ${column} (position ${cursor})`
             });
         }
     }
 
     tokens.push({
-        kind: TokenKind.EOF, 
-        value: "",
+        kind:   TokenKind.EOF,
+        value:  "",
         line,
         column,
         offset: cursor

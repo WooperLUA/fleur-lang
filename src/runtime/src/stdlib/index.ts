@@ -14,6 +14,7 @@ import {crypto} from "./src/crypto.ts";
 import {json} from "./src/json.ts";
 import {http} from "./src/http.ts";
 import {test} from "./src/test.ts";
+import {tui} from "./src/tui.ts";
 
 export const setup_stdlib = (env: Environment, args: string[] = []) =>
 {
@@ -37,4 +38,5 @@ export const setup_stdlib = (env: Environment, args: string[] = []) =>
     env.declare("json", json, true);
     env.declare("http", http, true);
     env.declare("test", test, true);
+    env.declare("tui", tui, true);
 };

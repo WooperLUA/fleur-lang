@@ -30,6 +30,7 @@ const s = math::sqrt(9); // sqrt is a method (a function)
 - [**`str`**](./str/): String manipulation utilities.
 - [**`test`**](./test/): Test-related utilities.
 - [**`time`**](./time/): Time-related utilities.
+- [**`tui`**](./tui/): Double-buffered Terminal User Interface engine.
 - [**`type`**](./type/): Type checking and explicit conversion.
 
 

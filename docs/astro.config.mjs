@@ -63,6 +63,7 @@ export default defineConfig({
                                 {label: 'str', slug: 'guides/stdlib/str'},
                                 {label: 'test', slug: 'guides/stdlib/test'},
                                 {label: 'time', slug: 'guides/stdlib/time'},
+                                {label: 'tui', slug: 'guides/stdlib/tui'},
                                 {label: 'type', slug: 'guides/stdlib/type'},
                             ]
                         },
