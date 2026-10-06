@@ -1,22 +1,22 @@
-import {RuntimeValueType, type StringValue, type NumberValue} from "@types";
-import {check_args_length} from "@utils";
-import type {RuntimeValue, NativeFunctionValue, StructValue} from "@types";
+import type {NativeFunctionValue, RuntimeValue, StructValue} from "@types";
+import {type NumberValue, RuntimeValueType, type StringValue} from "@types";
+import {check_arg_type, check_args_length} from "@utils";
 
 const ANSI_COLORS: Record<string, string> = {
-    "BLACK": "\x1b[30m",
-    "RED": "\x1b[31m",
-    "GREEN": "\x1b[32m",
-    "YELLOW": "\x1b[33m",
-    "BLUE": "\x1b[34m",
-    "MAGENTA": "\x1b[35m",
-    "CYAN": "\x1b[36m",
-    "WHITE": "\x1b[37m",
-    "GRAY": "\x1b[90m",
-    "BG_RED": "\x1b[41m",
-    "BG_GREEN": "\x1b[42m",
+    "BLACK":     "\x1b[30m",
+    "RED":       "\x1b[31m",
+    "GREEN":     "\x1b[32m",
+    "YELLOW":    "\x1b[33m",
+    "BLUE":      "\x1b[34m",
+    "MAGENTA":   "\x1b[35m",
+    "CYAN":      "\x1b[36m",
+    "WHITE":     "\x1b[37m",
+    "GRAY":      "\x1b[90m",
+    "BG_RED":    "\x1b[41m",
+    "BG_GREEN":  "\x1b[42m",
     "BG_YELLOW": "\x1b[43m",
-    "BG_BLUE": "\x1b[44m",
-    "BOLD": "\x1b[1m",
+    "BG_BLUE":   "\x1b[44m",
+    "BOLD":      "\x1b[1m",
     "UNDERLINE": "\x1b[4m",
 };
 
@@ -101,6 +101,14 @@ export const tui: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, [3, 4], "tui::set");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "tui::set")
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "tui::set")
+                          check_arg_type(args[2]!, RuntimeValueType.String, "tui::set")
+                          if (args[3])
+                          {
+                              check_arg_type(args[3]!, RuntimeValueType.String, "tui::set")
+                          }
+
                           const x = (args[0] as NumberValue).value;
                           const y = (args[1] as NumberValue).value;
                           const char = (args[2] as StringValue).value.charAt(0) || " ";
@@ -121,6 +129,15 @@ export const tui: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, [4, 5], "tui::box");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "tui::box")
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "tui::box")
+                          check_arg_type(args[2]!, RuntimeValueType.Number, "tui::box")
+                          check_arg_type(args[3]!, RuntimeValueType.Number, "tui::box")
+                          if (args[4])
+                          {
+                              check_arg_type(args[4]!, RuntimeValueType.String, "tui::box")
+                          }
+
                           const x = (args[0] as NumberValue).value;
                           const y = (args[1] as NumberValue).value;
                           const w = (args[2] as NumberValue).value;
@@ -155,12 +172,146 @@ export const tui: StructValue = {
             } as NativeFunctionValue
         ],
         [
+            "line",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, [5, 6], "tui::line");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "tui::line")
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "tui::line")
+                          check_arg_type(args[2]!, RuntimeValueType.Number, "tui::line")
+                          check_arg_type(args[3]!, RuntimeValueType.Number, "tui::line")
+                          check_arg_type(args[4]!, RuntimeValueType.String, "tui::line")
+                          if (args[5])
+                          {
+                              check_arg_type(args[5]!, RuntimeValueType.String, "tui::line")
+                          }
+
+                          const x1 = (args[0] as NumberValue).value;
+                          const y1 = (args[1] as NumberValue).value;
+                          const x2 = (args[2] as NumberValue).value;
+                          const y2 = (args[3] as NumberValue).value;
+                          const char = (args[4] as StringValue).value.charAt(0) || "─";
+                          const color = args[5] ? (args[5] as StringValue).value : null;
+
+                          let dx = Math.abs(x2 - x1), sx = x1 < x2 ? 1 : -1;
+                          let dy = -Math.abs(y2 - y1), sy = y1 < y2 ? 1 : -1;
+                          let err = dx + dy, e2;
+
+                          let cx = x1, cy = y1;
+                          while (true)
+                          {
+                              if (cx >= 0 && cx < width && cy >= 0 && cy < height)
+                              {
+                                  back_buffer[cy]![cx] = get_colored_char(char, color);
+                              }
+                              if (cx === x2 && cy === y2) break;
+                              e2 = 2 * err;
+                              if (e2 >= dy)
+                              {
+                                  err += dy;
+                                  cx += sx;
+                              }
+                              if (e2 <= dx)
+                              {
+                                  err += dx;
+                                  cy += sy;
+                              }
+                          }
+                          return {type: RuntimeValueType.Null, value: null};
+                      }
+            } as NativeFunctionValue
+        ],
+        [
+            "fill",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, [5, 6], "tui::fill");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "tui::fill")
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "tui::fill")
+                          check_arg_type(args[2]!, RuntimeValueType.Number, "tui::fill")
+                          check_arg_type(args[3]!, RuntimeValueType.Number, "tui::fill")
+                          check_arg_type(args[4]!, RuntimeValueType.String, "tui::fill")
+                          if (args[5])
+                          {
+                              check_arg_type(args[5]!, RuntimeValueType.String, "tui::fill")
+                          }
+
+                          const x = (args[0] as NumberValue).value;
+                          const y = (args[1] as NumberValue).value;
+                          const w = (args[2] as NumberValue).value;
+                          const h = (args[3] as NumberValue).value;
+                          const char = (args[4] as StringValue).value.charAt(0) || "█";
+                          const color = args[5] ? (args[5] as StringValue).value : null;
+
+                          for (let i = 0; i < w; i++)
+                          {
+                              for (let j = 0; j < h; j++)
+                              {
+                                  const cx = x + i;
+                                  const cy = y + j;
+                                  if (cx >= 0 && cx < width && cy >= 0 && cy < height)
+                                  {
+                                      back_buffer[cy]![cx] = get_colored_char(char, color);
+                                  }
+                              }
+                          }
+                          return {type: RuntimeValueType.Null, value: null};
+                      }
+            } as NativeFunctionValue
+        ],
+        [
+            "progress",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, [4, 5], "tui::progress");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "tui::progress")
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "tui::progress")
+                          check_arg_type(args[2]!, RuntimeValueType.Number, "tui::progress")
+                          check_arg_type(args[3]!, RuntimeValueType.Number, "tui::progress")
+                          if (args[4])
+                          {
+                              check_arg_type(args[4]!, RuntimeValueType.String, "tui::fill")
+                          }
+                          const x = (args[0] as NumberValue).value;
+                          const y = (args[1] as NumberValue).value;
+                          const w = (args[2] as NumberValue).value;
+                          const percent = Math.max(0, Math.min(100, (args[3] as NumberValue).value));
+                          const color = args[4] ? (args[4] as StringValue).value : null;
+
+                          const filledWidth = Math.round((percent / 100) * w);
+
+                          for (let i = 0; i < w; i++)
+                          {
+                              const char = i < filledWidth ? "█" : "░";
+                              if (x + i < width && y < height && x + i >= 0 && y >= 0)
+                              {
+                                  back_buffer[y]![x + i] = get_colored_char(char, color);
+                              }
+                          }
+                          return {type: RuntimeValueType.Null, value: null};
+                      }
+            } as NativeFunctionValue
+        ],
+        [
             "text",
             {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, [3, 4], "tui::text");
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "tui::progress")
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "tui::progress")
+                          check_arg_type(args[2]!, RuntimeValueType.String, "tui::progress")
+                          if (args[3])
+                          {
+                              check_arg_type(args[3]!, RuntimeValueType.String, "tui::progress")
+                          }
                           const x = (args[0] as NumberValue).value;
                           const y = (args[1] as NumberValue).value;
                           const text = (args[2] as StringValue).value;

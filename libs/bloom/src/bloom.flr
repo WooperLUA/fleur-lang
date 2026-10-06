@@ -1,0 +1,10 @@
+struct Bloom
+{
+
+}
+
+
+Bloom::card(frame: Map, header: Map, body: Map)
+{
+    tui::box
+}
