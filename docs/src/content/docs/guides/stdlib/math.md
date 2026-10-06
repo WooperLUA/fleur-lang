@@ -7,10 +7,12 @@ Provides mathematical constants and functions.
 
 ## Properties
 
-| Member | Description |
-|:-------| :--- |
-| `PI`   | The ratio of a circle's circumference to its diameter (~3.14159). |
-| `INF`  | The numeric value representing infinity. |
+| Member     | Description                                                        |
+|:-----------|:-------------------------------------------------------------------|
+| `PI`       | The ratio of a circle's circumference to its diameter (~3.14159).  |
+| `E`        | Euler's number, the base of natural logarithms `e` (~2.718).       |
+| `TAU`      | The ratio of the circumference to the radius of a circle  (~2π).   |
+| `INF`      | The numeric value representing infinity.                           |
 
 ## Methods
 

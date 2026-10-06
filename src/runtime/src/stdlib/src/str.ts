@@ -94,7 +94,8 @@ export const str: StructValue = {
                           check_arg_type(args[1]!, RuntimeValueType.Number, "str::at");
                           const value = (args[0] as StringValue).value
                           const index = (args[1] as NumberValue).value;
-                          return {type: RuntimeValueType.String, value: value.at(index)};
+                          const char = value.at(index);
+                          return char ?? {type: RuntimeValueType.Null, value: null};
                       },
             } as NativeFunctionValue,
         ],

@@ -7,10 +7,10 @@ Operating system and process information.
 
 ## Properties
 
-| Member | Description |
-| :--- | :--- |
+| Member     | Description                                                  |
+|:-----------|:-------------------------------------------------------------|
 | `platform` | Returns the OS platform string (e.g., `"win32"`, `"linux"`). |
-| `homedir` | Returns the path to the current user's home directory. |
+| `homedir`  | Returns the path to the current user's home directory.       |
 
 ## Methods
 

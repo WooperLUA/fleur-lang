@@ -22,6 +22,20 @@ export const math: StructValue = {
             }
         ],
         [
+            "E",
+            {
+                type:  RuntimeValueType.Number,
+                value: Math.E
+            }
+        ],
+        [
+            "TAU",
+            {
+                type:  RuntimeValueType.Number,
+                value: 6.283185307179586
+            }
+        ],
+        [
             "INF",
             {
                 type:  RuntimeValueType.Number,

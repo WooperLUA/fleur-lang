@@ -657,7 +657,7 @@ export const set: StructValue = {
                                check_args_length(args, 2, "<set>::group");
                                check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::group");
                                check_arg_type(args[1]!, RuntimeValueType.Number, "<set>::group");
-                               check_mutability(args[0]!, "<set>::group");
+                               check_mutability(args[0]!, "<set>::group", "Use ::grouped for immutable sets");
 
                                const set = (args[0] as SetValue);
                                const group_size = (args[1] as NumberValue).value;

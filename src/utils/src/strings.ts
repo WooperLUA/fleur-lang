@@ -18,9 +18,9 @@ export const stringify_value = (val: any): string =>
         case RuntimeValueType.Array:
             return "[" + val.elements.map((e: any) => stringify_value(e)).join(", ") + "]";
         case RuntimeValueType.Set:
-            return "Set(" + val.elements.map((e: any) => stringify_value(e)).join(", ") + ")";
+            return "(" + val.elements.map((e: any) => stringify_value(e)).join(", ") + ")";
         case RuntimeValueType.Map:
-            return "Map { " + (val as MapValue).elements.map((el) =>
+            return "{ " + (val as MapValue).elements.map((el) =>
             {
                 return `${stringify_value(el.key)}: ${stringify_value(el.value)}`;
             }).join(", ") + " }";
@@ -31,17 +31,17 @@ export const stringify_value = (val: any): string =>
                 return `${k}: ${stringify_value(v)}`;
             }).join(", ") + " }";
         case RuntimeValueType.Function:
-            return `[Function: ${val.identifier}]`;
+            return `<Function: ${val.identifier}>`;
         case RuntimeValueType.Procedure:
-            return `[Procedure: ${val.identifier}]`;
+            return `<Procedure: ${val.identifier}>`;
         case RuntimeValueType.NativeFunction:
-            return `[NativeFunction]`;
+            return `<NativeFunction>`;
         case RuntimeValueType.Null:
             return "null";
         case RuntimeValueType.Range:
             return `${stringify_value((val as RangeValue).start)}..${stringify_value((val as RangeValue).end)}`;
         case RuntimeValueType.Error:
-            return `Error: ${(val as any).message}`;
+            return `<Error: ${(val as any).message}>`;
         default:
             return String(val.value);
     }

@@ -38,7 +38,7 @@ import {
     type StringValue,
     type BooleanValue,
     type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
-    type ImportStatement, type StructField, type ErrorValue,
+    type ImportStatement, type StructField, type ErrorValue, type NullValue,
 } from "@types";
 import {throw_exception, stringify_value, is_equal, FleurError, deep_copy} from "@utils";
 import {setup_stdlib} from "./stdlib";
@@ -1264,13 +1264,14 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
     const index = evaluate(expr.index, env);
 
     // Indexing for Arrays
-    if (object.type === RuntimeValueType.Array)
+    if (object.type === RuntimeValueType.Array || object.type === RuntimeValueType.Set)
     {
+        const arr_or_set = object.type === RuntimeValueType.Array ? 'Array' : 'Set';
         if (index.type !== RuntimeValueType.Number)
         {
             throw_exception({
                 type:    "Runtime",
-                message: "Array index must be a number."
+                message: `${arr_or_set} index must be a number.`
             });
         }
 
@@ -1281,7 +1282,7 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
         {
             throw_exception({
                 type:    "OutOfBounds",
-                message: `Array index ${idx} is out of bounds (length ${array.elements.length}).`
+                message: `${arr_or_set} index ${idx} is out of bounds (length ${array.elements.length}).`
             });
         }
 
@@ -1319,11 +1320,18 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
         if (idx !== -1) return m.elements[idx]!.value;
         return {type: RuntimeValueType.Null, value: null};
     }
+    else if (object.type === RuntimeValueType.String)
+    {
+        const s = (object as StringValue).value;
+        const i = (index as NumberValue).value;
+        const char = s.at(i);
+        return char ? {type: RuntimeValueType.String, value: char} : {type: RuntimeValueType.Null, value: null} as NullValue;
+    }
     else
     {
         throw_exception({
             type:    "Runtime",
-            message: "Indexing is only allowed on arrays and structs."
+            message: "Indexing is only allowed on arrays, sets, maps, structs and strings."
         });
     }
     // fallback

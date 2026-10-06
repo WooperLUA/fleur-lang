@@ -659,7 +659,7 @@ export const array: StructValue = {
                                check_args_length(args, 2, "<array>::group");
                                check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::group");
                                check_arg_type(args[1]!, RuntimeValueType.Number, "<array>::group");
-                               check_mutability(args[0]!, "<array>::group");
+                               check_mutability(args[0]!, "<array>::group", "Use ::grouped for immutable arrays");
 
                                const arr = (args[0] as ArrayValue);
                                const group_size = (args[1] as NumberValue).value;

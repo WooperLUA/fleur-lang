@@ -19,7 +19,7 @@ Immutability is `deep`, meaning you cannot mutate complex types inside a complex
 
 ```flr
 const arr = [1, 2, 3];
-// arr::push(4); // Error: Cannot modify a constant array
+// arr::add(4); // Error: Cannot modify a constant array
 
 const user = User { name: "Alice" };
 // user.name = "Bob"; // Error: Cannot modify a constant struct
@@ -64,11 +64,12 @@ b = 30; // OK
 
 ### Complex Types
 
-- **Arrays**: Ordered collections of values.
-- **Sets**: Ordered collections of unique values.
-- **Structs**: Custom data structures with named properties.
+- **Arrays**: Ordered collections of values. See the [Arrays Guide](../arrays).
+- **Sets**: Ordered collections of unique values. See the [Sets Guide](../sets).
+- **Maps**: Collections of key-value pairs. See the [Maps Guide](../maps).
+- **Structs**: Custom data structures with named properties. See the [Structs Guide](../structs).
 - **Ranges**: Represent a sequence of numbers (e.g., `1..10`). See the [Ranges Guide](../ranges).
-- **Errors**: Represent a error that exits the program unless caught. See the [Errors Guide](../errors).
+- **Errors**: Represent an error that exits the program unless caught. See the [Errors Guide](../errors).
 
 ## Operators
 
@@ -92,33 +93,33 @@ const greeting = "Hello " + "World";
 
 ### Assignment Operators
 
-| Operator | Description |
-| :--- | :--- |
-| `=` | Assignment |
-| `+=` | Add and assign |
-| `-=` | Subtract and assign |
-| `*=` | Multiply and assign |
-| `/=` | Divide and assign |
-| `%=` | Modulo and assign |
+| Operator | Description         |
+|:---------|:--------------------|
+| `=`      | Assignment          |
+| `+=`     | Add and assign      |
+| `-=`     | Subtract and assign |
+| `*=`     | Multiply and assign |
+| `/=`     | Divide and assign   |
+| `%=`     | Modulo and assign   |
 
 ### Comparison Operators
 
-| Operator | Description |
-| :--- | :--- |
-| `==` | Equal to |
-| `!=` | Not equal to |
-| `<` | Less than |
-| `>` | Greater than |
-| `<=` | Less than or equal to |
-| `>=` | Greater than or equal to |
+| Operator | Description              |
+|:---------|:-------------------------|
+| `==`     | Equal to                 |
+| `!=`     | Not equal to             |
+| `<`      | Less than                |
+| `>`      | Greater than             |
+| `<=`     | Less than or equal to    |
+| `>=`     | Greater than or equal to |
 
 ### Logical Operators
 
 | Operator | Description |
-| :--- | :--- |
-| `and` | Logical AND |
-| `or` | Logical OR |
-| `not` | Logical NOT |
+|:---------|:------------|
+| `and`    | Logical AND |
+| `or`     | Logical OR  |
+| `not`    | Logical NOT |
 
 ```flr
 if x > 0 and not is_finished {
