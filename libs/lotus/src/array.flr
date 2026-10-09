@@ -1,0 +1,19 @@
+pub func map(arr: Array, fn: Function or NativeFunction): Array
+{
+    var _arr = reflect::clone(arr);
+    for i in 0.._arr::length() - 1
+    {
+        _arr[i] = fn(_arr[i]);
+    }
+    return _arr;
+}
+
+pub func filter(arr: Array, fn: Function or NativeFunction): Array
+{
+    var _arr = [];
+    for el in arr
+    {
+        if fn(el) { _arr::add(el); }
+    }
+    return _arr;
+}

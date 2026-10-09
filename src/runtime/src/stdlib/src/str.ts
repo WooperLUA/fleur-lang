@@ -1,4 +1,5 @@
 import {
+    type ArrayValue,
     type BooleanValue,
     type NumberValue, type RangeValue,
     RuntimeValueType, type StringValue,
@@ -102,40 +103,40 @@ export const str: StructValue = {
         [
             "slice",
             {
-                type:      RuntimeValueType.NativeFunction,
-                call:      (args: RuntimeValue[]) =>
-                           {
-                               check_args_length(args, 2, "str::slice");
-                               check_arg_type(args[0]!, RuntimeValueType.String, "str::slice");
-                               check_arg_type(args[1]!, RuntimeValueType.Range, "str::slice");
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "str::slice");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::slice");
+                          check_arg_type(args[1]!, RuntimeValueType.Range, "str::slice");
 
-                               const str = (args[0] as StringValue).value;
-                               const range = args[1] as RangeValue;
+                          const str = (args[0] as StringValue).value;
+                          const range = args[1] as RangeValue;
 
-                               const startVal = (range.start as NumberValue).value;
-                               const endVal = (range.end as NumberValue).value;
+                          const startVal = (range.start as NumberValue).value;
+                          const endVal = (range.end as NumberValue).value;
 
-                               const len = str.length;
+                          const len = str.length;
 
-                               let start = startVal < 0 ? len + startVal : startVal;
-                               let end = endVal < 0 ? len + endVal : endVal;
+                          let start = startVal < 0 ? len + startVal : startVal;
+                          let end = endVal < 0 ? len + endVal : endVal;
 
-                               const elements: string[] = [];
-                               const step = start <= end ? 1 : -1;
+                          const elements: string[] = [];
+                          const step = start <= end ? 1 : -1;
 
-                               for (let i = start; step > 0 ? i <= end : i >= end; i += step)
-                               {
-                                   if (i >= 0 && i < len)
-                                   {
-                                       elements.push(str[i]!);
-                                   }
-                               }
+                          for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                          {
+                              if (i >= 0 && i < len)
+                              {
+                                  elements.push(str[i]!);
+                              }
+                          }
 
-                               return {
-                                   type:     RuntimeValueType.String,
-                                   value: elements.join(''),
-                               } as StringValue;
-                           },
+                          return {
+                              type:  RuntimeValueType.String,
+                              value: elements.join(''),
+                          } as StringValue;
+                      },
             } as NativeFunctionValue,
         ],
         [
@@ -165,7 +166,7 @@ export const str: StructValue = {
                           check_arg_type(args[0]!, RuntimeValueType.String, "str::unicode");
                           const value = (args[0] as StringValue).value
                           if (value.length > 1) return throw_exception({
-                              type: "Runtime",
+                              type:    "Runtime",
                               message: `You must provide a string of length 1 (a character)`
                           })
                           const unicode = value.codePointAt(0);
@@ -216,7 +217,27 @@ export const str: StructValue = {
                           const string = (args[0] as StringValue).value
                           const search = (args[1] as StringValue).value
                           const replacement = (args[2] as StringValue).value
-                          return {type: RuntimeValueType.String, value: string.replace(search, replacement)} as StringValue
+                          return {
+                              type:  RuntimeValueType.String,
+                              value: string.replace(search, replacement)
+                          } as StringValue
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "split",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "str::split");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::split");
+                          check_arg_type(args[1]!, RuntimeValueType.String, "str::split");
+                          const string = (args[0] as StringValue).value
+                          const splitter = (args[1] as StringValue).value
+                          const strings = string.split(splitter)
+                                                            .map(s => ({type: RuntimeValueType.String, value: s} as StringValue))
+                          return {type: RuntimeValueType.Array, elements: strings} as ArrayValue
                       },
             } as NativeFunctionValue,
         ],

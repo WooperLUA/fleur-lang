@@ -752,6 +752,22 @@ export const set: StructValue = {
                                } as SetValue;
                            },
             } as NativeFunctionValue,
-        ]
+        ],
+        [
+            "empty",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<set>::empty");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::empty");
+
+                               const set = args[0] as SetValue;
+
+                               return {type: RuntimeValueType.Boolean, value: set.elements.length === 0};
+                           },
+            } as NativeFunctionValue,
+        ],
     ]),
 };

@@ -754,6 +754,66 @@ export const array: StructValue = {
                                } as ArrayValue;
                            },
             } as NativeFunctionValue,
-        ]
+        ],
+        [
+            "empty",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 1, "<array>::empty");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::empty");
+
+                               const arr = args[0] as ArrayValue;
+
+                               return {type: RuntimeValueType.Boolean, value: arr.elements.length === 0};
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "collect",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, [2, 3], "<array>::collect");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::collect");
+
+                               const arr = args[0] as ArrayValue;
+                               const target = args[1]!;
+
+                               let keep_idx = false;
+
+                               if (args.length > 2)
+                               {
+                                   check_arg_type(args[2]!, RuntimeValueType.Boolean, "<array>::collect");
+                                   keep_idx = (args[2]! as BooleanValue).value ?? false;
+                               }
+
+                               let res: RuntimeValue[];
+
+                               if (keep_idx)
+                               {
+                                   res = arr.elements
+                                            .map((el, index) => ({
+                                                type:     RuntimeValueType.Array,
+                                                elements: [el, {
+                                                    type:  RuntimeValueType.Number,
+                                                    value: index
+                                                } as NumberValue],
+                                            } as ArrayValue))
+                                            .filter(pair => is_equal(pair.elements[0]!, target));
+                               }
+                               else
+                               {
+                                   res = arr.elements.filter(el => is_equal(el, target));
+                               }
+
+                               return {type: RuntimeValueType.Array, elements: res} as ArrayValue;
+                           },
+            } as NativeFunctionValue,
+        ],
     ]),
 };

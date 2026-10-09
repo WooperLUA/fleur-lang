@@ -244,7 +244,7 @@ export const tui: StructValue = {
                           const y = (args[1] as NumberValue).value;
                           const w = (args[2] as NumberValue).value;
                           const h = (args[3] as NumberValue).value;
-                          const char = (args[4] as StringValue).value.charAt(0) || "█";
+                          const char = (args[4] as StringValue).value.charAt(0) || " ";
                           const color = args[5] ? (args[5] as StringValue).value : null;
 
                           for (let i = 0; i < w; i++)

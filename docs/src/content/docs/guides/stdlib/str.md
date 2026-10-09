@@ -21,6 +21,7 @@ String manipulation utilities. Note that these are static methods on the `str` m
 | `prefixed(s, prefix)`             | `Boolean`   | Returns `true` if `s` is prefixed with `prefix`.                                                                                      | 
 | `suffixed(s, suffix)`             | `Boolean`   | Returns `true` if `s` is suffixed with `suffix`.                                                                                      | 
 | `replace(s, search, replacement)` | `String`    | Returns a new string being `s` where the `search` string in `s` was replaced with the `replacement` string.                           | 
+| `split(s, splitter)`              | `Array`     | Returns an array of strings containing the elements of `s` splitted each time the `splitter` was encountered.                         |
 
 ### Examples
 
@@ -28,5 +29,6 @@ String manipulation utilities. Note that these are static methods on the `str` m
 const name = "  fleur Lang  ";
 const trimmed = str::trim(name); // "fleur Lang"
 const is_fleur = str::contains(trimmed, "fleur"); // true
+const decomposed = str::split(trimmed, " "); // ["fleur", "Lang"]
 ```
 
