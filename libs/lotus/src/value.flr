@@ -5,7 +5,3 @@ pub func flow(value, funs: Array)
     const _value = fn(value);
     return flow(_value, funs);
 }
-
-
-io::print(flow(1.5, [math::int,
-                     Array::new]));

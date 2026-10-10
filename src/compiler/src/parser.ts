@@ -48,6 +48,11 @@ export class Parser
     private readonly tokens: Token<any>[];
     private pos: number = 0;
 
+    private static global_lambda_counter = 0;
+
+    private block_stack: Statement[][] = [];
+    private top_level_hoists: Statement[] = [];
+
     constructor(tokens: Token<any>[])
     {
         this.tokens = tokens;
@@ -101,6 +106,7 @@ export class Parser
     {
         const body: Statement[] = [];
         const startToken = this.peek();
+        this.top_level_hoists = [];
         while (this.peek().kind !== TokenKind.EOF)
         {
             body.push(this.parse_statement());
@@ -108,7 +114,7 @@ export class Parser
         return {
             type: NodeType.Program,
             ...this.loc(startToken),
-            body
+            body: [...this.top_level_hoists, ...body]
         };
     }
 
@@ -132,8 +138,17 @@ export class Parser
             case TokenKind.K_CONST:
                 return this.parse_variable_declaration();
             case TokenKind.K_FUNC:
+                if (this.tokens[this.pos + 1]?.kind === TokenKind.LPAREN)
+                {
+                    return this.parse_expression_statement();
+                }
                 return this.parse_function_declaration();
+
             case TokenKind.K_PROC:
+                if (this.tokens[this.pos + 1]?.kind === TokenKind.LPAREN)
+                {
+                    return this.parse_expression_statement();
+                }
                 return this.parse_procedure_declaration();
             case TokenKind.K_STRUCT:
                 return this.parse_struct_declaration();
@@ -272,7 +287,9 @@ export class Parser
             return_type = this.parse_type_annotation();
         }
 
-        const body = this.parse_block_statement();
+        const body = this.peek().kind === TokenKind.FAT_ARROW
+            ? this.parse_arrow_body(false)
+            : this.parse_block_statement();
 
         if (!this.has_return_statement(body))
         {
@@ -304,7 +321,10 @@ export class Parser
         this.expect(TokenKind.LPAREN, "Expected '(' after procedure name");
         const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
-        const body = this.parse_block_statement();
+
+        const body = this.peek().kind === TokenKind.FAT_ARROW
+            ? this.parse_arrow_body(true)
+            : this.parse_block_statement();
 
         if (this.has_return_statement(body))
         {
@@ -425,7 +445,8 @@ export class Parser
         this.expect(TokenKind.LBRACE, "Expected '{' after when expression");
 
         const cases: WhenCase[] = [];
-        while (this.peek().kind !== TokenKind.RBRACE)
+
+        while (this.peek().kind !== TokenKind.RBRACE && this.peek().kind !== TokenKind.EOF)
         {
             let value: Expression | "else";
             if (this.match(TokenKind.K_ELSE))
@@ -436,10 +457,30 @@ export class Parser
             {
                 value = this.parse_expression();
             }
+
             this.expect(TokenKind.FAT_ARROW, "Expected '=>' in when case");
-            const body = this.parse_block_statement();
+
+            let body: BlockStatement;
+
+            if (this.peek().kind === TokenKind.LBRACE)
+            {
+                body = this.parse_block_statement();
+            }
+            else
+            {
+                const stmt = this.parse_statement();
+
+                body = {
+                    type:   NodeType.BlockStatement,
+                    line:   stmt.line,
+                    column: stmt.column,
+                    body:   [stmt]
+                };
+            }
+
             cases.push({value, body});
         }
+
         this.expect(TokenKind.RBRACE, "Expected '}' after when cases");
 
         return {
@@ -502,6 +543,9 @@ export class Parser
         const startToken = this.peek();
         this.expect(TokenKind.LBRACE, "Expected '{' at start of block");
 
+        const local_hoists: Statement[] = [];
+        this.block_stack.push(local_hoists);
+
         const body: Statement[] = [];
         while (this.peek().kind !== TokenKind.RBRACE && this.peek().kind !== TokenKind.EOF)
         {
@@ -509,10 +553,30 @@ export class Parser
         }
         this.expect(TokenKind.RBRACE, "Expected '}' at end of block");
 
+        this.block_stack.pop();
+
         return {
             type: NodeType.BlockStatement,
             ...this.loc(startToken),
-            body
+            body: [...local_hoists, ...body]
+        };
+    }
+
+    private parse_arrow_body(is_procedure: boolean): BlockStatement
+    {
+        const startToken = this.peek();
+        this.expect(TokenKind.FAT_ARROW, "Expected '=>'");
+
+        const expr = this.parse_expression();
+
+        const stmt = is_procedure
+            ? {type: NodeType.ExpressionStatement, ...this.loc(startToken), expression: expr} as ExpressionStatement
+            : {type: NodeType.ReturnStatement, ...this.loc(startToken), value: expr} as ReturnStatement;
+
+        return {
+            type: NodeType.BlockStatement,
+            ...this.loc(startToken),
+            body: [stmt]
         };
     }
 
@@ -575,16 +639,18 @@ export class Parser
         };
     }
 
-    private parse_break_statement(): BreakStatement {
+    private parse_break_statement(): BreakStatement
+    {
         this.eat(); // consume 'break'
         this.expect(TokenKind.SEMICOLON, "Expected ';' after break");
-        return { type: NodeType.BreakStatement };
+        return {type: NodeType.BreakStatement};
     }
 
-    private parse_continue_statement(): ContinueStatement {
+    private parse_continue_statement(): ContinueStatement
+    {
         this.eat(); // consume 'continue'
         this.expect(TokenKind.SEMICOLON, "Expected ';' after continue");
-        return { type: NodeType.ContinueStatement };
+        return {type: NodeType.ContinueStatement};
     }
 
     // ── Expressions ──────────────────────────────────────────────────
@@ -852,6 +918,50 @@ export class Parser
     private parse_primary(allow_struct: boolean = true): Expression
     {
         const token = this.peek();
+
+        if (token.kind === TokenKind.K_FUNC || token.kind === TokenKind.K_PROC)
+        {
+            const is_proc = token.kind === TokenKind.K_PROC;
+
+            const hidden_name = `__lambda_${Parser.global_lambda_counter++}`;
+
+            this.eat();
+            this.expect(TokenKind.LPAREN, "Expected '(' after anonymous function keyword");
+            const parameters = this.parse_parameters();
+            this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
+
+            const body = this.peek().kind === TokenKind.FAT_ARROW
+                ? this.parse_arrow_body(is_proc)
+                : this.parse_block_statement();
+
+            const hidden_decl = is_proc
+                ? {
+                    type:       NodeType.ProcedureDeclaration,
+                    identifier: hidden_name,
+                    parameters,
+                    body,
+                    is_pub:     false, ...this.loc(token)
+                } as ProcedureDeclaration
+                : {
+                    type:        NodeType.FunctionDeclaration,
+                    identifier:  hidden_name,
+                    parameters,
+                    body,
+                    is_pub:      false,
+                    return_type: undefined, ...this.loc(token)
+                } as FunctionDeclaration;
+
+            if (this.block_stack.length > 0)
+            {
+                this.block_stack[this.block_stack.length - 1]!.push(hidden_decl);
+            }
+            else
+            {
+                this.top_level_hoists.push(hidden_decl);
+            }
+
+            return {type: NodeType.Identifier, name: hidden_name, ...this.loc(token)} as Identifier;
+        }
 
         switch (token.kind)
         {

@@ -25,17 +25,20 @@ if age >= 18 {
 
 The `when` statement is a powerful alternative to `switch` or multiple `if-else` blocks. It evaluates an expression and matches it against several cases.
 
-- **Cases**: Each case is defined by a value followed by `=>` and a block of code `{}`.
+- **Cases**: Each case is defined by a value followed by `=>` and a block of code `{}`. One line statements don't require `{}`.
 - **Else**: An optional `else` case can be provided to handle any values not covered by other cases.
 - **Strict Equality**: Matching uses deep equality for complex types (Arrays, Structs, etc.).
 
 ```flr
-const status = 1;
+var status = 1;
 
 when status {
-    0 => { io::print("Idle"); }
-    1 => { io::print("Running"); }
-    else => { io::print("Unknown"); }
+    0 => io::print("Idle");
+    1 => io::print("Running"); 
+    else => { 
+        io::print("Unknown"); 
+        status = 0;
+    }
 }
 ```
 
