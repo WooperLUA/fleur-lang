@@ -111,7 +111,3 @@ const triple = create_multiplier(3);
 io::print(double(5)); // 10
 io::print(triple(5)); // 15
 ```
-
-:::tip[Under the Hood]
-Behind the scenes, Fleur's parser automatically "hoists" anonymous functions into hidden, uniquely named declarations (e.g., `__lambda_0`) at the top of their respective scope. This guarantees that anonymous functions are just as fast and memory-efficient as standard named functions, with zero runtime overhead!
-:::

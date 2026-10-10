@@ -104,6 +104,7 @@ const main = async () =>
                 {
                     const config_path = node_path.join(process.cwd(), 'fleur.json');
                     const src_path = node_path.join(process.cwd(), 'src');
+                    const entry_point_path = node_path.join(src_path, 'main.flr');
                     const file = Bun.file(config_path);
 
                     if (await file.exists())
@@ -114,12 +115,14 @@ const main = async () =>
 
                     const default_config = {
                         name:         node_path.basename(process.cwd()),
+                        description: "an awesome fleur project.",
                         version:      "1.0.0",
                         dependencies: {}
                     };
 
                     await Bun.write(config_path, JSON.stringify(default_config, null, 2));
                     if (!existsSync(src_path)) mkdirSync(src_path, { recursive: true })
+                    if (!existsSync(entry_point_path)) await Bun.write(entry_point_path, "io::print(\"Hello, fleur !\");");
                     console.log("\x1b[32mSuccessfully created the fleur project\x1b[0m");
                 }
                 else if (sub_cmd === 'install')
