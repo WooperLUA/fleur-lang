@@ -39,7 +39,7 @@ import {
     type ImportStatement,
     type TypeAnnotation,
     type Parameter,
-    type StructField, type BreakStatement, type ContinueStatement
+    type StructField, type BreakStatement, type ContinueStatement, type MapLiteral, type MapEntry
 } from "@types";
 import {throw_exception} from "@utils";
 
@@ -93,14 +93,10 @@ export class Parser
         });
     }
 
-    // ── Location helper ──────────────────────────────────────────────
-    // Extracts line/column from a token so we can spread it into any AST node.
     private loc(token: Token<any>): { line: number; column: number }
     {
         return {line: token.line, column: token.column};
     }
-
-    // ── Top-level ────────────────────────────────────────────────────
 
     public parse(): Program
     {
@@ -976,17 +972,10 @@ export class Parser
             case TokenKind.STRING:
                 this.eat();
                 const rawValue = token.value.slice(1, -1);
-                const unescapedValue = rawValue
-                    .replace(/\\n/g, '\n')
-                    .replace(/\\t/g, '\t')
-                    .replace(/\\r/g, '\r')
-                    .replace(/\\"/g, '"')
-                    .replace(/\\\\/g, '\\')
-                    .replace(/\\x([0-9a-fA-F]{2})/g, (_: any, hex: string) => String.fromCharCode(parseInt(hex, 16)));
                 return {
                     type: NodeType.StringLiteral,
                     ...this.loc(token),
-                    value: unescapedValue
+                    value: this.unescape_string(rawValue),
                 } as StringLiteral;
 
             case TokenKind.K_TRUE:
@@ -1060,7 +1049,25 @@ export class Parser
                     ...this.loc(token),
                     elements
                 } as ArrayLiteral;
-
+            case TokenKind.LBRACE:
+                this.eat(); // consume '{'
+                const map_entries: MapEntry[] = [];
+                if (this.peek().kind !== TokenKind.RBRACE)
+                {
+                    do
+                    {
+                        const key = this.parse_expression(true);
+                        this.expect(TokenKind.COLON, "Expected ':' after map key");
+                        const value = this.parse_expression(true);
+                        map_entries.push({key, value});
+                    } while (this.match(TokenKind.COMMA));
+                }
+                this.expect(TokenKind.RBRACE, "Expected '}' after map entries");
+                return {
+                    type: NodeType.MapLiteral,
+                    ...this.loc(token),
+                    entries: map_entries
+                } as MapLiteral;
             default:
                 return throw_exception({
                     type:    'Parser',
@@ -1128,5 +1135,16 @@ export class Parser
             } while (this.match(TokenKind.COMMA));
         }
         return parameters;
+    }
+
+    private unescape_string(raw: string): string
+    {
+        return raw
+            .replace(/\\n/g, '\n')
+            .replace(/\\t/g, '\t')
+            .replace(/\\r/g, '\r')
+            .replace(/\\"/g, '"')
+            .replace(/\\\\/g, '\\')
+            .replace(/\\x([0-9a-fA-F]{2})/g, (_: any, hex: string) => String.fromCharCode(parseInt(hex, 16)));
     }
 }

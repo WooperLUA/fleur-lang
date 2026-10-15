@@ -137,7 +137,8 @@ export const reflect: StructValue = {
                       {
                           check_args_length(args, 1, "reflect::clone");
                           check_arg_type(args[0]!, [RuntimeValueType.Struct, RuntimeValueType.Array,
-                                                    RuntimeValueType.Set, RuntimeValueType.Map], "reflect::clone");
+                                                    RuntimeValueType.Set, RuntimeValueType.Map,
+                                                    RuntimeValueType.Range, RuntimeValueType.Error], "reflect::clone");
 
                           return deep_copy(args[0]!);
                       }

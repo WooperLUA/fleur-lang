@@ -26,6 +26,7 @@ export enum NodeType
     NullLiteral = "NullLiteral",
     ArrayLiteral = "ArrayLiteral",
     StructLiteral = "StructLiteral",
+    MapLiteral = "MapLiteral",
     CallExpression = "CallExpression",
     MemberExpression = "MemberExpression",
     IndexExpression = "IndexExpression",
@@ -206,7 +207,8 @@ export type Expression =
     | StaticMemberExpression
     | IndexExpression
     | AssignmentExpression
-    | RangeExpression;
+    | RangeExpression
+    | MapLiteral;
 
 export type BinaryExpression = Node & {
     type: NodeType.BinaryExpression;
@@ -260,6 +262,16 @@ export type StructLiteral = Node & {
     type: NodeType.StructLiteral;
     identifier: string;
     properties: StructProperty[];
+};
+
+export type MapEntry = {
+    key: Expression;
+    value: Expression;
+};
+
+export type MapLiteral = Node & {
+    type: NodeType.MapLiteral;
+    entries: MapEntry[];
 };
 
 export type CallExpression = Node & {

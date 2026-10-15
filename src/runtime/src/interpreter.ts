@@ -38,7 +38,7 @@ import {
     type StringValue,
     type BooleanValue,
     type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
-    type ImportStatement, type StructField, type ErrorValue, type NullValue,
+    type ImportStatement, type StructField, type ErrorValue, type NullValue, type MapLiteral,
 } from "@types";
 import {throw_exception, stringify_value, is_equal, FleurError, deep_copy} from "@utils";
 import {setup_stdlib} from "./stdlib";
@@ -660,6 +660,19 @@ const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
                     type:     RuntimeValueType.Array,
                     elements: (expr as ArrayLiteral).elements.map(e => evaluate(e, env))
                 };
+            case NodeType.MapLiteral:
+                const map_expr = expr as MapLiteral;
+                const map_elements: { key: RuntimeValue; value: RuntimeValue }[] = [];
+                for (const entry of map_expr.entries)
+                {
+                    const key = evaluate(entry.key, env);
+                    const value = evaluate(entry.value, env);
+                    map_elements.push({key, value});
+                }
+                return {
+                    type: RuntimeValueType.Map,
+                    elements: map_elements
+                } as MapValue;
             case NodeType.StructLiteral:
                 return evaluate_struct_literal(expr as StructLiteral, env);
             case NodeType.CallExpression:

@@ -7,7 +7,7 @@ Maps in fleur are collections of key-value pairs. They allow you to associate a 
 
 ## Creation
 
-You can create a new map using `Map::new()`. You can also initialize it with an array of `[key, value]` tuples.
+You can create a new map using literal syntax or the `Map::new()` method. You can also initialize it with an array of `[key, value]` tuples.
 
 :::note
 Using `const` to declare a Map makes the Map itself **immutable**. You will not be able to modify its values or add/remove keys. Use `var` for a mutable Map.
@@ -15,10 +15,17 @@ Using `const` to declare a Map makes the Map itself **immutable**. You will not 
 
 ```flr
 // Create an empty map
-var empty_map = Map::new();
+var empty_map = {};
+var empty_map_alt = Map::new();
 
 // Create and initialize a map
-const colors = Map::new([
+const colors = {
+    "red" : "#FF0000",
+    "green" : "#00FF00",
+    "blue" : "#0000FF"
+}
+
+const colors_alt = Map::new([
     ["red", "#FF0000"],
     ["green", "#00FF00"],
     ["blue", "#0000FF"]

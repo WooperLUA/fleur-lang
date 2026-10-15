@@ -43,7 +43,6 @@ export const http: StructValue = {
                           check_args_length(args, 1, "http::request");
                           check_arg_type(args[0]!, RuntimeValueType.Map, "http::request");
                           const config = args[0]!;
-                          6
                           const get_val = (key: string): RuntimeValue | undefined =>
                           {
                               const el = (config as any).elements.find((e: any) => (e.key as StringValue).value === key);
