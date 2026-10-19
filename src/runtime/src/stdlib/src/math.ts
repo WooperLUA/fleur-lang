@@ -394,13 +394,25 @@ export const math: StructValue = {
                                   const range = args[0] as RangeValue;
                                   const start = (range.start as NumberValue).value;
                                   const end = (range.end as NumberValue).value;
-                                  let sum = 0;
-                                  const step = start <= end ? 1 : -1;
-                                  for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+
+                                  if ((!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
                                   {
-                                      sum += i;
+                                      throw_exception({
+                                          type:    "Runtime",
+                                          message: `Float range ${start}..${end} has a difference of less than 1.`
+                                      });
                                   }
-                                  return {type: RuntimeValueType.Number, value: Math.min(Math.max(sum, start), end)}
+
+                                  const step = start <= end ? 1 : -1;
+                                  const epsilon = 1e-10;
+
+                                  let total = 0;
+                                  for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)
+                                  {
+                                      total += i;
+                                  }
+
+                                  return {type: RuntimeValueType.Number, value: total};
                               }
                           }
                       }

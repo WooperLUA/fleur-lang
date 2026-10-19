@@ -445,9 +445,19 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
         }
         const start = (range.start as NumberValue).value;
         const end = (range.end as NumberValue).value;
-        const step = start <= end ? 1 : -1;
 
-        for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+        if ((!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
+        {
+            throw_exception({
+                type: "Runtime",
+                message: `Float range ${start}..${end} has a difference of less than 1. Since the default step is 1, it would only yield the start value. Use a 'while' loop for fractional steps.`
+            });
+        }
+
+        const step = start <= end ? 1 : -1;
+        const epsilon = 1e-10;
+
+        for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)
         {
             loop_env.assign_or_declare(stmt.identifier, {type: RuntimeValueType.Number, value: i});
             const result = execute(stmt.body, loop_env);

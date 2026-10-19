@@ -269,6 +269,42 @@ export const map: StructValue = {
                                return m;
                            }
             } as NativeFunctionValue
-        ]
+        ],
+        [
+            "concat",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "Map::concat");
+                          check_arg_type(args[0]!, RuntimeValueType.Map, "Map::concat");
+                          check_arg_type(args[1]!, RuntimeValueType.Map, "Map::concat");
+
+                          const map1 = args[0] as MapValue;
+                          const map2 = args[1] as MapValue;
+
+                          const merged_elements: { key: RuntimeValue; value: RuntimeValue }[] =
+                              map1.elements.map(el => ({ key: deep_copy(el.key), value: el.value }));
+
+                          for (const entry of map2.elements)
+                          {
+                              const idx = find_key_index(merged_elements, entry.key);
+                              if (idx !== -1)
+                              {
+                                  merged_elements[idx]!.value = entry.value;
+                              }
+                              else
+                              {
+                                  merged_elements.push({ key: deep_copy(entry.key), value: entry.value });
+                              }
+                          }
+
+                          return {
+                              type:     RuntimeValueType.Map,
+                              elements: merged_elements
+                          } as MapValue;
+                      }
+            } as NativeFunctionValue
+        ],
     ])
 };

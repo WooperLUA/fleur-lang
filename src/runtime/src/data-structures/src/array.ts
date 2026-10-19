@@ -52,13 +52,23 @@ export const array: StructValue = {
                                   }
                                   const start = (range.start as NumberValue).value;
                                   const end = (range.end as NumberValue).value;
-                                  const step = start <= end ? 1 : -1;
 
-                                  for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                                  if ((!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
+                                  {
+                                      throw_exception({
+                                          type:    "Runtime",
+                                          message: `Float range ${start}..${end} has a difference of less than 1. Since the default step is 1, it would only yield the start value.`
+                                      });
+                                  }
+
+                                  const step = start <= end ? 1 : -1;
+                                  const epsilon = 1e-10;
+
+                                  for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)
                                   {
                                       elements.push({type: RuntimeValueType.Number, value: i});
                                   }
-                                  break
+                                  break;
                               }
                               case RuntimeValueType.Array:
                               case RuntimeValueType.Set:

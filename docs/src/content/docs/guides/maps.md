@@ -34,19 +34,20 @@ const colors_alt = Map::new([
 
 ## Methods
 
-| Member                  | Return Type | Description                                                                        |
-|:------------------------|:------------|:-----------------------------------------------------------------------------------|
-| `Map::new(initial?)`    | `Map`       | Creates a new map, optionally initialized with an array of `[key, value]` tuples.  |
-| `Map::from(other)`      | `Map`       | Creates a new map from an existing `Struct` instance's properties.                 |
-| `set(key, value)`       | `Map`       | Associates the specified value with the key. Returns the map.                      |
-| `get(key)`              | `Any`       | Returns the value associated with the key *or null if absent*.                     |
-| `has(key)`              | `Boolean`   | Returns `true` if the map contains the specified key.                              |
-| `remove(key)`           | `Map`       | Removes the mapping for a key. Returns the map.                                    |
-| `clear()`               | `Map`       | Removes all mappings from the map. Returns the map.                                |
-| `length()`              | `Number`    | Returns the number of key-value pairs in the map.                                  |
-| `keys()`                | `Array`     | Returns an array containing all keys in the map.                                   |
-| `values()`              | `Array`     | Returns an array containing all values in the map.                                 |
-| `pairs()`               | `Array`     | Returns an array of `[key, value]` tuples.                                         |
+| Member                        | Return Type | Description                                                                        |
+|:------------------------------|:------------|:-----------------------------------------------------------------------------------|
+| `Map::new(initial?)`          | `Map`       | Creates a new map, optionally initialized with an array of `[key, value]` tuples.  |
+| `Map::from(other)`            | `Map`       | Creates a new map from an existing `Struct` instance's properties.                 |
+| `Map::concat(map, other_map)` | `Map`       | Returns a new map containing the keys and values from both maps *(no duplicates)*. |
+| `set(key, value)`             | `Map`       | Associates the specified value with the key. Returns the map.                      |
+| `get(key)`                    | `Any`       | Returns the value associated with the key *or null if absent*.                     |
+| `has(key)`                    | `Boolean`   | Returns `true` if the map contains the specified key.                              |
+| `remove(key)`                 | `Map`       | Removes the mapping for a key. Returns the map.                                    |
+| `clear()`                     | `Map`       | Removes all mappings from the map. Returns the map.                                |
+| `length()`                    | `Number`    | Returns the number of key-value pairs in the map.                                  |
+| `keys()`                      | `Array`     | Returns an array containing all keys in the map.                                   |
+| `values()`                    | `Array`     | Returns an array containing all values in the map.                                 |
+| `pairs()`                     | `Array`     | Returns an array of `[key, value]` tuples.                                         |
 
 ## Bracket Syntax
 

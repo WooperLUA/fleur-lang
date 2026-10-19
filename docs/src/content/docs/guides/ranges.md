@@ -36,6 +36,7 @@ const r = Range::new(1, 10);
 | `contains(value)` | `Boolean` | Returns `true` if the `value` is within the range (inclusive).              |
 | `reverse()`       | `Range`   | Reverses the range in-place (swaps start and end). Returns the range.       |
 | `reversed()`      | `Range`   | Return a new range being the original range reversed (swaps start and end). |
+| `sum()`           | `Number`  | Return the sum of all the elements in the range *(O(1) complexity)*.        |
 
 #### Example: Membership Test
 
