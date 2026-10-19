@@ -19,6 +19,19 @@ try {
 }
 ```
 
+## Syntactic Sugar
+
+One-line `try | catch` statements can be written in a shorter syntax without `{}`.
+
+```flr
+const arr = [1, 2];
+
+try 
+    io::print(arr[99]) 
+catch err 
+    io::print("Caught error: ", err)
+```
+
 ## The Error Struct
 
 Custom errors can be created using the built-in `Error` type. 

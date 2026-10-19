@@ -21,6 +21,19 @@ if age >= 18 {
 }
 ```
 
+## Syntactic Sugar
+
+One-line `if` statements can be written in a shorter syntax without `{}`.
+
+```flr
+const age = 20;
+
+if age >= 18 
+    io::print("Adult")
+else 
+    io::print("Minor")
+```
+
 ### When Statement (Pattern Matching)
 
 The `when` statement is a powerful alternative to `switch` or multiple `if-else` blocks. It evaluates an expression and matches it against several cases.
@@ -60,6 +73,19 @@ for elt in [1,2,3,4,5]{
 for elt in Set::new(1,2,3,4,5){
     io::print(elt);
 }
+```
+
+## Syntactic Sugar
+
+One-line `for` loops can be written in a shorter syntax without `{}`.
+
+```flr
+for elt in [1,2,3,4,5]
+    io::print(elt)
+
+
+for elt in Set::new(1,2,3,4,5)
+    io::print(elt)
 ```
 
 ### While Loop

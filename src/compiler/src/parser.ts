@@ -195,7 +195,7 @@ export class Parser
                                     offset++; // skip type name
                                 }
                             }
-                            if (this.tokens[this.pos + offset]?.kind === TokenKind.LBRACE)
+                            if ([TokenKind.LBRACE, TokenKind.FAT_ARROW].includes(this.tokens[this.pos + offset]?.kind!))
                             {
                                 return this.parse_method_declaration();
                             }
@@ -358,7 +358,9 @@ export class Parser
             return_type = this.parse_type_annotation();
         }
 
-        const body = this.parse_block_statement();
+        const body = this.peek().kind === TokenKind.FAT_ARROW
+            ? this.parse_arrow_body(false)
+            : this.parse_block_statement();
 
         return {
             type: NodeType.MethodDeclaration,
@@ -409,7 +411,27 @@ export class Parser
         const startToken = this.peek();
         this.eat(); // if
         const condition = this.parse_expression(false);
-        const consequent = this.parse_block_statement();
+
+        let consequent: BlockStatement;
+        if (this.peek().kind === TokenKind.LBRACE)
+        {
+            consequent = this.parse_block_statement();
+        }
+        else
+        {
+            const expr = this.parse_expression(false);
+            consequent = {
+                type:   NodeType.BlockStatement,
+                line:   expr.line,
+                column: expr.column,
+                body:   [{
+                    type:       NodeType.ExpressionStatement,
+                    line:       expr.line,
+                    column:     expr.column,
+                    expression: expr
+                } as ExpressionStatement]
+            };
+        }
 
         let alternate: BlockStatement | IfStatement | undefined;
         if (this.match(TokenKind.K_ELSE))
@@ -418,9 +440,24 @@ export class Parser
             {
                 alternate = this.parse_if_statement();
             }
-            else
+            else if (this.peek().kind === TokenKind.LBRACE)
             {
                 alternate = this.parse_block_statement();
+            }
+            else
+            {
+                const expr = this.parse_expression(false);
+                alternate = {
+                    type:   NodeType.BlockStatement,
+                    line:   expr.line,
+                    column: expr.column,
+                    body:   [{
+                        type:       NodeType.ExpressionStatement,
+                        line:       expr.line,
+                        column:     expr.column,
+                        expression: expr
+                    } as ExpressionStatement]
+                };
             }
         }
 
@@ -494,7 +531,26 @@ export class Parser
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected identifier in for loop").value;
         this.expect(TokenKind.K_IN, "Expected 'in' in for loop");
         const iterable = this.parse_expression(false);
-        const body = this.parse_block_statement();
+        let body: BlockStatement;
+        if (this.peek().kind === TokenKind.LBRACE)
+        {
+            body = this.parse_block_statement();
+        }
+        else
+        {
+            const expr = this.parse_expression(false);
+            body = {
+                type:   NodeType.BlockStatement,
+                line:   expr.line,
+                column: expr.column,
+                body:   [{
+                    type:       NodeType.ExpressionStatement,
+                    line:       expr.line,
+                    column:     expr.column,
+                    expression: expr
+                } as ExpressionStatement]
+            };
+        }
 
         return {
             type: NodeType.ForStatement,
@@ -593,10 +649,51 @@ export class Parser
     {
         const startToken = this.peek();
         this.eat(); // try
-        const body = this.parse_block_statement();
+
+        let body: BlockStatement;
+        if (this.peek().kind === TokenKind.LBRACE)
+        {
+            body = this.parse_block_statement();
+        }
+        else
+        {
+            const expr = this.parse_expression(false);
+            body = {
+                type:   NodeType.BlockStatement,
+                line:   expr.line,
+                column: expr.column,
+                body:   [{
+                    type:       NodeType.ExpressionStatement,
+                    line:       expr.line,
+                    column:     expr.column,
+                    expression: expr
+                } as ExpressionStatement]
+            };
+        }
+
         this.expect(TokenKind.K_CATCH, "Expected 'catch' after 'try' block");
         const catch_param = this.expect(TokenKind.IDENTIFIER, "Expected identifier after 'catch'").value;
-        const catch_body = this.parse_block_statement();
+
+        let catch_body: BlockStatement;
+        if (this.peek().kind === TokenKind.LBRACE)
+        {
+            catch_body = this.parse_block_statement();
+        }
+        else
+        {
+            const expr = this.parse_expression(false);
+            catch_body = {
+                type:   NodeType.BlockStatement,
+                line:   expr.line,
+                column: expr.column,
+                body:   [{
+                    type:       NodeType.ExpressionStatement,
+                    line:       expr.line,
+                    column:     expr.column,
+                    expression: expr
+                } as ExpressionStatement]
+            };
+        }
 
         return {
             type: NodeType.TryStatement,

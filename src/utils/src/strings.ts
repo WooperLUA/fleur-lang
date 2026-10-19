@@ -42,6 +42,12 @@ export const stringify_value = (val: any): string =>
             return `${stringify_value((val as RangeValue).start)}..${stringify_value((val as RangeValue).end)}`;
         case RuntimeValueType.Error:
             return `<Error: ${(val as any).message}>`;
+        case RuntimeValueType.Return:
+            return stringify_value((val as any).value);
+        case RuntimeValueType.Break:
+            return "<break>";
+        case RuntimeValueType.Continue:
+            return "<continue>";
         default:
             return String(val.value);
     }
