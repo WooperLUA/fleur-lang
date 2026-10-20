@@ -213,6 +213,15 @@ export const file: StructValue = {
                           check_arg_type(args[0]!, RuntimeValueType.String, "file::remove");
 
                           const path = (args[0] as StringValue).value;
+
+                          if (fs.statSync(path).isDirectory())
+                          {
+                              throw_exception({
+                                  type:    "Runtime",
+                                  message: `'${path}' is a directory. Use dir::remove instead.`
+                              });
+                          }
+
                           try
                           {
                               fs.unlinkSync(path);
@@ -241,6 +250,61 @@ export const file: StructValue = {
                               return (arg as StringValue).value;
                           });
                           return {type: RuntimeValueType.String, value: node_path.join(...parts)} as StringValue;
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "rename",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "file::rename");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "file::rename");
+                          check_arg_type(args[1]!, RuntimeValueType.String, "file::rename");
+
+                          const old_path = (args[0] as StringValue).value;
+                          const new_path = (args[1] as StringValue).value;
+
+                          try
+                          {
+                              if (!fs.existsSync(old_path))
+                              {
+                                  throw_exception({
+                                      type:    "Runtime",
+                                      message: `Cannot rename '${old_path}': File does not exist.`
+                                  });
+                              }
+
+                              if (fs.statSync(old_path).isDirectory())
+                              {
+                                  throw_exception({
+                                      type:    "Runtime",
+                                      message: `'${old_path}' is a directory. Use dir::rename instead.`
+                                  });
+                              }
+
+                              if (fs.existsSync(new_path) && fs.statSync(new_path).isDirectory())
+                              {
+                                  throw_exception({
+                                      type:    "Runtime",
+                                      message: `Cannot rename to '${new_path}': Target is an existing directory.`
+                                  });
+                              }
+
+                              fs.renameSync(old_path, new_path);
+                              return {type: RuntimeValueType.Null, value: null};
+                          }
+                          catch (e: any)
+                          {
+                              if (e.name === "FleurError") throw e;
+
+                              throw_exception({
+                                  type:    "Runtime",
+                                  message: `Failed to rename '${old_path}' to '${new_path}': ${e.message}`
+                              });
+                              return {type: RuntimeValueType.Null, value: null};
+                          }
                       },
             } as NativeFunctionValue,
         ],

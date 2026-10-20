@@ -51,6 +51,7 @@ export default defineConfig({
                             label: 'Standard Library', items: [
                                 {label: 'Overview', slug: 'guides/stdlib'},
                                 {label: 'crypto', slug: 'guides/stdlib/crypto'},
+                                {label: 'dir', slug: 'guides/stdlib/dir'},
                                 {label: 'encoding', slug: 'guides/stdlib/encoding'},
                                 {label: 'file', slug: 'guides/stdlib/file'},
                                 {label: 'http', slug: 'guides/stdlib/http'},

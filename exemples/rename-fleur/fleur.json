@@ -1,0 +1,6 @@
+{
+  "name": "rename-fleur",
+  "description": "A small program that allows to mass rename files with common prefix.",
+  "version": "1.0.0",
+  "dependencies": {}
+}

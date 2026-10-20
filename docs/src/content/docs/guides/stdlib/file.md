@@ -7,14 +7,15 @@ File system operations.
 
 ## Methods
 
-| Member                             | Return Type             | Description                                                                                                       |
-|:-----------------------------------|:------------------------|:------------------------------------------------------------------------------------------------------------------|
-| `read(path, encoding?)`            | `String` or `Array`     | Reads the bytes of the file as the `encoding` *(defaults to utf-8)* format at `path`.                             |
-| `write(path, bytes, encoding?)`    | `Null`                  | Writes `bytes` as the `encoding` *(defaults to utf-8)* format to the file at `path`. Overwrites existing content. |
-| `append(path, bytes, encoding?)`   | `Null`                  | Appends `bytes` as the `encoding` *(defaults to utf-8)* format to the end of the file at `path`.                  |
-| `exists(path)`                     | `Boolean`               | Returns `true` if a file or directory exists at `path`.                                                           |
-| `remove(path)`                     | `Null`                  | Deletes the file at `path`.                                                                                       |
-| `join_path(...parts)`              | `String`                | Joins multiple path segments into a single path string.                                                           |
+| Member                            | Return Type          | Description                                                                                                       |
+|:----------------------------------|:---------------------|:------------------------------------------------------------------------------------------------------------------|
+| `read(path, encoding?)`           | `String` or `Array`  | Reads the bytes of the file as the `encoding` *(defaults to utf-8)* format at `path`.                             |
+| `write(path, bytes, encoding?)`   | `Null`               | Writes `bytes` as the `encoding` *(defaults to utf-8)* format to the file at `path`. Overwrites existing content. |
+| `append(path, bytes, encoding?)`  | `Null`               | Appends `bytes` as the `encoding` *(defaults to utf-8)* format to the end of the file at `path`.                  |
+| `exists(path)`                    | `Boolean`            | Returns `true` if a file or directory exists at `path`.                                                           |
+| `remove(path)`                    | `Null`               | Deletes the file at `path`.                                                                                       |
+| `join_path(...parts)`             | `String`             | Joins multiple path segments into a single path string *(same as dir::join_path)*.                                |
+| `rename(old_path, new_path) `     | `Null`               | Renames the file at `old_path` to `new_path`.                                                                     |
 
 ### Examples
 

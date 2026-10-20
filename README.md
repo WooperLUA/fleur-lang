@@ -2,16 +2,6 @@
 
 Fleur is a minimalistic programming language designed for simplicity and educational purposes while remaining useful for real-world scripting. It features a full compiler pipeline, including a lexer, parser, and tree-walking interpreter, along with a growing standard library.
 
-## Features
-
-- **Educational & Practical**: Designed to be easy to learn and understand, yet powerful enough for useful scripts.
-- **Control Flow**: `if`/`else`, `when` (pattern matching), `for`, and `while` loops.
-- **Functions & Procedures**: Differentiate between pure functions (`func`) and side-effecting procedures (`proc`).
-- **Data Structures**: Support for `structs`, `arrays`, and `maps`.
-- **Error Handling**: Built-in `try`/`catch` mechanisms.
-- **Module System**: Organize code with `import` and `pub` keywords.
-- **REPL**: Interactive shell for quick prototyping.
-- **Standard Library**: Built-in modules for IO, Time, Types, and more.
 
 ## Getting Started
 
@@ -81,11 +71,7 @@ Here is the proof Fleur is a real language :
 io::print("Hello, Fleur (and also the world)");
 ```
 
-Check the `exemple/` directory for more comprehensive examples of the language features.
-
-## Libraries
-
-Check the `libs/` directory for exemples of libraries built in Fleur by me, they can just be imported by downloading them and importing them with the import module system.
+Check the `exemples/` directory for more comprehensive examples of the language features.
 
 ## Documentation
 

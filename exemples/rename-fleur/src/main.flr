@@ -1,0 +1,33 @@
+if io.args::length() < 3
+{
+    io::print("Usage : main.flr <target_dir> <match> <replacement>");
+    os::exit(1);
+}
+
+const target_dir_path = io.args[0];
+const match = io.args[1];
+const replacement = io.args[2];
+
+var rename_count = 0;
+const target_dir = dir::read(target_dir_path);
+
+for f in target_dir
+{
+    const full_path = dir::join_path(target_dir_path, f);
+
+    if file::exists(full_path) and str::contains(f, match)
+    {
+        const new_name = str::replace(f, match, replacement);
+        const new_path = dir::join_path(target_dir_path, new_name);
+
+        file::rename(full_path, new_path);
+        rename_count += 1;
+    }
+}
+
+var file_or_files = "files";
+
+if rename_count == 1
+    file_or_files = "file"
+
+io::print("Renamed " + rename_count + " " + file_or_files);
