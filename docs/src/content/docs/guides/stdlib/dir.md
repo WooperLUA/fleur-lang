@@ -19,7 +19,7 @@ Directory system operations.
 ### Examples
 
 ```flr
-const src_path = ".\src\";
+const src_path = ".\\src\\";
 if dir::exists(src_path) {
     const files: Array = dir::read(src_path);
     io::print(files);
