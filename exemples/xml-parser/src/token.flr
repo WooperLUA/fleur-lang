@@ -1,0 +1,11 @@
+pub const TokenKind = {
+    "OPEN_TAG":   "OPEN_TAG",
+    "CLOSE_TAG":  "CLOSE_TAG",
+    "DATA":     "DATA"
+};
+
+pub struct Token
+{
+    kind: String,
+    value: String
+}

@@ -1,0 +1,70 @@
+import [Token, TokenKind] in "./token.flr";
+
+pub struct Lexer
+{
+    source: String,
+    loc: Number,
+    buffer: String,
+    curr_kind: String,
+    tokens: Array
+}
+
+Lexer::new(source: String) => Lexer {
+    source: source,
+    loc: 0,
+    buffer: "",
+    curr_kind: "",
+    tokens: []
+}
+
+Lexer::tokenize(): Array
+{
+    this.loc = 0;
+    this.tokens = [];
+    this::reset_buffers();
+
+    while this.loc != str::length(this.source)
+    {
+        const char = this::curr();
+        this.loc += 1;
+        const next_char = this::curr();
+
+        when char
+        {
+            "<" => {
+                if this.buffer != "" and this.curr_kind == TokenKind.DATA
+                    this::flush()
+
+                if next_char == "/"
+                {
+                    this.curr_kind = TokenKind.CLOSE_TAG;
+                    this.loc += 1;
+                }
+                else
+                    this.curr_kind = TokenKind.OPEN_TAG
+            }
+            ">" => this::flush();
+            else => {
+                if this.curr_kind == ""
+                    this.curr_kind = TokenKind.DATA
+                this.buffer = str::join("", this.buffer, char);
+            }
+        }
+    }
+
+    return this.tokens;
+}
+
+Lexer::flush()
+{
+    this.tokens::add(Token { kind: this.curr_kind, value: this.buffer });
+    this::reset_buffers();
+}
+
+Lexer::reset_buffers()
+{
+    this.buffer = "";
+    this.curr_kind = "";
+}
+
+Lexer::curr(): String => this.source[this.loc]

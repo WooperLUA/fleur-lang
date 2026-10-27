@@ -1,0 +1,85 @@
+import [Token, TokenKind] in "./token.flr";
+
+pub struct Parser
+{
+    loc: Number,
+    tokens: Array
+}
+
+Parser::new(tokens: Array) => Parser {
+    loc: 0,
+    tokens: tokens
+}
+
+Parser::parse(): Map
+{
+    this.loc = 0;
+    const token = this::curr();
+
+    if token.kind != TokenKind.OPEN_TAG
+    {
+        Error::new("Expected OPEN_TAG at root", "ParsingError");
+    }
+
+    const root_tag = token.value;
+    const root_content = this::parse_element();
+
+    var result = {};
+    result[root_tag] = root_content;
+    return result;
+}
+
+Parser::parse_element(): Map
+{
+    const token = this::curr();
+
+    if token.kind != TokenKind.OPEN_TAG
+    {
+        Error::new("Expected OPEN_TAG, got " + token.kind, "ParsingError");
+    }
+
+    const tag_name = token.value;
+    this.loc += 1;
+
+    var node = {};
+    var text_content = "";
+
+    while this.loc < this.tokens::length()
+    {
+        const curr_token = this::curr();
+
+        if curr_token.kind == TokenKind.CLOSE_TAG
+        {
+            if curr_token.value != tag_name
+            {
+                Error::new("Mismatched closing tag: expected </" + tag_name + ">, got </" + curr_token.value + ">", "ParsingError");
+            }
+            this.loc += 1;
+            break;
+        }
+        else if curr_token.kind == TokenKind.OPEN_TAG
+        {
+            const nested_tag = curr_token.value;
+            const nested_value = this::parse_element();
+            node[nested_tag] = nested_value;
+        }
+        else if curr_token.kind == TokenKind.DATA
+        {
+            text_content = str::join("", text_content, curr_token.value);
+            this.loc += 1;
+        }
+        else
+        {
+            this.loc += 1;
+        }
+    }
+
+    if text_content != "" and node::keys()::length() == 0
+    {
+        return text_content;
+    }
+
+    return node;
+}
+
+Parser::curr(): Token => this.tokens[this.loc]

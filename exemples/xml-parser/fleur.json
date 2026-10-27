@@ -1,0 +1,6 @@
+{
+  "name": "xml-parser",
+  "description": "A simple implementation of an XML parser in fleur.",
+  "version": "1.0.0",
+  "dependencies": {}
+}

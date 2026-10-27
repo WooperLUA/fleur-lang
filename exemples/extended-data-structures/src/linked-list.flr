@@ -1,0 +1,145 @@
+struct LinkedListNode
+{
+    head,
+    tail: LinkedListNode or Null
+}
+
+LinkedListNode::new(head, tail: LinkedListNode or Null = null)
+    => LinkedListNode { head: head, tail: tail }
+
+LinkedListNode::string()
+{
+    var s = type::string(this.head);
+    if this.tail != null
+        s += " => "
+    return s;
+}
+
+func array_to_nodes(values: Array)
+{
+    if values::length() == 0
+    {
+        return null;
+    }
+
+    const value = values::shift();
+
+    return LinkedListNode::new(value, array_to_nodes(values));
+}
+
+struct LinkedList
+{
+    base: LinkedListNode
+}
+LinkedList::new(values: Array)
+{
+    return LinkedList { base: array_to_nodes(values) };
+}
+LinkedList::add(value)
+{
+    if this.base == null
+    {
+        this.base = LinkedListNode::new(value);
+        return this;
+    }
+
+    var curr_node = this.base;
+
+    while curr_node.tail != null
+    {
+        curr_node = curr_node.tail;
+    }
+
+    curr_node.tail = LinkedListNode::new(value);
+
+    return this;
+}
+LinkedList::remove(index: Number)
+{
+    if index == 0
+    {
+        if this.base != null
+        {
+            this.base = this.base.tail;
+        }
+        return this;
+    }
+
+    var curr_node = this.base;
+    var current_index = 0;
+
+    while curr_node != null and current_index < index - 1
+    {
+        curr_node = curr_node.tail;
+        current_index += 1;
+    }
+
+    if curr_node != null and curr_node.tail != null
+    {
+        curr_node.tail = curr_node.tail.tail;
+    }
+
+    return this;
+}
+LinkedList::get(index: Number)
+{
+    var curr_node = this.base;
+    var current_index = 0;
+
+    while curr_node != null
+    {
+        if current_index == index
+        {
+            return curr_node.head;
+        }
+
+        curr_node = curr_node.tail;
+        current_index += 1;
+    }
+
+    return null;
+}
+LinkedList::set(index: Number, value)
+{
+    var curr_node = this.base;
+    var current_index = 0;
+
+    while curr_node != null
+    {
+        if current_index == index
+        {
+            curr_node.head = value;
+            return this;
+        }
+
+        curr_node = curr_node.tail;
+        current_index += 1;
+    }
+
+    return null;
+}
+LinkedList::string()
+{
+    var s = "";
+    var curr_node = this.base;
+    var null_terminated = false;
+    while not null_terminated
+    {
+        if curr_node == null
+            null_terminated = true
+        else
+        {
+            s += curr_node::string();
+            curr_node = curr_node.tail;
+        }
+
+    }
+    return s;
+}
+
+var ll = LinkedList::new([1, 2, 3]);
+io::print("LinkedList\t\t", ll::string());
+io::print("LinkedList::add(4)\t", ll::add(4)::string());
+io::print("LinkedList::remove(1)\t", ll::remove(1)::string());
+io::print("LinkedList::get(0)\t", ll::get(0));
+io::print("LinkedList::set(0, 5)\t", ll::set(0, 5)::string());

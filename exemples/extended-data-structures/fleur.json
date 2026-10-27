@@ -1,0 +1,6 @@
+{
+  "name": "extended-data-structures",
+  "description": "A library that provides more data structures to use in Fleur.",
+  "version": "1.0.0",
+  "dependencies": {}
+}
