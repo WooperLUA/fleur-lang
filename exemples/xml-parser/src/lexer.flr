@@ -9,12 +9,14 @@ pub struct Lexer
     tokens: Array
 }
 
-Lexer::new(source: String) => Lexer {
-    source: source,
-    loc: 0,
-    buffer: "",
-    curr_kind: "",
-    tokens: []
+Lexer::new(source: String) {
+    return Lexer {
+        source: source,
+        loc: 0,
+        buffer: "",
+        curr_kind: "",
+        tokens: []
+    };
 }
 
 Lexer::tokenize(): Array
@@ -33,7 +35,7 @@ Lexer::tokenize(): Array
         {
             "<" => {
                 if this.buffer != "" and this.curr_kind == TokenKind.DATA
-                    this::flush()
+                    this::flush();
 
                 if next_char == "/"
                 {
@@ -41,12 +43,12 @@ Lexer::tokenize(): Array
                     this.loc += 1;
                 }
                 else
-                    this.curr_kind = TokenKind.OPEN_TAG
+                    this.curr_kind = TokenKind.OPEN_TAG;
             }
             ">" => this::flush();
             else => {
                 if this.curr_kind == ""
-                    this.curr_kind = TokenKind.DATA
+                    this.curr_kind = TokenKind.DATA;
                 this.buffer = str::join("", this.buffer, char);
             }
         }
@@ -67,4 +69,4 @@ Lexer::reset_buffers()
     this.curr_kind = "";
 }
 
-Lexer::curr(): String => this.source[this.loc]
+Lexer::curr(): String { return this.source[this.loc]; }

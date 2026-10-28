@@ -32,16 +32,14 @@ greet("Alex");
 
 ## Syntactic Sugar
 
-One-line functions and procedures can be written in a shorter syntax using the `=>` operator.
-
-:::note
-One-line functions implicitly return the value of the expression, so there is no need to add a `return` statement. They also do not require a trailing semicolon, making them perfectly consistent with the `{}` block syntax.
-:::
+One-line functions and procedures can be written in a shorter syntax without `{}`.
 
 ```flr
-func add(a, b) => a + b
+func add(a, b) 
+    return a + b;
 
-proc greet(name) => io::print("Hello, " + name + "!")
+proc greet(name) 
+    io::print("Hello, " + name + "!");
 ```
 
 ## Scoping
@@ -77,17 +75,21 @@ Fleur supports **lambda expressions** and **lambda statements**. These allow you
 
 ### Basic Syntax
 
-Lambda expressions and lambda statements use the same `func` or `proc` keywords, but simply omit the name. They support both the concise arrow syntax (`=>`) and standard blocks (`{}`).
+Lambda expressions and lambda statements use the same `func` or `proc` keywords, but simply omit the name. They support both the concise syntax and standard blocks (`{}`).
+
+:::note
+One-line lambda expressions implicitly return the value of the expression, so there is no need to add a `return` statement.
+:::
 
 ```flr
 // Lambda expressions
-const multiply = func(x, y) => x * y;
+const multiply = func(x, y) x * y;
 const divide = func(x, y) => { 
     return x / y; 
 }
 
 // Lambda statements
-const logger = proc(msg) => io::print("[LOG]: " + msg;
+const logger = proc(msg) io::print("[LOG]: " + msg);
 const error = proc(msg) {
     io::print("[ERROR]: " + msg);
     os::exit(1);
@@ -102,7 +104,7 @@ Lambda expressions and lambda statements in Fleur are **closures**. This means t
 ```flr
 func create_multiplier(factor) {
     // The returned lambda expression captures the 'factor' variable
-    return func(x) => x * factor;
+    return func(x) x * factor;
 }
 
 const double = create_multiplier(2);

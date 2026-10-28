@@ -283,9 +283,21 @@ export class Parser
             return_type = this.parse_type_annotation();
         }
 
-        const body = this.peek().kind === TokenKind.FAT_ARROW
-            ? this.parse_arrow_body(false)
-            : this.parse_block_statement();
+        let body: BlockStatement;
+        if (this.peek().kind === TokenKind.LBRACE)
+        {
+            body = this.parse_block_statement();
+        }
+        else
+        {
+            const stmt = this.parse_statement();
+            body = {
+                type:   NodeType.BlockStatement,
+                line:   stmt.line,
+                column: stmt.column,
+                body:   [stmt]
+            };
+        }
 
         if (!this.has_return_statement(body))
         {
@@ -318,9 +330,21 @@ export class Parser
         const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
 
-        const body = this.peek().kind === TokenKind.FAT_ARROW
-            ? this.parse_arrow_body(true)
-            : this.parse_block_statement();
+        let body: BlockStatement;
+        if (this.peek().kind === TokenKind.LBRACE)
+        {
+            body = this.parse_block_statement();
+        }
+        else
+        {
+            const stmt = this.parse_statement();
+            body = {
+                type:   NodeType.BlockStatement,
+                line:   stmt.line,
+                column: stmt.column,
+                body:   [stmt]
+            };
+        }
 
         if (this.has_return_statement(body))
         {
@@ -358,9 +382,7 @@ export class Parser
             return_type = this.parse_type_annotation();
         }
 
-        const body = this.peek().kind === TokenKind.FAT_ARROW
-            ? this.parse_arrow_body(false)
-            : this.parse_block_statement();
+        let body = this.parse_block_statement();
 
         return {
             type: NodeType.MethodDeclaration,
@@ -419,17 +441,12 @@ export class Parser
         }
         else
         {
-            const expr = this.parse_expression(false);
+            const stmt = this.parse_statement();
             consequent = {
                 type:   NodeType.BlockStatement,
-                line:   expr.line,
-                column: expr.column,
-                body:   [{
-                    type:       NodeType.ExpressionStatement,
-                    line:       expr.line,
-                    column:     expr.column,
-                    expression: expr
-                } as ExpressionStatement]
+                line:   stmt.line,
+                column: stmt.column,
+                body:   [stmt]
             };
         }
 
@@ -446,17 +463,12 @@ export class Parser
             }
             else
             {
-                const expr = this.parse_expression(false);
+                const stmt = this.parse_statement();
                 alternate = {
                     type:   NodeType.BlockStatement,
-                    line:   expr.line,
-                    column: expr.column,
-                    body:   [{
-                        type:       NodeType.ExpressionStatement,
-                        line:       expr.line,
-                        column:     expr.column,
-                        expression: expr
-                    } as ExpressionStatement]
+                    line:   stmt.line,
+                    column: stmt.column,
+                    body:   [stmt]
                 };
             }
         }
@@ -531,6 +543,7 @@ export class Parser
         const identifier = this.expect(TokenKind.IDENTIFIER, "Expected identifier in for loop").value;
         this.expect(TokenKind.K_IN, "Expected 'in' in for loop");
         const iterable = this.parse_expression(false);
+
         let body: BlockStatement;
         if (this.peek().kind === TokenKind.LBRACE)
         {
@@ -538,17 +551,12 @@ export class Parser
         }
         else
         {
-            const expr = this.parse_expression(false);
+            const stmt = this.parse_statement();
             body = {
                 type:   NodeType.BlockStatement,
-                line:   expr.line,
-                column: expr.column,
-                body:   [{
-                    type:       NodeType.ExpressionStatement,
-                    line:       expr.line,
-                    column:     expr.column,
-                    expression: expr
-                } as ExpressionStatement]
+                line:   stmt.line,
+                column: stmt.column,
+                body:   [stmt]
             };
         }
 
@@ -566,7 +574,22 @@ export class Parser
         const startToken = this.peek();
         this.eat(); // while
         const condition = this.parse_expression(false);
-        const body = this.parse_block_statement();
+
+        let body: BlockStatement;
+        if (this.peek().kind === TokenKind.LBRACE)
+        {
+            body = this.parse_block_statement();
+        }
+        else
+        {
+            const stmt = this.parse_statement();
+            body = {
+                type:   NodeType.BlockStatement,
+                line:   stmt.line,
+                column: stmt.column,
+                body:   [stmt]
+            };
+        }
 
         return {
             type: NodeType.WhileStatement,
@@ -614,24 +637,6 @@ export class Parser
         };
     }
 
-    private parse_arrow_body(is_procedure: boolean): BlockStatement
-    {
-        const startToken = this.peek();
-        this.expect(TokenKind.FAT_ARROW, "Expected '=>'");
-
-        const expr = this.parse_expression();
-
-        const stmt = is_procedure
-            ? {type: NodeType.ExpressionStatement, ...this.loc(startToken), expression: expr} as ExpressionStatement
-            : {type: NodeType.ReturnStatement, ...this.loc(startToken), value: expr} as ReturnStatement;
-
-        return {
-            type: NodeType.BlockStatement,
-            ...this.loc(startToken),
-            body: [stmt]
-        };
-    }
-
     private parse_expression_statement(): ExpressionStatement
     {
         const expression = this.parse_expression();
@@ -657,17 +662,12 @@ export class Parser
         }
         else
         {
-            const expr = this.parse_expression(false);
+            const stmt = this.parse_statement();
             body = {
                 type:   NodeType.BlockStatement,
-                line:   expr.line,
-                column: expr.column,
-                body:   [{
-                    type:       NodeType.ExpressionStatement,
-                    line:       expr.line,
-                    column:     expr.column,
-                    expression: expr
-                } as ExpressionStatement]
+                line:   stmt.line,
+                column: stmt.column,
+                body:   [stmt]
             };
         }
 
@@ -681,17 +681,12 @@ export class Parser
         }
         else
         {
-            const expr = this.parse_expression(false);
+            const stmt = this.parse_statement();
             catch_body = {
                 type:   NodeType.BlockStatement,
-                line:   expr.line,
-                column: expr.column,
-                body:   [{
-                    type:       NodeType.ExpressionStatement,
-                    line:       expr.line,
-                    column:     expr.column,
-                    expression: expr
-                } as ExpressionStatement]
+                line:   stmt.line,
+                column: stmt.column,
+                body:   [stmt]
             };
         }
 
@@ -1015,17 +1010,42 @@ export class Parser
         if (token.kind === TokenKind.K_FUNC || token.kind === TokenKind.K_PROC)
         {
             const is_proc = token.kind === TokenKind.K_PROC;
-
             const hidden_name = `__lambda_${Parser.global_lambda_counter++}`;
 
-            this.eat();
+            this.eat(); // func or proc
             this.expect(TokenKind.LPAREN, "Expected '(' after anonymous function keyword");
             const parameters = this.parse_parameters();
             this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
 
-            const body = this.peek().kind === TokenKind.FAT_ARROW
-                ? this.parse_arrow_body(is_proc)
-                : this.parse_block_statement();
+            let body: BlockStatement;
+
+            if (this.peek().kind === TokenKind.LBRACE)
+            {
+                body = this.parse_block_statement();
+            }
+            else
+            {
+                const expr = this.parse_expression();
+
+                const stmt = is_proc
+                    ? {type:        NodeType.ExpressionStatement,
+                        line:       expr.line,
+                        column:     expr.column,
+                        expression: expr
+                    } as ExpressionStatement
+                    : {type:    NodeType.ReturnStatement,
+                        line:   expr.line,
+                        column: expr.column,
+                        value:  expr
+                    } as ReturnStatement;
+
+                body = {
+                    type:   NodeType.BlockStatement,
+                    line:   expr.line,
+                    column: expr.column,
+                    body:   [stmt]
+                };
+            }
 
             const hidden_decl = is_proc
                 ? {

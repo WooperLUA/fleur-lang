@@ -73,17 +73,3 @@ if u::is_adult() {
     io::print("Welcome");
 }
 ```
-
-## Syntactic Sugar
-
-One-line instance methods can be written in a shorter syntax using the `=>` operator.
-
-:::note
-One-line instance methods implicitly return the value of the expression, so there is no need to add a `return` statement. They also do not require a trailing semicolon, making them perfectly consistent with the `{}` block syntax.
-:::
-
-```flr
-User::is_adult() => this.age >= 18
-if u::is_adult() 
-    io::print("Welcome")
-```

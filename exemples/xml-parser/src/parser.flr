@@ -6,9 +6,12 @@ pub struct Parser
     tokens: Array
 }
 
-Parser::new(tokens: Array) => Parser {
-    loc: 0,
-    tokens: tokens
+Parser::new(tokens: Array)
+{
+    return Parser {
+        loc: 0,
+        tokens: tokens
+    };
 }
 
 Parser::parse(): Map
@@ -17,9 +20,7 @@ Parser::parse(): Map
     const token = this::curr();
 
     if token.kind != TokenKind.OPEN_TAG
-    {
-        Error::new("Expected OPEN_TAG at root", "ParsingError");
-    }
+        Error::new("Expected OPEN_TAG at root", "ParsingError")::throw();
 
     const root_tag = token.value;
     const root_content = this::parse_element();
@@ -34,9 +35,7 @@ Parser::parse_element(): Map
     const token = this::curr();
 
     if token.kind != TokenKind.OPEN_TAG
-    {
-        Error::new("Expected OPEN_TAG, got " + token.kind, "ParsingError");
-    }
+        Error::new("Expected OPEN_TAG, got " + token.kind, "ParsingError")::throw();
 
     const tag_name = token.value;
     this.loc += 1;
@@ -51,9 +50,7 @@ Parser::parse_element(): Map
         if curr_token.kind == TokenKind.CLOSE_TAG
         {
             if curr_token.value != tag_name
-            {
-                Error::new("Mismatched closing tag: expected </" + tag_name + ">, got </" + curr_token.value + ">", "ParsingError");
-            }
+                Error::new("Mismatched closing tag: expected </" + tag_name + ">, got </" + curr_token.value + ">", "ParsingError")::throw();
             this.loc += 1;
             break;
         }
@@ -69,17 +66,13 @@ Parser::parse_element(): Map
             this.loc += 1;
         }
         else
-        {
             this.loc += 1;
-        }
     }
 
     if text_content != "" and node::keys()::length() == 0
-    {
         return text_content;
-    }
 
     return node;
 }
 
-Parser::curr(): Token => this.tokens[this.loc]
+Parser::curr(): Token { return this.tokens[this.loc]; }

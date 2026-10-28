@@ -5,25 +5,24 @@ struct LinkedListNode
 }
 
 LinkedListNode::new(head, tail: LinkedListNode or Null = null)
-    => LinkedListNode { head: head, tail: tail }
+{
+    return LinkedListNode { head: head, tail: tail };
+}
 
 LinkedListNode::string()
 {
     var s = type::string(this.head);
     if this.tail != null
-        s += " => "
+        s += " => ";
     return s;
 }
 
 func array_to_nodes(values: Array)
 {
     if values::length() == 0
-    {
         return null;
-    }
 
     const value = values::shift();
-
     return LinkedListNode::new(value, array_to_nodes(values));
 }
 
@@ -46,9 +45,7 @@ LinkedList::add(value)
     var curr_node = this.base;
 
     while curr_node.tail != null
-    {
         curr_node = curr_node.tail;
-    }
 
     curr_node.tail = LinkedListNode::new(value);
 
@@ -59,9 +56,7 @@ LinkedList::remove(index: Number)
     if index == 0
     {
         if this.base != null
-        {
             this.base = this.base.tail;
-        }
         return this;
     }
 
@@ -75,9 +70,7 @@ LinkedList::remove(index: Number)
     }
 
     if curr_node != null and curr_node.tail != null
-    {
         curr_node.tail = curr_node.tail.tail;
-    }
 
     return this;
 }
@@ -89,9 +82,7 @@ LinkedList::get(index: Number)
     while curr_node != null
     {
         if current_index == index
-        {
             return curr_node.head;
-        }
 
         curr_node = curr_node.tail;
         current_index += 1;
@@ -126,7 +117,7 @@ LinkedList::string()
     while not null_terminated
     {
         if curr_node == null
-            null_terminated = true
+            null_terminated = true;
         else
         {
             s += curr_node::string();

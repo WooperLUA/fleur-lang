@@ -29,9 +29,9 @@ One-line `if` statements can be written in a shorter syntax without `{}`.
 const age = 20;
 
 if age >= 18 
-    io::print("Adult")
+    io::print("Adult");
 else 
-    io::print("Minor")
+    io::print("Minor");
 ```
 
 ### When Statement (Pattern Matching)
@@ -81,11 +81,11 @@ One-line `for` loops can be written in a shorter syntax without `{}`.
 
 ```flr
 for elt in [1,2,3,4,5]
-    io::print(elt)
+    io::print(elt);
 
 
 for elt in Set::new(1,2,3,4,5)
-    io::print(elt)
+    io::print(elt);
 ```
 
 ### While Loop
@@ -98,6 +98,15 @@ while count < 3 {
     io::print("Count is: ", count);
     count += 1;
 }
+```
+
+## Syntactic Sugar
+
+One-line `while` loops can be written in a shorter syntax without `{}`.
+```flr
+var arr = [1,2,3];
+while not arr::empty() 
+    arr::shift();
 ```
 
 ### Breaking and continuing
