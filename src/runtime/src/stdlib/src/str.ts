@@ -145,14 +145,24 @@ export const str: StructValue = {
                 type: RuntimeValueType.NativeFunction,
                 call: (args: RuntimeValue[]) =>
                       {
-                          if (args.length < 3) throw_exception({
+                          if (args.length < 2) throw_exception({
                               type:    "Runtime",
-                              message: `str::join expects at least 3 arguments.`
+                              message: `str::join expects at least 2 arguments.`
                           });
                           check_arg_type(args[0]!, RuntimeValueType.String, "str::join");
                           const separator = (args[0]! as StringValue).value;
                           const strs = args.slice(1).map(x => stringify_value(x));
                           return {type: RuntimeValueType.String, value: strs.join(separator)};
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "concat",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          return {type: RuntimeValueType.String, value: args.map(a => stringify_value(a)).join("")};
                       },
             } as NativeFunctionValue,
         ],

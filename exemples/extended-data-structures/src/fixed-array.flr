@@ -1,0 +1,113 @@
+pub struct FixedArray
+{
+    size: Number,
+    arr: Array,
+    initialized: Array
+}
+FixedArray::new(size: Number)
+{
+    if size < 1
+        Error::new("'size' of FixedArray::new must be greater than 0.", "InvalidArgument")::throw();
+
+    return FixedArray {
+        size: size,
+        arr: Array::from(0..size - 1)::fill(null),
+        initialized: Array::from(0..size - 1)::fill(false)
+    };
+}
+FixedArray::get(index: Number)
+{
+    if index < 0 or index >= this.size
+        Error::new("Index " + index + " is out of bounds for FixedArray of size " + this.size, "OutOfBounds")::throw();
+
+    if not this.initialized[index]
+        Error::new("Cannot read uninitialized index " + index + " of FixedArray", "UninitializedAccess")::throw();
+
+    return this.arr[index];
+}
+FixedArray::set(index: Number, value)
+{
+    if index < 0 or index >= this.size
+        Error::new("Index " + index + " is out of bounds for FixedArray of size " + this.size, "OutOfBounds")::throw();
+
+    this.arr[index] = value;
+    this.initialized[index] = true;
+    return this;
+}
+FixedArray::size()
+{
+    return this.size;
+}
+FixedArray::contains(value)
+{
+    for i in 0..this.size - 1
+    {
+        if this.initialized[i] and this.arr[i] == value
+            return true;
+    }
+    return false;
+}
+FixedArray::clear()
+{
+    this.arr::fill(null);
+    this.initialized::fill(false);
+    return this;
+}
+FixedArray::first()
+{
+    if this.initialized[0]
+        return this.arr[0];
+    return null;
+}
+FixedArray::last()
+{
+    const last_idx = this.size - 1;
+    if this.initialized[last_idx]
+        return this.arr[last_idx];
+    return null;
+}
+FixedArray::reverse()
+{
+    this.arr::reverse();
+    this.initialized::reverse();
+    return this;
+}
+FixedArray::fill(value, range: Range or Null = null)
+{
+    var r = range;
+    if r == null
+        r = 0..this.size;
+    this.arr::fill(value, r);
+    this.initialized::fill(true, r);
+    return this;
+}
+FixedArray::empty()
+{
+    return not this.initialized::contains(true);
+}
+FixedArray::string()
+{
+    var parts = [];
+    for i in 0..this.size - 1
+    {
+        if this.initialized[i]
+            parts::add(type::string(this.arr[i]));
+        else
+            parts::add("<uninitialized>");
+    }
+    return str::concat("<", this.size, "> ", parts);
+}
+
+//var farr = FixedArray::new(5);
+//io::print("FixedArray\t\t\t", farr::string());
+//io::print("FixedArray::set(1, 67)\t\t", farr::set(1, 67)::string());
+//io::print("FixedArray::get(1)\t\t", farr::get(1));
+//io::print("FixedArray::size()\t\t", farr::size());
+//io::print("FixedArray::contains(67)\t", farr::contains(67));
+//io::print("FixedArray::first()\t\t", farr::first());
+//io::print("FixedArray::last()\t\t", farr::last());
+//io::print("FixedArray::reverse()\t\t", farr::reverse()::string());
+//io::print("FixedArray::fill(46, 1..3)\t", farr::fill(46, 1..3)::string());
+//io::print("FixedArray::fill(46)\t\t", farr::fill(46)::string());
+//io::print("FixedArray::empty()\t\t", farr::empty());
+//io::print("FixedArray::clear()\t\t", farr::clear()::string());

@@ -1,0 +1,7 @@
+import [FixedArray] in "./src/fixed-array.flr";
+import [LinkedList] in "./src/linked-list.flr";
+
+pub const EDS = {
+    "FixedArray" : FixedArray,
+    "LinkedList" : LinkedList
+};

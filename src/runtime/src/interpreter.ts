@@ -1163,14 +1163,6 @@ const evaluate_member_expression = (expr: MemberExpression, env: Environment): R
     const struct = object as StructValue;
     const property = expr.property.name;
 
-    if (struct.methods.has(property))
-    {
-        throw_exception({
-            type:    "Runtime",
-            message: `Property '${property}' is a method on struct '${struct.identifier}'. Use '::' to access it.`
-        });
-    }
-
     if (!struct.properties.has(property))
     {
         throw_exception({

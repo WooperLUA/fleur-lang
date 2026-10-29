@@ -1,4 +1,0 @@
-// Example how to use it
-import [XML] in "./index.flr";
-
-io::print(XML::parse("<title>Hello</title>"));

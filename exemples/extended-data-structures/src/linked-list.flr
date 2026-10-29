@@ -13,7 +13,7 @@ LinkedListNode::string()
 {
     var s = type::string(this.head);
     if this.tail != null
-        s += " => ";
+        s += " -> ";
     return s;
 }
 
@@ -26,15 +26,15 @@ func array_to_nodes(values: Array)
     return LinkedListNode::new(value, array_to_nodes(values));
 }
 
-struct LinkedList
+pub struct LinkedList
 {
-    base: LinkedListNode
+    base: LinkedListNode or Null
 }
-LinkedList::new(values: Array)
+LinkedList::new(values: Array or Range)
 {
-    return LinkedList { base: array_to_nodes(values) };
+    return LinkedList { base: array_to_nodes(Array::from(values)) };
 }
-LinkedList::add(value)
+LinkedList::add(value): LinkedList
 {
     if this.base == null
     {
@@ -51,7 +51,7 @@ LinkedList::add(value)
 
     return this;
 }
-LinkedList::remove(index: Number)
+LinkedList::remove(index: Number): LinkedList
 {
     if index == 0
     {
@@ -73,6 +73,27 @@ LinkedList::remove(index: Number)
         curr_node.tail = curr_node.tail.tail;
 
     return this;
+}
+LinkedList::insert(index: Number, value)
+{
+    var curr_node = this.base;
+    var current_index = 0;
+
+    while curr_node != null
+    {
+        if current_index == index
+        {
+            const mem_node = reflect::clone(curr_node);
+            curr_node.head = value;
+            curr_node.tail = mem_node;
+            return this;
+        }
+
+        curr_node = curr_node.tail;
+        current_index += 1;
+    }
+
+    return null;
 }
 LinkedList::get(index: Number)
 {
@@ -109,9 +130,114 @@ LinkedList::set(index: Number, value)
 
     return null;
 }
+LinkedList::length(): Number
+{
+    var curr_node = this.base;
+    var current_index = 0;
+
+    while curr_node != null
+    {
+        curr_node = curr_node.tail;
+        current_index += 1;
+    }
+
+    return current_index;
+}
+LinkedList::pop()
+{
+    var curr_node = this.base;
+    var current_index = 0;
+
+    while curr_node.tail != null
+    {
+        curr_node = curr_node.tail;
+        current_index += 1;
+    }
+
+    const value = curr_node.head;
+    this::remove(current_index);
+
+    return value;
+}
+LinkedList::shift()
+{
+    const value = this.base.head;
+    this.base = this.base.tail;
+    return value;
+}
+LinkedList::contains(value): Boolean
+{
+    var curr_node = this.base;
+    while curr_node.tail != null
+    {
+        if curr_node.head == value
+            return true;
+        curr_node = curr_node.tail;
+    }
+
+    return false;
+}
+LinkedList::last()
+{
+    var curr_node = this.base;
+
+    while curr_node.tail != null
+        curr_node = curr_node.tail;
+
+    return curr_node.head;
+}
+LinkedList::first()
+{
+    return this.base.head;
+}
+LinkedList::reverse(): LinkedList
+{
+    var values = [];
+    while not this::empty()
+        values::add(this::pop());
+    this.base = array_to_nodes(values);
+    return this;
+}
+LinkedList::last(value, range)
+{
+    var curr_node = this.base;
+
+    while curr_node.tail != null
+        curr_node = curr_node.tail;
+
+    return curr_node.head;
+}
+LinkedList::group(size)
+{
+    if size == 0 Error::new("'size' of ::group must be greater than 0.", "InvalidArgument")::throw();
+
+    var values = [];
+    var buffer = [];
+
+    while not this::empty()
+    {
+        buffer::add(this::shift());
+
+        if buffer::length() == size
+        {
+            values::add(array_to_nodes(buffer));
+            buffer::clear();
+        }
+    }
+
+    if not buffer::empty()
+        values::add(array_to_nodes(buffer));
+
+    this.base = array_to_nodes(values);
+    return this;
+}
+LinkedList::empty(): Boolean
+{
+    return this::length() == 0;
+}
 LinkedList::string()
 {
-    var s = "";
+    var s = "(";
     var curr_node = this.base;
     var null_terminated = false;
     while not null_terminated
@@ -125,12 +251,22 @@ LinkedList::string()
         }
 
     }
-    return s;
+    return s + ")";
 }
 
-var ll = LinkedList::new([1, 2, 3]);
-io::print("LinkedList\t\t", ll::string());
-io::print("LinkedList::add(4)\t", ll::add(4)::string());
-io::print("LinkedList::remove(1)\t", ll::remove(1)::string());
-io::print("LinkedList::get(0)\t", ll::get(0));
-io::print("LinkedList::set(0, 5)\t", ll::set(0, 5)::string());
+//var ll = LinkedList::new([1, 2, 3]);
+//io::print("LinkedList\t\t\t", ll::string());
+//io::print("LinkedList::add(4)\t\t", ll::add(4)::string());
+//io::print("LinkedList::remove(1)\t\t", ll::remove(1)::string());
+//io::print("LinkedList::insert(2, 67)\t", ll::insert(2, 67)::string());
+//io::print("LinkedList::get(0)\t\t", ll::get(0));
+//io::print("LinkedList::set(0, 5)\t\t", ll::set(0, 5)::string());
+//io::print("LinkedList::length()\t\t", ll::length());
+//io::print("LinkedList::pop()\t\t", ll::pop());
+//io::print("LinkedList::shift()\t\t", ll::shift());
+//io::print("LinkedList::contains(3)\t\t", ll::contains(3));
+//io::print("LinkedList::first()\t\t", ll::first());
+//io::print("LinkedList::last()\t\t", ll::last());
+//io::print("LinkedList::reverse()\t\t", ll::reverse()::string());
+//io::print("LinkedList::group(1)\t\t", ll::group(1)::string());
+//io::print("LinkedList::empty()\t\t", ll::empty());

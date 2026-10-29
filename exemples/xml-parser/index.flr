@@ -1,5 +1,5 @@
-import [Lexer] in "./lexer.flr";
-import [Parser] in "./parser.flr";
+import [Lexer] in "./src/lexer.flr";
+import [Parser] in "./src/parser.flr";
 
 struct _XML {}
 _XML::parse(source: String): Map => Parser::new(Lexer::new(source)::tokenize())::parse()

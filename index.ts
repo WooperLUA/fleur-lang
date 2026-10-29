@@ -104,6 +104,7 @@ const main = async () =>
                 {
                     const config_path = node_path.join(process.cwd(), 'fleur.json');
                     const src_path = node_path.join(process.cwd(), 'src');
+                    const public_index_path = node_path.join(process.cwd(), 'index.flr');
                     const entry_point_path = node_path.join(src_path, 'main.flr');
                     const file = Bun.file(config_path);
 
@@ -122,6 +123,7 @@ const main = async () =>
 
                     await Bun.write(config_path, JSON.stringify(default_config, null, 2));
                     if (!existsSync(src_path)) mkdirSync(src_path, { recursive: true })
+                    if (!existsSync(public_index_path)) await Bun.write(public_index_path, "// index.flr should be used in libraries to import public functions, procedures, structs... and to re-export them in a single place for easier imports.");
                     if (!existsSync(entry_point_path)) await Bun.write(entry_point_path, "io::print(\"Hello, fleur !\");");
                     console.log("\x1b[32mSuccessfully created the fleur project\x1b[0m");
                 }
