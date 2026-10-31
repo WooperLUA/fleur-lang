@@ -42,6 +42,7 @@ export enum TokenKind {
     GREATER_EQUAL = "GREATER_EQUAL",
     DOT_DOT = "DOT_DOT",
     DOUBLE_COLON = "DOUBLE_COLON",
+    QUESTION_QUESTION = "QUESTION_QUESTION",
 
     ASSIGN = "ASSIGN",
     PLUS_ASSIGN = "PLUS_ASSIGN",
@@ -58,6 +59,7 @@ export enum TokenKind {
     PERCENT = "PERCENT",
     DOT = "DOT",
     CARET = "CARET",
+    QUESTION = "QUESTION",
 
     LBRACE = "LBRACE",
     RBRACE = "RBRACE",

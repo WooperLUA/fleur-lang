@@ -18,6 +18,16 @@ const optimize_expression = (expr: Expression): Expression =>
     {
         const bin_expr = expr as BinaryExpression;
         const left = optimize_expression(bin_expr.left);
+        if (bin_expr.operator === "??")
+        {
+           if (left.type !== NodeType.NullLiteral)
+            {
+                return left;
+            }
+
+            return optimize_expression(bin_expr.right);
+        }
+
         const right = optimize_expression(bin_expr.right);
 
         if (left.type === NodeType.NumericLiteral && right.type === NodeType.NumericLiteral)

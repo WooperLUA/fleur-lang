@@ -725,6 +725,30 @@ const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
 
 const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): RuntimeValue =>
 {
+    if (expr.operator === "and")
+    {
+        const left = evaluate(expr.left, env);
+        if (!is_truthy(left)) return left;
+        return evaluate(expr.right, env);
+    }
+
+    if (expr.operator === "or")
+    {
+        const left = evaluate(expr.left, env);
+        if (is_truthy(left)) return left;
+        return evaluate(expr.right, env);
+    }
+
+    if (expr.operator === "??")
+    {
+        const left = evaluate(expr.left, env);
+        if (left.type !== RuntimeValueType.Null)
+        {
+            return left;
+        }
+        return evaluate(expr.right, env);
+    }
+
     const left = evaluate(expr.left, env);
     const right = evaluate(expr.right, env);
 
@@ -744,92 +768,132 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
                 return {
                     type:  RuntimeValueType.Number,
                     value: (left as NumberValue).value + (right as NumberValue).value
-                };
+                } as NumberValue;
             }
             throw_exception({
                 type:    "Runtime",
                 message: `Operator '+' cannot be applied to types ${left.type} and ${right.type}.`
             });
             return {type: RuntimeValueType.Null, value: null};
+
         case "-":
             if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
             {
                 return {
                     type:  RuntimeValueType.Number,
                     value: (left as NumberValue).value - (right as NumberValue).value
-                };
+                } as NumberValue;
             }
             throw_exception({
                 type:    "Runtime",
                 message: `Operator '-' cannot be applied to types ${left.type} and ${right.type}.`
             });
             return {type: RuntimeValueType.Null, value: null};
+
         case "*":
-            return {type: RuntimeValueType.Number, value: (left as NumberValue).value * (right as NumberValue).value};
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                return {type: RuntimeValueType.Number, value: (left as NumberValue).value * (right as NumberValue).value} as NumberValue;
+            }
+            throw_exception({type: "Runtime", message: `Operator '*' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+
         case "^":
-            return {
-                type:  RuntimeValueType.Number,
-                value: Math.pow((left as NumberValue).value, (right as NumberValue).value)
-            };
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                return {
+                    type:  RuntimeValueType.Number,
+                    value: Math.pow((left as NumberValue).value, (right as NumberValue).value)
+                } as NumberValue;
+            }
+            throw_exception({type: "Runtime", message: `Operator '^' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+
         case "/":
         {
-            const left_val = (left as NumberValue).value
-            const right_val = (right as NumberValue).value
-            if (right_val === 0) return throw_exception({
-                type:    "Runtime",
-                message: "Impossible to divide by 0"
-            })
-            return {type: RuntimeValueType.Number, value: left_val / right_val};
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                const left_val = (left as NumberValue).value;
+                const right_val = (right as NumberValue).value;
+                if (right_val === 0) return throw_exception({
+                    type:    "Runtime",
+                    message: "Impossible to divide by 0"
+                });
+                return {type: RuntimeValueType.Number, value: left_val / right_val} as NumberValue;
+            }
+            throw_exception({type: "Runtime", message: `Operator '/' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
         }
+
         case "%":
         {
-            const left_val = (left as NumberValue).value
-            const right_val = (right as NumberValue).value
-            if (right_val === 0) return throw_exception({
-                type:    "Runtime",
-                message: "Impossible to % by 0"
-            })
-            return {type: RuntimeValueType.Number, value: left_val % right_val};
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                const left_val = (left as NumberValue).value;
+                const right_val = (right as NumberValue).value;
+                if (right_val === 0) return throw_exception({
+                    type:    "Runtime",
+                    message: "Impossible to % by 0"
+                });
+                return {type: RuntimeValueType.Number, value: left_val % right_val} as NumberValue;
+            }
+            throw_exception({type: "Runtime", message: `Operator '%' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
         }
+
         case "==":
-            return {type: RuntimeValueType.Boolean, value: is_equal(left, right)};
+            return {type: RuntimeValueType.Boolean, value: is_equal(left, right)} as BooleanValue;
         case "!=":
-            return {type: RuntimeValueType.Boolean, value: !is_equal(left, right)};
+            return {type: RuntimeValueType.Boolean, value: !is_equal(left, right)} as BooleanValue;
+
         case "<":
-            return {type: RuntimeValueType.Boolean, value: (left as NumberValue).value < (right as NumberValue).value};
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+                return {type: RuntimeValueType.Boolean, value: (left as NumberValue).value < (right as NumberValue).value} as BooleanValue;
+            throw_exception({type: "Runtime", message: `Operator '<' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+
         case "<=":
-            return {type: RuntimeValueType.Boolean, value: (left as NumberValue).value <= (right as NumberValue).value};
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+                return {type: RuntimeValueType.Boolean, value: (left as NumberValue).value <= (right as NumberValue).value} as BooleanValue;
+            throw_exception({type: "Runtime", message: `Operator '<=' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+
         case ">":
-            return {type: RuntimeValueType.Boolean, value: (left as NumberValue).value > (right as NumberValue).value};
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+                return {type: RuntimeValueType.Boolean, value: (left as NumberValue).value > (right as NumberValue).value} as BooleanValue;
+            throw_exception({type: "Runtime", message: `Operator '>' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+
         case ">=":
-            return {type: RuntimeValueType.Boolean, value: (left as NumberValue).value >= (right as NumberValue).value};
-        case "and":
-            return {type: RuntimeValueType.Boolean, value: is_truthy(left) && is_truthy(right)};
-        case "or":
-            return {type: RuntimeValueType.Boolean, value: is_truthy(left) || is_truthy(right)};
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+                return {type: RuntimeValueType.Boolean, value: (left as NumberValue).value >= (right as NumberValue).value} as BooleanValue;
+            throw_exception({type: "Runtime", message: `Operator '>=' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+
         case "xor":
-            return {type: RuntimeValueType.Boolean, value: is_truthy(left) !== is_truthy(right)};
+            return {type: RuntimeValueType.Boolean, value: is_truthy(left) !== is_truthy(right)} as BooleanValue;
+
         case "band":
             if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
             {
                 return {
                     type:  RuntimeValueType.Number,
                     value: (left as NumberValue).value & (right as NumberValue).value
-                };
+                } as NumberValue;
             }
             throw_exception({type: "Runtime", message: `Operator 'band' can only be applied to numbers.`});
             return {type: RuntimeValueType.Null, value: null};
+
         case "bor":
             if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
             {
                 return {
                     type:  RuntimeValueType.Number,
                     value: (left as NumberValue).value | (right as NumberValue).value
-                };
+                } as NumberValue;
             }
             throw_exception({type: "Runtime", message: `Operator 'bor' can only be applied to numbers.`});
             return {type: RuntimeValueType.Null, value: null};
-
 
         case "bxor":
             if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
@@ -839,31 +903,31 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
                     value: (left as NumberValue).value ^ (right as NumberValue).value
                 } as NumberValue;
             }
-            throw_exception({
-                type:    "Runtime",
-                message: `Operator 'bxor' can only be applied to numbers.`
-            });
+            throw_exception({type: "Runtime", message: `Operator 'bxor' can only be applied to numbers.`});
             return {type: RuntimeValueType.Null, value: null};
+
         case "bshl":
             if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
             {
                 return {
                     type:  RuntimeValueType.Number,
                     value: (left as NumberValue).value << (right as NumberValue).value
-                };
+                } as NumberValue;
             }
             throw_exception({type: "Runtime", message: `Operator 'bshl' can only be applied to numbers.`});
             return {type: RuntimeValueType.Null, value: null};
+
         case "bshr":
             if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
             {
                 return {
                     type:  RuntimeValueType.Number,
                     value: (left as NumberValue).value >> (right as NumberValue).value
-                };
+                } as NumberValue;
             }
             throw_exception({type: "Runtime", message: `Operator 'bshr' can only be applied to numbers.`});
             return {type: RuntimeValueType.Null, value: null};
+
         default:
             throw_exception({
                 type:    "Runtime",

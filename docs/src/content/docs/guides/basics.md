@@ -128,6 +128,18 @@ if x > 0 and not is_finished {
 }
 ```
 
+### Null Coalescing Operator
+The `??` (null coalescing) operator provides a concise way to handle `null` values. It returns the left operand if it is not `null` otherwise, it evaluates and returns the right operand.
+This operator short-circuits, meaning the right side is only evaluated if the left side is actually `null`.
+
+```flr
+const name = user_name ?? "Anonymous";
+const port = os::env("PORT") ?? 8080;
+
+// expensive_function() is only called if config is null
+const my_config = config ?? expensive_function();
+```
+
 ### Bitwise Operators
 
 | Operator  | Description          |

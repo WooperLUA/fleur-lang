@@ -752,7 +752,7 @@ export class Parser
 
     private parse_assignment(allow_struct: boolean = true): Expression
     {
-        const left = this.parse_or(allow_struct);
+        const left = this.parse_null_coalesce(allow_struct);
 
         const assignTokens = [
             TokenKind.ASSIGN, TokenKind.PLUS_ASSIGN, TokenKind.MINUS_ASSIGN,
@@ -771,6 +771,26 @@ export class Parser
                 left,
                 right,
             } as AssignmentExpression;
+        }
+
+        return left;
+    }
+
+    private parse_null_coalesce(allow_struct: boolean = true): Expression
+    {
+        let left = this.parse_or(allow_struct);
+
+        while (this.match(TokenKind.QUESTION_QUESTION))
+        {
+            const right = this.parse_or(allow_struct);
+            left = {
+                type:     NodeType.BinaryExpression,
+                line:     left.line,
+                column:   left.column,
+                left,
+                right,
+                operator: "??"
+            } as BinaryExpression;
         }
 
         return left;
