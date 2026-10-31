@@ -1,0 +1,113 @@
+func map(arr: Array, fn: Function or NativeFunction): Array
+{
+    var _arr = reflect::clone(arr);
+    var i = 0;
+    while i < _arr::length()
+    {
+        _arr[i] = fn(_arr[i]);
+        i += 1;
+    }
+
+    return _arr;
+}
+
+pub struct LazyList
+{
+    list: Array
+}
+
+LazyList::new(values: Array)
+{
+    return LazyList {
+        list: map(values, func(value) {
+            return func() {
+                return value;
+            };
+        })
+    };
+}
+
+LazyList::map(fn: Function): LazyList
+{
+    var mapped_list = [];
+    var i = 0;
+
+    while i < this.list::length()
+    {
+        const thunk = this.list[i];
+        mapped_list::add(func() {
+            return fn(thunk());
+        });
+        i += 1;
+    }
+
+    return LazyList { list: mapped_list };
+}
+
+LazyList::filter(predicate: Function): LazyList
+{
+    var filtered_list = [];
+    var i = 0;
+
+    while i < this.list::length()
+    {
+        const thunk = this.list[i];
+        filtered_list::add(func() {
+            const val = thunk();
+            if predicate(val)
+            {
+                return val;
+            }
+            return null;
+        });
+        i += 1;
+    }
+
+    return LazyList { list: filtered_list };
+}
+
+LazyList::sliced(range: Range or Null = null): LazyList
+{
+    const list_len = this.list::length();
+
+    var r = range;
+    if r == null
+        r = 0..list_len;
+
+    var taken_list = [];
+    var i = r::start();
+    var n = r::end();
+
+    while i < list_len and i < n
+    {
+        taken_list::add(this.list[i]);
+        i += 1;
+    }
+
+    return LazyList { list: taken_list };
+}
+
+LazyList::to_array()
+{
+    var arr = [];
+    var i = 0;
+
+    while i < this.list::length()
+    {
+        arr::add(this.list[i]());
+        i += 1;
+    }
+
+    return arr;
+}
+
+LazyList::string()
+{
+    return type::string(map(this.list, func(value) str::concat("() => ", value())));
+}
+
+const result = LazyList::new([1, 2, 3, 4, 5])
+    ::map(func(x) x * 2)
+    ::to_array();
+
+io::print(result);

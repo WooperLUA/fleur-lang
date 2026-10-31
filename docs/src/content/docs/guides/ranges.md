@@ -33,6 +33,8 @@ const r = Range::new(1, 10);
 
 | Method            | Returns   | Description                                                                 |
 |:------------------|:----------|:----------------------------------------------------------------------------|
+| `start()`         | `Number`  | Returns the start (first element) of the range.                             |
+| `end()`           | `Number`  | Returns the end (last element) of the range.                                |
 | `contains(value)` | `Boolean` | Returns `true` if the `value` is within the range (inclusive).              |
 | `reverse()`       | `Range`   | Reverses the range in-place (swaps start and end). Returns the range.       |
 | `reversed()`      | `Range`   | Return a new range being the original range reversed (swaps start and end). |

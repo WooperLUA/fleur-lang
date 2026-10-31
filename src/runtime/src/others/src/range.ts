@@ -28,6 +28,42 @@ export const range: StructValue = {
             } as NativeFunctionValue
         ],
         [
+            "start",
+            {
+                type: RuntimeValueType.NativeFunction,
+                is_method: true,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "<range>::start");
+                          const rangeVal = args[0]! as RangeValue;
+                          const start = (rangeVal.start as NumberValue).value;
+
+                          return {
+                              type: RuntimeValueType.Number,
+                              value: start,
+                          } as NumberValue;
+                      }
+            }
+        ],
+        [
+            "end",
+            {
+                type: RuntimeValueType.NativeFunction,
+                is_method: true,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "<range>::end");
+                          const rangeVal = args[0]! as RangeValue;
+                          const end = (rangeVal.end as NumberValue).value;
+
+                          return {
+                              type: RuntimeValueType.Number,
+                              value: end,
+                          } as NumberValue;
+                      }
+            }
+        ],
+        [
             "contains",
             {
                 type: RuntimeValueType.NativeFunction,

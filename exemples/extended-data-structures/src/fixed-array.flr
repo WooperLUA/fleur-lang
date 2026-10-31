@@ -4,15 +4,29 @@ pub struct FixedArray
     arr: Array,
     initialized: Array
 }
-FixedArray::new(size: Number)
+FixedArray::new(size: Number, values: Array = [])
 {
     if size < 1
         Error::new("'size' of FixedArray::new must be greater than 0.", "InvalidArgument")::throw();
 
+    if size < values::length()
+        Error::new("length of 'values' cant be greater than 'size' of FixedArray::new", "InvalidArgument")::throw();
+
+    var arr = Array::from(0..size)::fill(null);
+    var initialized = Array::from(0..size)::fill(false);
+
+    var i = 0;
+    while i < values::length()
+    {
+        arr[i] = values[i];
+        initialized[i] = true;
+        i += 1;
+    }
+
     return FixedArray {
         size: size,
-        arr: Array::from(0..size - 1)::fill(null),
-        initialized: Array::from(0..size - 1)::fill(false)
+        arr: arr,
+        initialized: initialized
     };
 }
 FixedArray::get(index: Number)
