@@ -8,8 +8,8 @@ import {
 } from "@types";
 
 const NO_OP_STATEMENT: ExpressionStatement = {
-    type: NodeType.ExpressionStatement,
-    expression: { type: NodeType.NullLiteral } as any
+    type:       NodeType.ExpressionStatement,
+    expression: {type: NodeType.NullLiteral} as any
 };
 
 const optimize_expression = (expr: Expression): Expression =>
@@ -39,6 +39,17 @@ const optimize_expression = (expr: Expression): Expression =>
                     if (l_val === 0) return right;
                     if (r_val === 0) return left;
                     break;
+                case "band":
+                    return {type: NodeType.NumericLiteral, value: l_val & r_val} as NumericLiteral;
+                case "bor":
+                    return {type: NodeType.NumericLiteral, value: l_val | r_val} as NumericLiteral;
+                case "bxor":
+                    return {type: NodeType.NumericLiteral, value: l_val ^ r_val} as NumericLiteral;
+                case "bshl":
+                    return {type: NodeType.NumericLiteral, value: l_val << r_val} as NumericLiteral;
+                case "bshr":
+                    return {type: NodeType.NumericLiteral, value: l_val >> r_val} as NumericLiteral;
+
             }
         }
 
@@ -48,10 +59,29 @@ const optimize_expression = (expr: Expression): Expression =>
             return {type: NodeType.StringLiteral, value: combined} as StringLiteral;
         }
 
+        if (left.type === NodeType.BooleanLiteral && right.type === NodeType.BooleanLiteral)
+        {
+            const l_val = (left as any).value;
+            const r_val = (right as any).value;
+
+            if (bin_expr.operator === "and")
+            {
+                return {type: NodeType.BooleanLiteral, value: l_val && r_val} as any;
+            }
+            if (bin_expr.operator === "or")
+            {
+                return {type: NodeType.BooleanLiteral, value: l_val || r_val} as any;
+            }
+            if (bin_expr.operator === "xor")
+            {
+                return {type: NodeType.BooleanLiteral, value: l_val !== r_val} as any;
+            }
+        }
+
         return {...bin_expr, left, right} as BinaryExpression;
     }
 
-     return expr;
+    return expr;
 };
 
 export const optimize_statement = (stmt: Statement): Statement =>
@@ -85,7 +115,7 @@ export const optimize_statement = (stmt: Statement): Statement =>
                 return NO_OP_STATEMENT;
             }
 
-            return { ...block, body: optimized_body } as BlockStatement;
+            return {...block, body: optimized_body} as BlockStatement;
         }
 
         case NodeType.VariableDeclaration:
@@ -123,9 +153,9 @@ export const optimize_statement = (stmt: Statement): Statement =>
 
             return {
                 ...if_stmt,
-                condition: optimized_condition,
+                condition:  optimized_condition,
                 consequent: optimize_statement(if_stmt.consequent) as BlockStatement,
-                alternate: if_stmt.alternate ? optimize_statement(if_stmt.alternate) as any : undefined
+                alternate:  if_stmt.alternate ? optimize_statement(if_stmt.alternate) as any : undefined
             } as IfStatement;
         }
 
@@ -143,7 +173,7 @@ export const optimize_statement = (stmt: Statement): Statement =>
             return {
                 ...while_stmt,
                 condition: optimized_condition,
-                body: optimize_statement(while_stmt.body) as BlockStatement
+                body:      optimize_statement(while_stmt.body) as BlockStatement
             } as WhileStatement;
         }
 
@@ -153,9 +183,9 @@ export const optimize_statement = (stmt: Statement): Statement =>
             return {
                 ...when_stmt,
                 expression: optimize_expression(when_stmt.expression),
-                cases: when_stmt.cases.map(c => ({
+                cases:      when_stmt.cases.map(c => ({
                     value: c.value === "else" ? "else" : optimize_expression(c.value),
-                    body: optimize_statement(c.body) as BlockStatement
+                    body:  optimize_statement(c.body) as BlockStatement
                 }))
             } as WhenStatement;
         }
@@ -166,7 +196,7 @@ export const optimize_statement = (stmt: Statement): Statement =>
             return {
                 ...for_stmt,
                 iterable: optimize_expression(for_stmt.iterable),
-                body: optimize_statement(for_stmt.body) as BlockStatement
+                body:     optimize_statement(for_stmt.body) as BlockStatement
             } as ForStatement;
         }
 
@@ -193,7 +223,7 @@ export const optimize_statement = (stmt: Statement): Statement =>
             const try_stmt = stmt as TryStatement;
             return {
                 ...try_stmt,
-                body: optimize_statement(try_stmt.body) as BlockStatement,
+                body:       optimize_statement(try_stmt.body) as BlockStatement,
                 catch_body: optimize_statement(try_stmt.catch_body) as BlockStatement
             } as TryStatement;
         }
@@ -201,19 +231,19 @@ export const optimize_statement = (stmt: Statement): Statement =>
         case NodeType.FunctionDeclaration:
         {
             const func_decl = stmt as FunctionDeclaration;
-            return { ...func_decl, body: optimize_statement(func_decl.body) as BlockStatement } as FunctionDeclaration;
+            return {...func_decl, body: optimize_statement(func_decl.body) as BlockStatement} as FunctionDeclaration;
         }
 
         case NodeType.ProcedureDeclaration:
         {
             const proc_decl = stmt as ProcedureDeclaration;
-            return { ...proc_decl, body: optimize_statement(proc_decl.body) as BlockStatement } as ProcedureDeclaration;
+            return {...proc_decl, body: optimize_statement(proc_decl.body) as BlockStatement} as ProcedureDeclaration;
         }
 
         case NodeType.MethodDeclaration:
         {
             const meth_decl = stmt as MethodDeclaration;
-            return { ...meth_decl, body: optimize_statement(meth_decl.body) as BlockStatement } as MethodDeclaration;
+            return {...meth_decl, body: optimize_statement(meth_decl.body) as BlockStatement} as MethodDeclaration;
         }
 
         default:

@@ -23,6 +23,12 @@ export enum TokenKind {
 
     AND = "AND",
     OR = "OR",
+    XOR = "XOR",
+    BAND = "BAND",
+    BOR = "BOR",
+    BXOR = "BXOR",
+    BSHL = "BSHL",
+    BSHR = "BSHR",
     NOT = "NOT",
 
     IDENTIFIER = "IDENTIFIER",

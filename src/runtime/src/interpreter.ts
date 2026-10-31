@@ -449,7 +449,7 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
         if ((!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
         {
             throw_exception({
-                type: "Runtime",
+                type:    "Runtime",
                 message: `Float range ${start}..${end} has a difference of less than 1. Since the default step is 1, it would only yield the start value. Use a 'while' loop for fractional steps.`
             });
         }
@@ -680,7 +680,7 @@ const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
                     map_elements.push({key, value});
                 }
                 return {
-                    type: RuntimeValueType.Map,
+                    type:     RuntimeValueType.Map,
                     elements: map_elements
                 } as MapValue;
             case NodeType.StructLiteral:
@@ -807,6 +807,63 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
             return {type: RuntimeValueType.Boolean, value: is_truthy(left) && is_truthy(right)};
         case "or":
             return {type: RuntimeValueType.Boolean, value: is_truthy(left) || is_truthy(right)};
+        case "xor":
+            return {type: RuntimeValueType.Boolean, value: is_truthy(left) !== is_truthy(right)};
+        case "band":
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                return {
+                    type:  RuntimeValueType.Number,
+                    value: (left as NumberValue).value & (right as NumberValue).value
+                };
+            }
+            throw_exception({type: "Runtime", message: `Operator 'band' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+        case "bor":
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                return {
+                    type:  RuntimeValueType.Number,
+                    value: (left as NumberValue).value | (right as NumberValue).value
+                };
+            }
+            throw_exception({type: "Runtime", message: `Operator 'bor' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+
+
+        case "bxor":
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                return {
+                    type:  RuntimeValueType.Number,
+                    value: (left as NumberValue).value ^ (right as NumberValue).value
+                } as NumberValue;
+            }
+            throw_exception({
+                type:    "Runtime",
+                message: `Operator 'bxor' can only be applied to numbers.`
+            });
+            return {type: RuntimeValueType.Null, value: null};
+        case "bshl":
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                return {
+                    type:  RuntimeValueType.Number,
+                    value: (left as NumberValue).value << (right as NumberValue).value
+                };
+            }
+            throw_exception({type: "Runtime", message: `Operator 'bshl' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
+        case "bshr":
+            if (left.type === RuntimeValueType.Number && right.type === RuntimeValueType.Number)
+            {
+                return {
+                    type:  RuntimeValueType.Number,
+                    value: (left as NumberValue).value >> (right as NumberValue).value
+                };
+            }
+            throw_exception({type: "Runtime", message: `Operator 'bshr' can only be applied to numbers.`});
+            return {type: RuntimeValueType.Null, value: null};
         default:
             throw_exception({
                 type:    "Runtime",
@@ -1340,7 +1397,10 @@ const evaluate_index_expression = (expr: IndexExpression, env: Environment): Run
         const s = (object as StringValue).value;
         const i = (index as NumberValue).value;
         const char = s.at(i);
-        return char ? {type: RuntimeValueType.String, value: char} : {type: RuntimeValueType.Null, value: null} as NullValue;
+        return char ? {type: RuntimeValueType.String, value: char} : {
+            type:  RuntimeValueType.Null,
+            value: null
+        } as NullValue;
     }
     else
     {

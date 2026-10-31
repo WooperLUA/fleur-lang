@@ -33,6 +33,12 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     // Logical Operators
     [TokenKind.AND]: /^and\b/,
     [TokenKind.OR]:  /^or\b/,
+    [TokenKind.XOR]:  /^xor\b/,
+    [TokenKind.BAND]:  /^band\b/,
+    [TokenKind.BOR]:  /^bor\b/,
+    [TokenKind.BXOR]:  /^bxor\b/,
+    [TokenKind.BSHL]:  /^bshl\b/,
+    [TokenKind.BSHR]:  /^bshr\b/,
     [TokenKind.NOT]: /^not\b/,
 
     // Identifiers and Literals

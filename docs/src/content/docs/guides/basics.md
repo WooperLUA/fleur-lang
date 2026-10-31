@@ -115,11 +115,12 @@ const greeting = "Hello " + "World";
 
 ### Logical Operators
 
-| Operator | Description |
-|:---------|:------------|
-| `and`    | Logical AND |
-| `or`     | Logical OR  |
-| `not`    | Logical NOT |
+| Operator | Description                |
+|:---------|:---------------------------|
+| `and`    | Logical AND                |
+| `or`     | Logical OR                 |
+| `xor`    | Logical XOR (Exclusive OR) |
+| `not`    | Logical NOT                |
 
 ```flr
 if x > 0 and not is_finished {
@@ -127,3 +128,24 @@ if x > 0 and not is_finished {
 }
 ```
 
+### Bitwise Operators
+
+| Operator  | Description          |
+|:----------|:---------------------|
+| `band`    | Bitwise AND          |
+| `bor`     | Bitwise OR           |
+| `bxor`    | Bitwise XOR          |
+| `bshl`    | Bitwise shift left   |
+| `bshr`    | Bitwise shift right  |
+
+```flr
+const a = 5;  // Binary: 101
+const b = 3;  // Binary: 011
+
+const and_result = a band b;  // 1   (Binary: 001)
+const or_result  = a bor b;   // 7   (Binary: 111)
+const xor_result = a bxor b;  // 6   (Binary: 110)
+
+const shift_left  = a bshl 1; // 10  (Binary: 1010)
+const shift_right = a bshr 1; // 2   (Binary: 010)
+```

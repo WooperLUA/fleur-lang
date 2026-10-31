@@ -776,13 +776,93 @@ export class Parser
         return left;
     }
 
+    private parse_and(allow_struct: boolean = true): Expression
+    {
+        let left = this.parse_bor(allow_struct);
+
+        while (this.match(TokenKind.AND))
+        {
+            const right = this.parse_bor(allow_struct);
+            left = {
+                type:     NodeType.BinaryExpression,
+                line:     left.line,
+                column:   left.column,
+                left,
+                right,
+                operator: "and"
+            } as BinaryExpression;
+        }
+
+        return left;
+    }
+
+    private parse_bor(allow_struct: boolean = true): Expression
+    {
+        let left = this.parse_bxor(allow_struct);
+
+        while (this.match(TokenKind.BOR))
+        {
+            const right = this.parse_bxor(allow_struct);
+            left = {
+                type:     NodeType.BinaryExpression,
+                line:     left.line,
+                column:   left.column,
+                left,
+                right,
+                operator: "bor"
+            } as BinaryExpression;
+        }
+
+        return left;
+    }
+
+    private parse_bxor(allow_struct: boolean = true): Expression
+    {
+        let left = this.parse_band(allow_struct);
+
+        while (this.match(TokenKind.BXOR))
+        {
+            const right = this.parse_band(allow_struct);
+            left = {
+                type:     NodeType.BinaryExpression,
+                line:     left.line,
+                column:   left.column,
+                left,
+                right,
+                operator: "bxor"
+            } as BinaryExpression;
+        }
+
+        return left;
+    }
+
+    private parse_band(allow_struct: boolean = true): Expression
+    {
+        let left = this.parse_equality(allow_struct);
+
+        while (this.match(TokenKind.BAND))
+        {
+            const right = this.parse_equality(allow_struct);
+            left = {
+                type:     NodeType.BinaryExpression,
+                line:     left.line,
+                column:   left.column,
+                left,
+                right,
+                operator: "band"
+            } as BinaryExpression;
+        }
+
+        return left;
+    }
+
     private parse_or(allow_struct: boolean = true): Expression
     {
-        let left = this.parse_and(allow_struct);
+        let left = this.parse_xor(allow_struct);
 
         while (this.match(TokenKind.OR))
         {
-            const right = this.parse_and(allow_struct);
+            const right = this.parse_xor(allow_struct);
             left = {
                 type:     NodeType.BinaryExpression,
                 line:     left.line,
@@ -796,25 +876,27 @@ export class Parser
         return left;
     }
 
-    private parse_and(allow_struct: boolean = true): Expression
+    private parse_xor(allow_struct: boolean = true): Expression
     {
-        let left = this.parse_equality(allow_struct);
+        let left = this.parse_and(allow_struct);
 
-        while (this.match(TokenKind.AND))
+        while (this.match(TokenKind.XOR))
         {
-            const right = this.parse_equality(allow_struct);
+            const right = this.parse_and(allow_struct);
             left = {
                 type:     NodeType.BinaryExpression,
                 line:     left.line,
                 column:   left.column,
                 left,
                 right,
-                operator: "and"
+                operator: "xor"
             } as BinaryExpression;
         }
 
         return left;
     }
+
+
 
     private parse_equality(allow_struct: boolean = true): Expression
     {
@@ -839,9 +921,30 @@ export class Parser
 
     private parse_relational(allow_struct: boolean = true): Expression
     {
-        let left = this.parse_range(allow_struct);
+        let left = this.parse_shift(allow_struct);
 
         while ([TokenKind.LESS, TokenKind.GREATER, TokenKind.LESS_EQUAL, TokenKind.GREATER_EQUAL].includes(this.peek().kind))
+        {
+            const operator = this.eat().value;
+            const right = this.parse_shift(allow_struct);
+            left = {
+                type:   NodeType.BinaryExpression,
+                line:   left.line,
+                column: left.column,
+                left,
+                right,
+                operator
+            } as BinaryExpression;
+        }
+
+        return left;
+    }
+
+    private parse_shift(allow_struct: boolean = true): Expression
+    {
+        let left = this.parse_range(allow_struct);
+
+        while (this.peek().kind === TokenKind.BSHL || this.peek().kind === TokenKind.BSHR)
         {
             const operator = this.eat().value;
             const right = this.parse_range(allow_struct);
