@@ -1,113 +1,198 @@
 func map(arr: Array, fn: Function or NativeFunction): Array
 {
     var _arr = reflect::clone(arr);
-    var i = 0;
-    while i < _arr::length()
-    {
-        _arr[i] = fn(_arr[i]);
-        i += 1;
-    }
-
+    const len = _arr::length();
+    if len > 0
+        for i in 0..len - 1
+            _arr[i] = fn(_arr[i]);
     return _arr;
+}
+
+func lazy_wrap(value)
+    return func() value;
+
+func lazy_unwrap(lazy_value)
+{
+    if lazy_value != null
+        return lazy_value();
+    else
+        return null;
 }
 
 pub struct LazyList
 {
     list: Array
 }
-
 LazyList::new(values: Array)
 {
-    return LazyList {
-        list: map(values, func(value) {
-            return func() {
-                return value;
-            };
-        })
-    };
+    return LazyList { list: map(values, lazy_wrap) };
 }
-
-LazyList::map(fn: Function): LazyList
+LazyList::add(value)
 {
-    var mapped_list = [];
-    var i = 0;
-
-    while i < this.list::length()
-    {
-        const thunk = this.list[i];
-        mapped_list::add(func() {
-            return fn(thunk());
-        });
-        i += 1;
-    }
-
-    return LazyList { list: mapped_list };
+    return LazyList { list: this.list::add(lazy_wrap(value)) };
 }
-
-LazyList::filter(predicate: Function): LazyList
+LazyList::insert(index: Number, value)
 {
-    var filtered_list = [];
-    var i = 0;
-
-    while i < this.list::length()
-    {
-        const thunk = this.list[i];
-        filtered_list::add(func() {
-            const val = thunk();
-            if predicate(val)
-            {
-                return val;
-            }
-            return null;
-        });
-        i += 1;
-    }
-
-    return LazyList { list: filtered_list };
+    return LazyList { list: this.list::insert(index, lazy_wrap(value)) };
 }
+LazyList::remove(index: Number)
+{
+    return LazyList { list: this.list::remove(index) };
+}
+LazyList::get(index: Number)
+{
+    return lazy_unwrap(this.list::get(index));
+}
+LazyList::set(index: Number, value)
+{
+    return LazyList { list: this.list::set(index, lazy_wrap(value)) };
+}
+LazyList::length()
+{
+    return this.list::length();
+}
+LazyList::contains(value): Bool
+{
+    const len = this.list::length();
+    if len == 0
+        return false;
 
+    for i in 0..len - 1
+        if lazy_unwrap(this.list[i]) == value
+            return true;
+
+    return false;
+}
+LazyList::index(value)
+{
+    const len = this.list::length();
+    if len == 0
+        return null;
+
+    for i in 0..len - 1
+        if lazy_unwrap(this.list[i]) == value
+            return i;
+
+    return null;
+}
+LazyList::first()
+{
+    return lazy_unwrap(this.list::first());
+}
+LazyList::last()
+{
+    return lazy_unwrap(this.list::last());
+}
 LazyList::sliced(range: Range or Null = null): LazyList
 {
     const list_len = this.list::length();
 
     var r = range;
     if r == null
-        r = 0..list_len;
+    {
+        if list_len > 0
+            r = 0..list_len - 1;
+        else
+            r = 0..0;
+    }
 
     var taken_list = [];
-    var i = r::start();
-    var n = r::end();
-
-    while i < list_len and i < n
-    {
+    for i in r
         taken_list::add(this.list[i]);
-        i += 1;
-    }
 
     return LazyList { list: taken_list };
 }
-
-LazyList::to_array()
+LazyList::reversed()
 {
-    var arr = [];
-    var i = 0;
-
-    while i < this.list::length()
-    {
-        arr::add(this.list[i]());
-        i += 1;
-    }
-
-    return arr;
+    return LazyList { list: this.list::reversed() };
 }
+LazyList::sorted()
+{
+    const sorted_values = map(this.list, lazy_unwrap)::sorted();
+    return LazyList { list: map(sorted_values, lazy_wrap) };
+}
+LazyList::grouped(size: Number): LazyList
+{
+    const raw_values = map(this.list, lazy_unwrap);
+    const grouped_raw = raw_values::grouped(size);
 
+    const lazy_groups = map(grouped_raw, func(group) {
+        return lazy_wrap(LazyList::new(group));
+    });
+
+    return LazyList { list: lazy_groups };
+}
+LazyList::map(fn: Function): LazyList
+{
+    var mapped_list = [];
+    const len = this.list::length();
+
+    if len > 0
+        for i in 0..len - 1
+        {
+            const thunk = this.list[i];
+            mapped_list::add(lazy_wrap(fn(thunk())));
+        }
+
+    return LazyList { list: mapped_list };
+}
+LazyList::filter(predicate: Function): LazyList
+{
+    var filtered_list = [];
+    const len = this.list::length();
+
+    if len > 0
+        for i in 0..len - 1
+        {
+            const thunk = this.list[i];
+            filtered_list::add(func() {
+                const val = lazy_unwrap(thunk);
+                if predicate(val)
+                    return val;
+                return null;
+            });
+        }
+
+    return LazyList { list: filtered_list };
+}
+LazyList::empty()
+{
+    return this.list::empty();
+}
 LazyList::string()
 {
-    return type::string(map(this.list, func(value) str::concat("() => ", value())));
+    var s = "<[";
+    var i = 0;
+    var len = this.list::length();
+
+    while i < len
+    {
+        const val = lazy_unwrap(this.list[i]);
+
+        if type::of(val) == "Struct"
+        {
+            if reflect::identifier(val) == "LazyList"
+                s += val::string();
+        }
+        else
+            s += type::string(val);
+
+        i += 1;
+        if i < len
+            s += ", ";
+    }
+
+    return s + "]>";
 }
 
-const result = LazyList::new([1, 2, 3, 4, 5])
-    ::map(func(x) x * 2)
-    ::to_array();
-
-io::print(result);
+//const result = LazyList::new([1, 2, 3, 4, 5])
+//    ::add(67)
+//    ::insert(2, 420)
+//    ::remove(3)
+//    ::set(0, -1)
+//    ::reversed()
+//    ::map(func(x) { return x * 2; })
+//    ::sorted()
+//    ::grouped(2);
+//
+//io::print(result::string());

@@ -1,7 +1,9 @@
 import [FixedArray] in "./src/fixed-array.flr";
 import [LinkedList] in "./src/linked-list.flr";
+import [LazyList] in "./src/lazy-list.flr";
 
 pub const EDS = {
     "FixedArray" : FixedArray,
-    "LinkedList" : LinkedList
+    "LinkedList" : LinkedList,
+    "LazyList" : LazyList
 };

@@ -84,7 +84,7 @@ One-line lambda expressions implicitly return the value of the expression, so th
 ```flr
 // Lambda expressions
 const multiply = func(x, y) x * y;
-const divide = func(x, y) => { 
+const divide = func(x, y) { 
     return x / y; 
 }
 

@@ -276,13 +276,11 @@ export class Parser
         this.expect(TokenKind.LPAREN, "Expected '(' after function name");
         const parameters = this.parse_parameters();
         this.expect(TokenKind.RPAREN, "Expected ')' after parameters");
-
         let return_type: TypeAnnotation | undefined;
         if (this.peek().kind === TokenKind.COLON)
         {
             return_type = this.parse_type_annotation();
         }
-
         let body: BlockStatement;
         if (this.peek().kind === TokenKind.LBRACE)
         {
@@ -290,15 +288,20 @@ export class Parser
         }
         else
         {
+            const local_hoists: Statement[] = [];
+            this.block_stack.push(local_hoists);
+
             const stmt = this.parse_statement();
+
+            this.block_stack.pop();
+
             body = {
                 type:   NodeType.BlockStatement,
                 line:   stmt.line,
                 column: stmt.column,
-                body:   [stmt]
+                body:   [...local_hoists, stmt]
             };
         }
-
         if (!this.has_return_statement(body))
         {
             throw_exception({
@@ -308,7 +311,6 @@ export class Parser
                 column:  startToken.column
             });
         }
-
         return {
             type: NodeType.FunctionDeclaration,
             ...this.loc(startToken),
