@@ -1,0 +1,5 @@
+import [_Fenv] in "./src/fenv.flr";
+
+pub const Fenv = _Fenv { };
+
+// Fenv::load(".env");

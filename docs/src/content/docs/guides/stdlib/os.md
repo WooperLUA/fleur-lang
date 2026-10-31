@@ -11,6 +11,7 @@ Operating system and process information.
 |:-----------|:-------------------------------------------------------------|
 | `platform` | Returns the OS platform string (e.g., `"win32"`, `"linux"`). |
 | `homedir`  | Returns the path to the current user's home directory.       |
+| `cwd`      | returns the current working directory of the Fleur process.  |
 
 ## Methods
 

@@ -1,17 +1,13 @@
+import type {NativeFunctionValue, NullValue, RuntimeValue, StructValue,} from "@types";
 import {
     type ArrayValue,
     type BooleanValue,
-    type NumberValue, type RangeValue,
-    RuntimeValueType, type StringValue,
+    type NumberValue,
+    type RangeValue,
+    RuntimeValueType,
+    type StringValue,
 } from "@types";
-import {
-    check_args_length, check_arg_type, throw_exception, stringify_value,
-} from "@utils";
-import type {
-    RuntimeValue,
-    NativeFunctionValue,
-    StructValue,
-} from "@types";
+import {check_arg_type, check_args_length, stringify_value, throw_exception,} from "@utils";
 
 export const str: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -248,6 +244,23 @@ export const str: StructValue = {
                           const strings = string.split(splitter)
                                                             .map(s => ({type: RuntimeValueType.String, value: s} as StringValue))
                           return {type: RuntimeValueType.Array, elements: strings} as ArrayValue
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "index",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "str::index");
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::index");
+                          check_arg_type(args[1]!, RuntimeValueType.String, "str::index");
+                          const string = (args[0] as StringValue).value
+                          const value = (args[1] as StringValue).value
+                          const idx = string.indexOf(value)
+                          return idx === -1 ? {type: RuntimeValueType.Null, value: null} as NullValue
+                                            : {type: RuntimeValueType.Number, value: idx} as NumberValue
                       },
             } as NativeFunctionValue,
         ],

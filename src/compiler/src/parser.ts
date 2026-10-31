@@ -1381,12 +1381,19 @@ export class Parser
 
     private unescape_string(raw: string): string
     {
-        return raw
-            .replace(/\\n/g, '\n')
-            .replace(/\\t/g, '\t')
-            .replace(/\\r/g, '\r')
-            .replace(/\\"/g, '"')
-            .replace(/\\\\/g, '\\')
-            .replace(/\\x([0-9a-fA-F]{2})/g, (_: any, hex: string) => String.fromCharCode(parseInt(hex, 16)));
+        return raw.replace(/\\(n|t|r|"|\\|x([0-9a-fA-F]{2}))/g, (_match, seq, hex) =>
+        {
+            switch (seq)
+            {
+                case 'n':  return '\n';
+                case 't':  return '\t';
+                case 'r':  return '\r';
+                case '"':  return '"';
+                case '\\': return '\\';
+                default:
+                    if (hex) return String.fromCharCode(parseInt(hex, 16));
+                    return _match;
+            }
+        });
     }
 }

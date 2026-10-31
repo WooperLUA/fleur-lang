@@ -1,0 +1,6 @@
+{
+  "name": "fenv",
+  "description": "A library that loads environment variables from a .env file into os::env.",
+  "version": "1.0.0",
+  "dependencies": {}
+}

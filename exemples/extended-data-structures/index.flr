@@ -7,3 +7,5 @@ pub const EDS = {
     "LinkedList" : LinkedList,
     "LazyList" : LazyList
 };
+
+io::print(LazyList::new([1,2,3])::get(1));

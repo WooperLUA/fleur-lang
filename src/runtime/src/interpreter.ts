@@ -367,7 +367,12 @@ const execute_method_declaration = (stmt: MethodDeclaration, env: Environment): 
         is_method:  true
     };
 
-    env.register_method(stmt.struct_name, stmt.identifier, method);
+    const struct_decl = env.lookup(stmt.struct_name) as StructValue;
+    if (struct_decl && struct_decl.type === RuntimeValueType.Struct && struct_decl.is_declaration)
+    {
+        struct_decl.methods.set(stmt.identifier, method);
+    }
+
     return {type: RuntimeValueType.Null, value: null};
 };
 
@@ -380,10 +385,7 @@ const execute_struct_declaration = (stmt: StructDeclaration, env: Environment): 
         type:       RuntimeValueType.Struct,
         identifier: stmt.identifier,
         properties: new Map<string, RuntimeValue>(),
-        get methods()
-        {
-            return env.get_methods(stmt.identifier);
-        },
+        methods:    new Map<string, FunctionValue>(),
         is_declaration: true
     };
 
@@ -1017,10 +1019,7 @@ const evaluate_struct_literal = (expr: StructLiteral, env: Environment): Runtime
         type:       RuntimeValueType.Struct,
         identifier: expr.identifier,
         properties,
-        get methods()
-        {
-            return env.get_methods(expr.identifier);
-        },
+        methods:    (env.lookup(expr.identifier) as StructValue).methods, // <-- CHANGE: Inherit from declaration
         is_declaration: false
     } as StructValue;
 };

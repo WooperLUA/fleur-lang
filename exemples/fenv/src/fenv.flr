@@ -1,0 +1,37 @@
+pub struct _Fenv {}
+
+_Fenv::load(file_path: String)
+{
+    if not file::exists(file_path)
+        Error::new("Could not find .env file at path " + file_path, "FenvException")::throw();
+
+    const content = file::read(file_path);
+    const normalized = str::replace(content, "\r\n", "\n");
+    const lines = str::split(normalized, "\n");
+
+    for l in lines
+    {
+        var line = str::trim(l);
+
+        if str::length(line) == 0 or str::prefixed(line, "#")
+            continue;
+
+        if str::prefixed(line, "export ")
+            line = str::slice(line, 7..str::length(line) - 1);
+
+        const eq_pos = str::index(line, "=");
+        if eq_pos == -1
+            continue;
+
+        const key = str::trim(str::slice(line, 0..eq_pos - 1));
+        var value = str::trim(str::slice(line, eq_pos + 1..str::length(line) - 1));
+
+        if (str::prefixed(value, "\"") and str::suffixed(value, "\"")) or
+           (str::prefixed(value, "'") and str::suffixed(value, "'"))
+        {
+            value = str::slice(value, 1..str::length(value) - 2);
+        }
+        
+        os::set_env(key, value);
+    }
+}
