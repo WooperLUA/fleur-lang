@@ -21,7 +21,6 @@ const main = async () =>
                     type:    "MissingArgument",
                     message: "You must provide a .flr file."
                 })
-
                 const path = args[1];
                 const absolute_path = node_path.resolve(path);
                 const current_dir = node_path.dirname(absolute_path);

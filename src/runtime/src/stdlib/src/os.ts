@@ -1,5 +1,11 @@
-import type {NativeFunctionValue, RuntimeValue, StructValue,} from "@types";
-import {type NumberValue, RuntimeValueType, type StringValue,} from "@types";
+import {
+    type NativeFunctionValue,
+    type NumberValue,
+    type RuntimeValue,
+    RuntimeValueType,
+    type StringValue,
+    type StructValue,
+} from "@types";
 import {check_arg_type, check_args_length, throw_exception,} from "@utils";
 
 import * as node_os from "node:os";
@@ -30,43 +36,54 @@ export const os: StructValue = {
                 type: RuntimeValueType.String,
                 value : process.cwd()
             }
-        ]
-    ]),
-    methods:    new Map<string, any>([
+        ],
         [
             "env",
             {
-                type: RuntimeValueType.NativeFunction,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          check_args_length(args, 1, "os::env");
-                          check_arg_type(args[0]!, RuntimeValueType.String, "os::env");
-                          const key = (args[0] as StringValue).value;
-                          const val = process.env[key];
+                type: RuntimeValueType.Struct,
+                identifier: "os_env",
+                properties : new Map<string, RuntimeValue>([]),
+                methods:    new Map<string, any>([
+                    [
+                        "get",
+                        {
+                            type: RuntimeValueType.NativeFunction,
+                            call: (args: RuntimeValue[]) =>
+                                  {
+                                      check_args_length(args, 1, "os.env::get");
+                                      check_arg_type(args[0]!, RuntimeValueType.String, "os.env::get");
+                                      const key = (args[0] as StringValue).value;
+                                      const val = process.env[key];
 
-                          if (val === undefined)
-                          {
-                              return {type: RuntimeValueType.Null, value: null};
-                          }
+                                      if (val === undefined)
+                                      {
+                                          return {type: RuntimeValueType.Null, value: null};
+                                      }
 
-                          return {type: RuntimeValueType.String, value: val} as StringValue;
-                      },
-            } as NativeFunctionValue,
-        ],
-        [
-            "set_env",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          check_args_length(args, 2, "os::set_env");
-                          check_arg_type(args[0]!, RuntimeValueType.String, "os::set_env");
-                          check_arg_type(args[1]!, RuntimeValueType.String, "os::set_env");
-                          process.env[(args[0] as StringValue).value] = (args[1] as StringValue).value;
-                          return {type: RuntimeValueType.Null, value: null};
-                      },
-            } as NativeFunctionValue,
-        ],
+                                      return {type: RuntimeValueType.String, value: val} as StringValue;
+                                  },
+                        } as NativeFunctionValue,
+                    ],
+                    [
+                        "set",
+                        {
+                            type: RuntimeValueType.NativeFunction,
+                            call: (args: RuntimeValue[]) =>
+                                  {
+                                      check_args_length(args, 2, "os.env::set");
+                                      check_arg_type(args[0]!, RuntimeValueType.String, "os.env::set");
+                                      check_arg_type(args[1]!, RuntimeValueType.String, "os.env::set");
+                                      process.env[(args[0] as StringValue).value] = (args[1] as StringValue).value;
+                                      return {type: RuntimeValueType.Null, value: null};
+                                  },
+                        } as NativeFunctionValue,
+                    ],
+                ]),
+                is_immutable  : true,
+            }
+        ]
+    ]),
+    methods:    new Map<string, any>([
         [
             "exit",
             {

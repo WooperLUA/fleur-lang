@@ -32,6 +32,6 @@ _Fenv::load(file_path: String)
             value = str::slice(value, 1..str::length(value) - 2);
         }
         
-        os::set_env(key, value);
+        os.env::set(key, value);
     }
 }
