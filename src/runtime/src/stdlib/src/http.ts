@@ -1,7 +1,8 @@
 import type {MapValue, NativeFunctionValue} from "@types";
-import {type RuntimeValue, RuntimeValueType, type StringValue, type StructValue,} from "@types";
+import {type RuntimeValue, RuntimeValueType, type StringValue, type StructValue} from "@types";
 import {check_arg_type, check_args_length, throw_exception} from "@utils";
-import {execSync} from "node:child_process";
+import request from "sync-request";
+import type {HttpVerb} from "sync-request";
 
 const build_response_struct = (status: number, body: string, url: string): MapValue =>
 {
@@ -29,6 +30,11 @@ const build_response_struct = (status: number, body: string, url: string): MapVa
     };
 };
 
+const valid_http_method = (method: string): boolean =>
+{
+    return ["GET" , "HEAD" , "POST" , "PUT" , "DELETE" , "CONNECT" , "OPTIONS" , "TRACE" , "PATCH"].includes(method);
+}
+
 export const http: StructValue = {
     type:       RuntimeValueType.Struct,
     identifier: "http",
@@ -43,6 +49,7 @@ export const http: StructValue = {
                           check_args_length(args, 1, "http::request");
                           check_arg_type(args[0]!, RuntimeValueType.Map, "http::request");
                           const config = args[0]!;
+
                           const get_val = (key: string): RuntimeValue | undefined =>
                           {
                               const el = (config as any).elements.find((e: any) => (e.key as StringValue).value === key);
@@ -60,48 +67,56 @@ export const http: StructValue = {
                           const url = (url_val as StringValue).value;
 
                           const method_val = get_val("method");
-                          const method = method_val?.type === RuntimeValueType.String ? (method_val as StringValue).value.toUpperCase() : "GET";
+                          const method_str = method_val?.type === RuntimeValueType.String
+                              ? (method_val as StringValue).value.toUpperCase()
+                              : "GET";
+
+                          if (!valid_http_method(method_str))
+                          {
+                              throw_exception({
+                                  type:    "Runtime",
+                                  message: `Invalid HTTP method: '${method_str}'. Must be one of: GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH.`
+                              });
+                          }
+
+                          const method = method_str as HttpVerb;
 
                           const body_val = get_val("body");
                           const has_body = body_val && body_val.type === RuntimeValueType.String;
 
                           const headers_val = get_val("headers");
+                          const headers: Record<string, string> = {};
+
+                          if (headers_val && headers_val.type === RuntimeValueType.Map)
+                          {
+                              const header_entries = (headers_val as any).elements;
+                              for (const entry of header_entries)
+                              {
+                                  const h_key = (entry.key as StringValue).value;
+                                  const h_val = entry.value;
+                                  if (h_val.type === RuntimeValueType.String)
+                                  {
+                                      headers[h_key] = h_val.value;
+                                  }
+                              }
+                          }
 
                           try
                           {
-                              const curl_args = ["curl", "-s", "-w", "\\n%{http_code}", "-X", method];
+                              const options: any = { headers };
 
                               if (has_body)
                               {
-                                  curl_args.push("-H", "Content-Type: application/json", "-d", "@-");
-                              }
-
-                              if (headers_val && headers_val.type === RuntimeValueType.Map)
-                              {
-                                  const header_entries = (headers_val as any).elements;
-
-                                  for (const entry of header_entries)
+                                  options.body = (body_val as StringValue).value;
+                                  if (!headers["Content-Type"])
                                   {
-                                      const h_key = (entry.key as StringValue).value;
-                                      const h_val = entry.value;
-
-                                      if (h_val.type === RuntimeValueType.String)
-                                      {
-                                          curl_args.push("-H", `${h_key}: ${h_val.value}`);
-                                      }
+                                      headers["Content-Type"] = "application/json";
                                   }
                               }
 
-                              curl_args.push(url);
-
-                              const raw_output = has_body
-                                  ? execSync(curl_args.join(" "), {input: (body_val as StringValue).value}).toString()
-                                  : execSync(curl_args.join(" ")).toString();
-
-                              const lines = raw_output.split("\n");
-                              const status_str = lines.pop()!.trim();
-                              const body = lines.join("\n");
-                              const status = parseInt(status_str, 10);
+                              const response = request(method, url, options);
+                              const status = response.statusCode;
+                              const body = response.getBody('utf8');
 
                               return build_response_struct(status, body, url);
                           }
@@ -109,7 +124,7 @@ export const http: StructValue = {
                           {
                               throw_exception({
                                   type:    "Runtime",
-                                  message: `HTTP request failed => ${(e.message as String).split('-X')[1]!.trimStart()}`
+                                  message: `HTTP request failed: ${e.message}`
                               });
                               return {type: RuntimeValueType.Null, value: null};
                           }
