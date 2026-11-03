@@ -20,7 +20,8 @@ const main = async () =>
                 if (!args[1]) return throw_exception({
                     type:    "MissingArgument",
                     message: "You must provide a .flr file."
-                })
+                });
+
                 const path = args[1];
                 const absolute_path = node_path.resolve(path);
                 const current_dir = node_path.dirname(absolute_path);
@@ -30,16 +31,15 @@ const main = async () =>
                     type:     "InvalidArgument",
                     message:  "Invalid file path.",
                     metadata: `\"${path}\"`
-                })
+                });
 
                 if (!(file?.name?.endsWith('.flr'))) return throw_exception({
                     type:    "InvalidArgument",
                     message: "You must provide a file with the '.flr' extension.",
-                })
+                });
 
                 let should_optimize = false;
                 const fleur_args: string[] = [];
-
                 for (let i = 2; i < args.length; i++)
                 {
                     if (args[i] === '--optimize')
@@ -49,6 +49,22 @@ const main = async () =>
                     else
                     {
                         fleur_args.push(args[i]!);
+                    }
+                }
+
+                let aliases: Record<string, string> = {};
+                const config_path = node_path.join(current_dir, 'fleur.json');
+                if (existsSync(config_path))
+                {
+                    console.log(`\x1b[36m'fleur.json' detected and loaded at \"${config_path}\"\x1b[0m`);
+                    try
+                    {
+                        const config = JSON.parse(await Bun.file(config_path).text());
+                        aliases = config.aliases || {};
+                    }
+                    catch (e)
+                    {
+                        // Ignore parse errors
                     }
                 }
 
@@ -64,7 +80,7 @@ const main = async () =>
                         ast.body = ast.body.map(stmt => optimize_statement(stmt));
                     }
 
-                    const env = create_global_env(fleur_args, current_dir);
+                    const env = create_global_env(fleur_args, current_dir, aliases);
                     env.source = bytes;
                     env.file = absolute_path;
                     interpret(ast, env);
@@ -117,7 +133,10 @@ const main = async () =>
                         name:         node_path.basename(process.cwd()),
                         description: "an awesome fleur project.",
                         version:      "1.0.0",
-                        dependencies: {}
+                        dependencies: {},
+                        aliases: {
+                            "@" : "./src"
+                        }
                     };
 
                     await Bun.write(config_path, JSON.stringify(default_config, null, 2));

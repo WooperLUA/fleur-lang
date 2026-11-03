@@ -1,7 +1,12 @@
 {
   "name": "fleur-lang",
   "module": "index.ts",
-  "type": "module",
+  "devDependencies": {
+    "@types/bun": "^1.4.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
   "private": true,
   "scripts": {
     "fleur": "bun run index.ts",
@@ -14,13 +19,5 @@
     "build-darwin-x64": "bun build --compile --minify --sourcemap --bytecode --target=bun-darwin-x64 --outfile=out/fleur index.ts",
     "build-darwin-arm64": "bun build --compile --minify --sourcemap --bytecode --target=bun-darwin-arm64 --outfile=out/fleur index.ts"
   },
-  "devDependencies": {
-    "@types/bun": "^1.4.0"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "dependencies": {
-    "sync-request": "^6.1.0"
-  }
+  "type": "module"
 }

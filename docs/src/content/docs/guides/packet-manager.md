@@ -1,13 +1,15 @@
 ---
 title: Package Management
-description: Learn how to manage dependencies and share libraries using Fleur's built-in package manager.
+description: Learn how to manage dependencies, share libraries, and configure path aliases using Fleur's built-in package manager.
 ---
 
-Fleur includes a lightweight, zero-configuration package manager to help you share code and manage external libraries. It relies directly on GitHub repositories, meaning you don't need to register with a central registry or deal with complex version resolution.
+Fleur includes a lightweight, zero-configuration package manager designed to help you share code and manage external libraries effortlessly. It relies directly on Git repositories, meaning you don't need to register with a central registry or deal with complex version resolution algorithms.
 
-## Getting Started
+---
 
-To start using packages in your project, you first need to initialize a configuration file. Run the following command in your project's root directory:
+## 1. Project Initialization
+
+To start using packages in your project, initialize a configuration file in your project's root directory:
 
 ```bash
 fleur pkg init
@@ -18,19 +20,25 @@ This generates a `fleur.json` file with a default configuration:
 ```json
 {
   "name": "my-fleur-project",
+  "description": "an awesome fleur project.",
   "version": "1.0.0",
-  "dependencies": {}
+  "dependencies": {},
+  "aliases": {
+    "@" : "./src"
+  }
 }
 ```
 
-## Adding Packages Quickly
+---
 
-While you can manually edit your `fleur.json` and run `fleur pkg install`, Fleur provides a convenient `add` command that automates the entire process in a single step.
+## 2. Adding Dependencies
+
+While you can manually edit `fleur.json`, Fleur provides a convenient `add` command that automates the entire process in a single step.
 
 To add a new dependency, run the `add` command followed by the Git repository URL:
 
 ```bash
-fleur pkg add https://github.com/..../my-package.git
+fleur pkg add https://github.com/username/my-package.git
 ```
 
 This single command will automatically:
@@ -41,13 +49,11 @@ This single command will automatically:
 
 ### Fallback Behavior
 
-:::note
+:::note[Missing Configuration]
 What happens if the repository doesn't have a `fleur.json` file?
 :::
 
-If you try to add a standard GitHub repository that hasn't been configured for Fleur (i.e., it lacks a `fleur.json`), the package manager will gracefully fall back to using the **repository's URL name**.
-
-It will print a warning to let you know, but the installation will still succeed.
+If you add a standard GitHub repository that hasn't been configured for Fleur, the package manager will gracefully fall back to using the **repository's URL name**. It will print a warning, but the installation will still succeed.
 
 ```bash
 $ fleur pkg add https://github.com/someone/random-scripts.git
@@ -56,9 +62,11 @@ Warning: Repository does not have a fleur.json. Falling back to URL name 'random
 Successfully added 'random-scripts' to fleur.json
 ```
 
-## Installing Packages
+---
 
-Once your `fleur.json` is configured, run the install command:
+## 3. Installing Dependencies
+
+Once your `fleur.json` is configured (or if you've just cloned a project), run the install command:
 
 ```bash
 fleur pkg install
@@ -70,27 +78,66 @@ This command will:
 3. Clone each dependency into its own folder inside `.fleur_deps/`.
 4. Skip downloading if a dependency is already installed.
 
-## Using Installed Packages
+---
 
-Because the package manager downloads libraries into the `.fleur_deps/` directory, you import them using standard relative paths pointing to the library's entry file.
+## 4. Importing Packages & Path Aliases
 
-```fleur
+### Standard Imports
+By default, you import packages using standard relative paths pointing to the library's entry file:
+
+```flr
 // Import specific components from the cloned repository
-import [A, B] in ".fleur_deps/..../example.flr";
+import [Button, Card] in ".fleur_deps/fleur-ui/src/components.flr";
 ```
 
-## Managing the project's version
+### Path Aliases (Recommended)
+To avoid deep, messy relative paths, you can define **path aliases** in your `fleur.json`. This creates clean, shortcut imports for both your local source code and installed dependencies.
 
-Running the `version` command followed by the type `major | minor | patch` allows you to quickly update the `version` property of `fleur.json`.
+```json
+{
+  "name": "my-project",
+  "version": "1.0.0",
+  "dependencies": {
+    "fleur-ui": "https://github.com/username/fleur-ui.git"
+  },
+  "aliases": {
+    "@utils": "./src/utils",
+    "@ui": ".fleur_deps/fleur-ui/src"
+  }
+}
+```
+
+Once configured, you can use these aliases directly in your code:
+
+```flr
+// Clean, readable imports using aliases
+import [Logger] in "@utils/logger.flr";
+import [Button] in "@ui/components.flr";
+```
+
+:::tip[How Aliases Work]
+- Aliases are resolved from the project root (where `fleur.json` is located).
+- If multiple aliases match, the longest (most specific) match is used.
+- Aliases propagate to imported modules, making them highly effective for large projects.
+  :::
+
+---
+
+## 5. Version Management
+
+Running the `version` command followed by `major`, `minor`, or `patch` allows you to quickly bump the `version` property of your `fleur.json` according to [Semantic Versioning](https://semver.org/).
 
 ```bash
-fleur pkg version major
+fleur pkg version patch   # 1.0.0 -> 1.0.1
+fleur pkg version minor   # 1.0.1 -> 1.1.0
+fleur pkg version major   # 1.1.0 -> 2.0.0
 ```
 
+---
 
-## Best Practices
+## 6. Best Practices
 
-### 1. Ignore Dependencies in Git
+### Ignore Dependencies in Git
 You should **never** commit the `.fleur_deps/` folder to your version control. It can be easily regenerated by anyone who clones your project.
 
 Add this line to your `.gitignore` file:
@@ -98,8 +145,8 @@ Add this line to your `.gitignore` file:
 .fleur_deps/
 ```
 
-### 2. Pinning to Specific Commits or Branches
-If you want to ensure your project doesn't break when a library updates, you can point to a specific branch, tag, or commit hash in your `fleur.json`:
+### Pinning to Specific Commits or Branches
+To ensure your project doesn't break when a library updates, you can point to a specific branch, tag, or commit hash in your `fleur.json`:
 
 ```json
 {
@@ -109,14 +156,15 @@ If you want to ensure your project doesn't break when a library updates, you can
 }
 ```
 
-### 3. Creating Your Own Library
-If you want to make your code installable by others, simply create a `fleur.json` at the root of your GitHub repository :
+### Creating Your Own Library
+If you want to make your code installable by others, simply create a `fleur.json` at the root of your GitHub repository:
 
 ```json
 {
   "name": "my-awesome-lib",
   "version": "1.0.0",
+  "description": "A useful library for Fleur.",
   "dependencies": {}
 }
 ```
-Users can then add your repository URL to their `fleur.json` and install it with a single command.
+Users can then add your repository URL to their project and install it with a single command.

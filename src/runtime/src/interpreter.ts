@@ -56,12 +56,13 @@ export class Environment
     private readonly types: Record<string, string[]>;
     private constants: Set<string>;
     private methods: Map<string, Map<string, FunctionValue>>;
+    public readonly aliases: Record<string, string>;
     public source?: string;
     public file?: string;
 
     public readonly base_dir: string;
 
-    constructor(parent?: Environment, base_dir?: string)
+    constructor(parent?: Environment, base_dir?: string, aliases?: Record<string, string>)
     {
         this.parent = parent;
         // Weird quirk, but I use this instead of {} because then it would have a
@@ -70,6 +71,7 @@ export class Environment
         this.types = Object.create(null);
         this.constants = new Set();
         this.methods = new Map();
+        this.aliases = aliases ?? parent?.aliases ?? {};
         this.base_dir = base_dir ?? parent?.base_dir ?? process.cwd();
         this.source = parent?.source;
         this.file = parent?.file;
@@ -566,7 +568,29 @@ const moduleCache = new Map<string, Record<string, RuntimeValue>>();
 
 const execute_import_statement = (stmt: ImportStatement, env: Environment): RuntimeValue =>
 {
-    const target_path = node_path.resolve(env.base_dir, stmt.source);
+    let source = stmt.source;
+
+    let matched_alias = "";
+    let matched_target = "";
+
+    for (const [alias, target] of Object.entries(env.aliases))
+    {
+        if (source === alias || source.startsWith(alias + "/"))
+        {
+            if (alias.length > matched_alias.length)
+            {
+                matched_alias = alias;
+                matched_target = target;
+            }
+        }
+    }
+
+    if (matched_alias)
+    {
+        source = source.replace(matched_alias, matched_target);
+    }
+
+    const target_path = node_path.resolve(env.base_dir, source);
     const target_dir = node_path.dirname(target_path);
 
     if (moduleCache.has(target_path))
@@ -580,7 +604,10 @@ const execute_import_statement = (stmt: ImportStatement, env: Environment): Runt
 
     if (!node_fs.existsSync(target_path))
     {
-        throw_exception({type: "Runtime", message: `Module not found: ${stmt.source} (Looked in ${env.base_dir})`});
+        throw_exception({
+            type: "Runtime",
+            message: `Module not found: ${stmt.source} (resolved to ${target_path})`
+        });
     }
 
     const code = node_fs.readFileSync(target_path, "utf-8");
@@ -621,9 +648,9 @@ const bind_exports = (exports: Record<string, RuntimeValue>, specifiers: string[
     }
 };
 
-export const create_global_env = (args: string[] = [], base_dir: string = process.cwd()): Environment =>
+export const create_global_env = (args: string[] = [], base_dir: string = process.cwd(),  aliases: Record<string, string> = {}): Environment =>
 {
-    const env = new Environment(undefined, base_dir);
+    const env = new Environment(undefined, base_dir, aliases);
     setup_stdlib(env, args);
     setup_data_structures(env, args);
     setup_other_structs(env, args);

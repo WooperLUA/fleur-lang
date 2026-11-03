@@ -1,0 +1,9 @@
+{
+  "name": "path-aliases",
+  "description": "an awesome fleur project.",
+  "version": "1.0.0",
+  "dependencies": {},
+  "aliases": {
+    "@": "./src"
+  }
+}
