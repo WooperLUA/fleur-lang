@@ -305,12 +305,12 @@ export const tui: StructValue = {
                 call: (args: RuntimeValue[]) =>
                       {
                           check_args_length(args, [3, 4], "tui::text");
-                          check_arg_type(args[0]!, RuntimeValueType.Number, "tui::progress")
-                          check_arg_type(args[1]!, RuntimeValueType.Number, "tui::progress")
-                          check_arg_type(args[2]!, RuntimeValueType.String, "tui::progress")
+                          check_arg_type(args[0]!, RuntimeValueType.Number, "tui::text")
+                          check_arg_type(args[1]!, RuntimeValueType.Number, "tui::text")
+                          check_arg_type(args[2]!, RuntimeValueType.String, "tui::text")
                           if (args[3])
                           {
-                              check_arg_type(args[3]!, RuntimeValueType.String, "tui::progress")
+                              check_arg_type(args[3]!, RuntimeValueType.String, "tui::text")
                           }
                           const x = (args[0] as NumberValue).value;
                           const y = (args[1] as NumberValue).value;

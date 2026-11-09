@@ -1,3 +1,0 @@
-import [VERY_IMPORTANT_CONST] in "@/main.flr";
-
-io::print(VERY_IMPORTANT_CONST);

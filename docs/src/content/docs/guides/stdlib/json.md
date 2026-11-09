@@ -27,7 +27,7 @@ const alice = User {
     skills: ["Fleur", "TypeScript"] 
 };
 
-const json_string = json::stringify(alice);
+const json_string = json::string(alice);
 io::print(json_string);
 
 const parsed_data = json::parse(json_string);

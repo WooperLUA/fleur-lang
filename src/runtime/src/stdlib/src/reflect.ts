@@ -1,5 +1,6 @@
 import {
-    type BooleanValue,
+    type ArrayValue,
+    type BooleanValue, type MapValue,
     type NativeFunctionValue,
     type NullValue,
     type RuntimeValue,
@@ -7,95 +8,132 @@ import {
     type StringValue,
     type StructValue,
 } from "@types";
-import {check_arg_type, check_args_length, check_mutability, deep_copy,} from "@utils";
+import {check_arg_type, check_args_length, check_mutability, deep_copy, throw_exception,} from "@utils";
 
 export const reflect: StructValue = {
     type:       RuntimeValueType.Struct,
     identifier: "Struct",
-    properties: new Map<string, RuntimeValue>(),
+    properties: new Map<string, RuntimeValue>([
+        [
+            "properties",
+            {
+                type:       RuntimeValueType.Struct,
+                identifier: "reflect_properties",
+                properties: new Map<string, RuntimeValue>([]),
+                methods:    new Map<string, any>([
+                    [
+                        "has",
+                        {
+                            type: RuntimeValueType.NativeFunction,
+                            call: (args: RuntimeValue[]) =>
+                                  {
+                                      check_args_length(args, 2, "reflect.properties::has");
+                                      check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect.properties::has");
+                                      check_arg_type(args[1]!, RuntimeValueType.String, "reflect.properties::has");
+
+                                      const instance = args[0] as StructValue;
+                                      const key = (args[1] as StringValue).value;
+
+                                      return {
+                                          type:  RuntimeValueType.Boolean,
+                                          value: instance.properties.has(key),
+                                      } as BooleanValue;
+                                  },
+                        } as NativeFunctionValue,
+                    ],
+                    [
+                        "get",
+                        {
+                            type: RuntimeValueType.NativeFunction,
+                            call: (args: RuntimeValue[]) =>
+                                  {
+                                      check_args_length(args, 2, "reflect.properties::get");
+                                      check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect.properties::get");
+                                      check_arg_type(args[1]!, RuntimeValueType.String, "reflect.properties::get");
+
+                                      const instance = args[0] as StructValue;
+                                      const key = (args[1] as StringValue).value;
+
+                                      return instance.properties.get(key) ?? {
+                                          type:  RuntimeValueType.Null,
+                                          value: null
+                                      } as NullValue;
+                                  },
+                        } as NativeFunctionValue,
+                    ],
+                    [
+                        "set",
+                        {
+                            type: RuntimeValueType.NativeFunction,
+                            call: (args: RuntimeValue[]) =>
+                                  {
+                                      check_args_length(args, 3, "reflect.properties::set");
+                                      check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect.properties::set");
+                                      check_arg_type(args[1]!, RuntimeValueType.String, "reflect.properties::set");
+                                      check_mutability(args[0]!, "reflect.properties::set");
+
+                                      const instance = args[0] as StructValue;
+                                      const key = (args[1] as StringValue).value;
+                                      const value = args[2]!;
+
+                                      instance.properties.set(key, value);
+
+                                      return {type: RuntimeValueType.Null, value: null} as NullValue;
+                                  },
+                        } as NativeFunctionValue,
+                    ],
+                    [
+                        "remove",
+                        {
+                            type: RuntimeValueType.NativeFunction,
+                            call: (args: RuntimeValue[]) =>
+                                  {
+                                      check_args_length(args, 2, "reflect.properties::remove");
+                                      check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect.properties::remove");
+                                      check_arg_type(args[1]!, RuntimeValueType.String, "reflect.properties::remove");
+                                      check_mutability(args[0]!, "reflect.properties::remove");
+
+                                      const instance = args[0] as StructValue;
+                                      const key = (args[1] as StringValue).value;
+
+                                      return {
+                                          type:  RuntimeValueType.Boolean,
+                                          value: instance.properties.delete(key),
+                                      } as BooleanValue;
+                                  },
+                        } as NativeFunctionValue,
+                    ],
+                    [
+                        "pairs",
+                        {
+                            type: RuntimeValueType.NativeFunction,
+                            call: (args: RuntimeValue[]) =>
+                                  {
+                                      check_args_length(args, 1, "reflect.properties::pairs");
+                                      check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect.properties::pairs");
+
+                                      const instance = args[0] as StructValue;
+                                      const elements: { key: RuntimeValue; value: RuntimeValue }[] = [];
+
+                                      for (const [k, v] of instance.properties.entries())
+                                      {
+                                          const key = deep_copy({type: RuntimeValueType.String, value: k});
+                                          const value = v;
+
+                                          elements.push({key, value});
+                                      }
+
+                                      return {
+                                          type:     RuntimeValueType.Map,
+                                          elements: elements,
+                                      } as MapValue;
+                                  },
+                        } as NativeFunctionValue,
+                    ],
+                ])
+            }
+        ]]),
     methods:    new Map<string, any>([
-        [
-            "has",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          check_args_length(args, 2, "reflect::has");
-                          check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect::has");
-                          check_arg_type(args[1]!, RuntimeValueType.String, "reflect::has");
-
-                          const instance = args[0] as StructValue;
-                          const key = (args[1] as StringValue).value;
-
-                          return {
-                              type:  RuntimeValueType.Boolean,
-                              value: instance.properties.has(key),
-                          } as BooleanValue;
-                      },
-            } as NativeFunctionValue,
-        ],
-        [
-            "get",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          check_args_length(args, 2, "reflect::get");
-                          check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect::get");
-                          check_arg_type(args[1]!, RuntimeValueType.String, "reflect::get");
-
-                          const instance = args[0] as StructValue;
-                          const key = (args[1] as StringValue).value;
-
-                          return instance.properties.get(key) ?? {
-                              type:  RuntimeValueType.Null,
-                              value: null
-                          } as NullValue;
-                      },
-            } as NativeFunctionValue,
-        ],
-        [
-            "set",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          check_args_length(args, 3, "reflect::set");
-                          check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect::set");
-                          check_arg_type(args[1]!, RuntimeValueType.String, "reflect::set");
-                          check_mutability(args[0]!, "reflect::set");
-
-                          const instance = args[0] as StructValue;
-                          const key = (args[1] as StringValue).value;
-                          const value = args[2]!;
-
-                          instance.properties.set(key, value);
-
-                          return {type: RuntimeValueType.Null, value : null} as NullValue;
-                      },
-            } as NativeFunctionValue,
-        ],
-        [
-            "remove",
-            {
-                type: RuntimeValueType.NativeFunction,
-                call: (args: RuntimeValue[]) =>
-                      {
-                          check_args_length(args, 2, "reflect::remove");
-                          check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect::remove");
-                          check_arg_type(args[1]!, RuntimeValueType.String, "reflect::remove");
-                          check_mutability(args[0]!, "reflect::remove");
-
-                          const instance = args[0] as StructValue;
-                          const key = (args[1] as StringValue).value;
-
-                          return {
-                              type:  RuntimeValueType.Boolean,
-                              value: instance.properties.delete(key),
-                          } as BooleanValue;
-                      },
-            } as NativeFunctionValue,
-        ],
         [
             "identifier",
             {
@@ -111,6 +149,34 @@ export const reflect: StructValue = {
                               type:  RuntimeValueType.String,
                               value: instance.identifier,
                           } as StringValue;
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "fields",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "reflect::fields");
+                          check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect::fields");
+
+                          const struct_decl = args[0] as StructValue;
+                          if (!struct_decl.is_declaration)
+                          {
+                              throw_exception({
+                                  type:    "Runtime",
+                                  message: "reflect::fields expects a struct declaration, not an instance."
+                              });
+                          }
+
+                          return {
+                              type:     RuntimeValueType.Array,
+                              elements: struct_decl.fields?.map(f => ({
+                                  type:  RuntimeValueType.String,
+                                  value: f.name
+                              } as StringValue)),
+                          } as ArrayValue;
                       },
             } as NativeFunctionValue,
         ],
@@ -137,8 +203,8 @@ export const reflect: StructValue = {
                       {
                           check_args_length(args, 1, "reflect::clone");
                           check_arg_type(args[0]!, [RuntimeValueType.Struct, RuntimeValueType.Array,
-                                                    RuntimeValueType.Set, RuntimeValueType.Map,
-                                                    RuntimeValueType.Range, RuntimeValueType.Error], "reflect::clone");
+                              RuntimeValueType.Set, RuntimeValueType.Map,
+                              RuntimeValueType.Range, RuntimeValueType.Error], "reflect::clone");
 
                           return deep_copy(args[0]!);
                       }

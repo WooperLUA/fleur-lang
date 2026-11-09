@@ -388,6 +388,7 @@ const execute_struct_declaration = (stmt: StructDeclaration, env: Environment): 
         identifier: stmt.identifier,
         properties: new Map<string, RuntimeValue>(),
         methods:    new Map<string, FunctionValue>(),
+        fields: stmt.fields,
         is_declaration: true
     };
 

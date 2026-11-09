@@ -1,4 +1,4 @@
-import type {BlockStatement, Parameter, TypeAnnotation} from "./ast";
+import type {BlockStatement, Parameter, StructField, TypeAnnotation} from "./ast";
 
 export enum RuntimeValueType
 {
@@ -76,6 +76,7 @@ export type StructValue = {
     identifier: string;
     properties: Map<string, RuntimeValue>;
     methods: Map<string, FunctionValue>;
+    fields?: StructField[];
     is_declaration?: boolean;
     is_immutable?: boolean;
 };
