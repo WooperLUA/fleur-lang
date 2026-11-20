@@ -23,7 +23,7 @@ export default defineConfig({
                 },
             },
             plugins:        [starlightThemeBlack({})],
-            social:         [{icon: 'github', label: 'GitHub', href: 'https://github.com/fleur-lang/fleur'}],
+            social:         [{icon: 'github', label: 'GitHub', href: 'https://github.com/WooperLUA/fleur-lang'}],
             sidebar:        [
                 {
                     label: 'Guides',
