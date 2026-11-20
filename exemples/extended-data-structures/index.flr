@@ -1,9 +1,14 @@
 import [FixedArray] in "./src/fixed-array.flr";
-import [LinkedList] in "./src/linked-list.flr";
 import [LazyList] in "./src/lazy-list.flr";
+import [LinkedList] in "./src/linked-list.flr";
+import [Triplet] in "./src/triplet.flr";
+import [Tuple] in "./src/tuple.flr";
 
 pub const EDS = {
     "FixedArray" : FixedArray,
+    "LazyList" : LazyList,
     "LinkedList" : LinkedList,
-    "LazyList" : LazyList
+    "Triplet" : Triplet,
+    "Tuple" : Tuple
 };
+

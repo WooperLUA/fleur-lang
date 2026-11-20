@@ -1,0 +1,30 @@
+pub struct Triplet
+{
+    fst,
+    snd,
+    trd
+}
+Triplet::new(fst, snd, trd)
+{
+    return Triplet {fst : fst, snd : snd, trd : trd };
+}
+Triplet::fst()
+{
+    return this.fst;
+}
+Triplet::snd()
+{
+    return this.snd;
+}
+Triplet::trd()
+{
+    return this.trd;
+}
+Triplet::reversed()
+{
+    return Triplet::new(this.trd, this.snd, this.fst);
+}
+Triplet::string()
+{
+    return str::concat("(", this.fst, ", ", this.snd, ", ", this.trd, ")");
+}

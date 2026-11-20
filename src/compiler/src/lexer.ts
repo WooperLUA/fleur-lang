@@ -31,15 +31,15 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.K_CONTINUE]: /^continue\b/,
 
     // Logical Operators
-    [TokenKind.AND]: /^and\b/,
-    [TokenKind.OR]:  /^or\b/,
+    [TokenKind.AND]:  /^and\b/,
+    [TokenKind.OR]:   /^or\b/,
     [TokenKind.XOR]:  /^xor\b/,
-    [TokenKind.BAND]:  /^band\b/,
+    [TokenKind.BAND]: /^band\b/,
     [TokenKind.BOR]:  /^bor\b/,
-    [TokenKind.BXOR]:  /^bxor\b/,
-    [TokenKind.BSHL]:  /^bshl\b/,
-    [TokenKind.BSHR]:  /^bshr\b/,
-    [TokenKind.NOT]: /^not\b/,
+    [TokenKind.BXOR]: /^bxor\b/,
+    [TokenKind.BSHL]: /^bshl\b/,
+    [TokenKind.BSHR]: /^bshr\b/,
+    [TokenKind.NOT]:  /^not\b/,
 
     // Identifiers and Literals
     [TokenKind.IDENTIFIER]: /^[a-zA-Z_][a-zA-Z0-9_]*/,
@@ -47,14 +47,14 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.STRING]:     /^"([^"\\]|\\.)*"/,
 
     // Multi-character Operators & Symbols
-    [TokenKind.EQUAL]:         /^==/,
-    [TokenKind.NOT_EQUAL]:     /^!=/,
-    [TokenKind.FAT_ARROW]:     /^=>/,
-    [TokenKind.LESS_EQUAL]:    /^<=/,
-    [TokenKind.GREATER_EQUAL]: /^>=/,
-    [TokenKind.DOT_DOT]:       /^\.\./,
-    [TokenKind.DOUBLE_COLON]:  /^::/,
-    [TokenKind.QUESTION_QUESTION] : /^\?\?/,
+    [TokenKind.EQUAL]:             /^==/,
+    [TokenKind.NOT_EQUAL]:         /^!=/,
+    [TokenKind.FAT_ARROW]:         /^=>/,
+    [TokenKind.LESS_EQUAL]:        /^<=/,
+    [TokenKind.GREATER_EQUAL]:     /^>=/,
+    [TokenKind.DOT_DOT]:           /^\.\./,
+    [TokenKind.DOUBLE_COLON]:      /^::/,
+    [TokenKind.QUESTION_QUESTION]: /^\?\?/,
 
     [TokenKind.PLUS_ASSIGN]:    /^\+=/,
     [TokenKind.MINUS_ASSIGN]:   /^-=/,
@@ -65,16 +65,16 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.CARET]: /^\^/,
 
     // Single-character Operators
-    [TokenKind.ASSIGN]:  /^=/,
-    [TokenKind.LESS]:    /^</,
-    [TokenKind.GREATER]: /^>/,
-    [TokenKind.PLUS]:    /^\+/,
-    [TokenKind.MINUS]:   /^-/,
-    [TokenKind.STAR]:    /^\*/,
-    [TokenKind.SLASH]:   /^\//,
-    [TokenKind.PERCENT]: /^%/,
-    [TokenKind.DOT]:     /^\./,
-    [TokenKind.QUESTION]:        /^\?/,
+    [TokenKind.ASSIGN]:   /^=/,
+    [TokenKind.LESS]:     /^</,
+    [TokenKind.GREATER]:  /^>/,
+    [TokenKind.PLUS]:     /^\+/,
+    [TokenKind.MINUS]:    /^-/,
+    [TokenKind.STAR]:     /^\*/,
+    [TokenKind.SLASH]:    /^\//,
+    [TokenKind.PERCENT]:  /^%/,
+    [TokenKind.DOT]:      /^\./,
+    [TokenKind.QUESTION]: /^\?/,
 
     // Delimiters, Groupings, and Punctuation
     [TokenKind.LBRACE]:   /^\{/,

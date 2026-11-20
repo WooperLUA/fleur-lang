@@ -1,0 +1,25 @@
+pub struct Tuple
+{
+    fst,
+    snd
+}
+Tuple::new(fst, snd)
+{
+    return Tuple {fst : fst, snd : snd };
+}
+Tuple::fst()
+{
+    return this.fst;
+}
+Tuple::snd()
+{
+    return this.snd;
+}
+Tuple::reversed()
+{
+    return Tuple::new(this.snd, this.fst);
+}
+Tuple::string()
+{
+    return str::concat("(", this.fst, ", ", this.snd, ")");
+}
