@@ -38,7 +38,8 @@ import {
     type StringValue,
     type BooleanValue,
     type NativeFunctionValue, type RangeExpression, type SetValue, type RangeValue, type TryStatement, type MapValue,
-    type ImportStatement, type StructField, type ErrorValue, type NullValue, type MapLiteral,
+    type ImportStatement, type StructField, type ErrorValue, type NullValue, type MapLiteral, type ConditionalExpression,
+    type WhenExpression,
 } from "@types";
 import {throw_exception, stringify_value, is_equal, FleurError, deep_copy} from "@utils";
 import {setup_stdlib} from "./stdlib";
@@ -725,6 +726,13 @@ const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
                 return evaluate_index_expression(expr as IndexExpression, env);
             case NodeType.AssignmentExpression:
                 return evaluate_assignment_expression(expr as AssignmentExpression, env);
+            case NodeType.ConditionalExpression:
+                const conditional_expr = expr as ConditionalExpression;
+                return is_truthy(evaluate(conditional_expr.condition, env))
+                    ? evaluate(conditional_expr.consequent, env)
+                    : evaluate(conditional_expr.alternate, env);
+            case NodeType.WhenExpression:
+                return evaluate_when_expression(expr as WhenExpression, env);
             case NodeType.RangeExpression:
                 return {
                     type:  RuntimeValueType.Range,
@@ -751,6 +759,27 @@ const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
         }
         throw e;
     }
+};
+
+const evaluate_when_expression = (expr: WhenExpression, env: Environment): RuntimeValue =>
+{
+    const val = evaluate(expr.expression, env);
+
+    for (const case_ of expr.cases)
+    {
+        if (case_.value === "else")
+        {
+            return evaluate(case_.body, env);
+        }
+
+        const case_val = evaluate(case_.value, env);
+        if (is_equal(val, case_val))
+        {
+            return evaluate(case_.body, env);
+        }
+    }
+
+    return {type: RuntimeValueType.Null, value: null};
 };
 
 const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): RuntimeValue =>

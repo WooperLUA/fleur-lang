@@ -1,5 +1,7 @@
 import {
     type BinaryExpression, type BlockStatement,
+    type ConditionalExpression,
+    type WhenExpression,
     type Expression, type ExpressionStatement, type ForStatement, type FunctionDeclaration, type IfStatement,
     type MethodDeclaration,
     NodeType,
@@ -14,6 +16,37 @@ const NO_OP_STATEMENT: ExpressionStatement = {
 
 const optimize_expression = (expr: Expression): Expression =>
 {
+    if (expr.type === NodeType.ConditionalExpression)
+    {
+        const cond_expr = expr as ConditionalExpression;
+        const condition = optimize_expression(cond_expr.condition);
+
+        if (condition.type === NodeType.BooleanLiteral)
+        {
+            return optimize_expression((condition as any).value ? cond_expr.consequent : cond_expr.alternate);
+        }
+
+        return {
+            ...cond_expr,
+            condition,
+            consequent: optimize_expression(cond_expr.consequent),
+            alternate:  optimize_expression(cond_expr.alternate)
+        } as ConditionalExpression;
+    }
+
+    if (expr.type === NodeType.WhenExpression)
+    {
+        const when_expr = expr as WhenExpression;
+        return {
+            ...when_expr,
+            expression: optimize_expression(when_expr.expression),
+            cases:      when_expr.cases.map(c => ({
+                value: c.value === "else" ? "else" : optimize_expression(c.value),
+                body:  optimize_expression(c.body)
+            }))
+        } as WhenExpression;
+    }
+
     if (expr.type === NodeType.BinaryExpression)
     {
         const bin_expr = expr as BinaryExpression;

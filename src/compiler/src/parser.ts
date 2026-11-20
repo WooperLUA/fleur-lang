@@ -28,8 +28,11 @@ import {
     type MemberExpression,
     type IndexExpression,
     type AssignmentExpression,
+    type ConditionalExpression,
     type RangeExpression,
     type WhenCase,
+    type WhenExpression,
+    type WhenExpressionCase,
     type StructProperty,
     type Node,
     type MethodDeclaration,
@@ -47,6 +50,7 @@ export class Parser
 {
     private readonly tokens: Token<any>[];
     private pos: number = 0;
+    private limit: number = Number.POSITIVE_INFINITY;
 
     private static global_lambda_counter = 0;
 
@@ -60,6 +64,17 @@ export class Parser
 
     private peek(): Token<any>
     {
+        if (this.pos >= this.limit)
+        {
+            const boundary = this.tokens[Math.min(this.limit, this.tokens.length - 1)];
+            return {
+                kind:   TokenKind.EOF,
+                value:  null,
+                line:   boundary?.line ?? 0,
+                column: boundary?.column ?? 0,
+                offset: boundary?.offset ?? 0
+            };
+        }
         return this.tokens[this.pos]!;
     }
 
@@ -532,6 +547,44 @@ export class Parser
 
         return {
             type: NodeType.WhenStatement,
+            ...this.loc(startToken),
+            expression,
+            cases
+        };
+    }
+
+    private parse_when_expression(): WhenExpression
+    {
+        const startToken = this.expect(TokenKind.K_WHEN, "Expected 'when'");
+        const expression = this.parse_expression(false);
+        this.expect(TokenKind.LBRACE, "Expected '{' after when expression");
+
+        const cases: WhenExpressionCase[] = [];
+
+        while (this.peek().kind !== TokenKind.RBRACE && this.peek().kind !== TokenKind.EOF)
+        {
+            let value: Expression | "else";
+            if (this.match(TokenKind.K_ELSE))
+            {
+                value = "else";
+            }
+            else
+            {
+                value = this.parse_expression();
+            }
+
+            this.expect(TokenKind.FAT_ARROW, "Expected '=>' in when case");
+
+            const body = this.parse_expression();
+            this.expect(TokenKind.SEMICOLON, "Expected ';' after when case");
+
+            cases.push({value, body});
+        }
+
+        this.expect(TokenKind.RBRACE, "Expected '}' after when cases");
+
+        return {
+            type: NodeType.WhenExpression,
             ...this.loc(startToken),
             expression,
             cases
@@ -1203,6 +1256,12 @@ export class Parser
 
         switch (token.kind)
         {
+            case TokenKind.K_IF:
+                return this.parse_conditional_expression();
+
+            case TokenKind.K_WHEN:
+                return this.parse_when_expression();
+
             case TokenKind.NUMBER:
                 this.eat();
                 return {
@@ -1317,6 +1376,143 @@ export class Parser
                     line:    token.line,
                     column:  token.column
                 });
+        }
+    }
+
+    private parse_conditional_expression(): ConditionalExpression
+    {
+        const startToken = this.expect(TokenKind.K_IF, "Expected 'if'");
+        const expression_start = this.pos;
+
+        let depth = 0;
+        let nested_ifs = 0;
+        let else_pos = -1;
+
+        for (let i = this.pos; i < Math.min(this.tokens.length, this.limit); i++)
+        {
+            const kind = this.tokens[i]!.kind;
+
+            if (kind === TokenKind.LPAREN || kind === TokenKind.LBRACKET || kind === TokenKind.LBRACE)
+            {
+                depth++;
+            }
+            else if (kind === TokenKind.RPAREN || kind === TokenKind.RBRACKET || kind === TokenKind.RBRACE)
+            {
+                if (depth === 0) break;
+                depth--;
+            }
+            else if (depth === 0)
+            {
+                if (kind === TokenKind.K_IF)
+                {
+                    nested_ifs++;
+                }
+                else if (kind === TokenKind.K_ELSE)
+                {
+                    if (nested_ifs === 0)
+                    {
+                        else_pos = i;
+                        break;
+                    }
+                    nested_ifs--;
+                }
+                else if (kind === TokenKind.SEMICOLON || kind === TokenKind.COMMA || kind === TokenKind.EOF)
+                {
+                    break;
+                }
+            }
+        }
+
+        if (else_pos === -1)
+        {
+            return throw_exception({
+                type:    "Parser",
+                message: "Expected 'else' in conditional expression",
+                line:    startToken.line,
+                column:  startToken.column
+            });
+        }
+
+        let split = -1;
+        for (let k = expression_start + 1; k < else_pos; k++)
+        {
+            if (this.parses_fully(this.tokens.slice(expression_start, k), false) &&
+                this.parses_fully(this.tokens.slice(k, else_pos), true))
+            {
+                split = k;
+                break;
+            }
+        }
+
+        if (split === -1)
+        {
+            return throw_exception({
+                type:    "Parser",
+                message: "Invalid conditional expression: could not separate condition and consequent",
+                line:    startToken.line,
+                column:  startToken.column
+            });
+        }
+
+        const previous_limit = this.limit;
+
+        this.limit = split;
+        const condition = this.parse_expression(false);
+        this.limit = previous_limit;
+        if (this.pos !== split)
+        {
+            return throw_exception({
+                type:    "Parser",
+                message: "Invalid conditional expression: could not parse condition",
+                line:    startToken.line,
+                column:  startToken.column
+            });
+        }
+
+        this.limit = else_pos;
+        const consequent = this.parse_expression();
+        this.limit = previous_limit;
+        if (this.pos !== else_pos)
+        {
+            return throw_exception({
+                type:    "Parser",
+                message: "Invalid conditional expression: could not parse consequent",
+                line:    startToken.line,
+                column:  startToken.column
+            });
+        }
+
+        this.expect(TokenKind.K_ELSE, "Expected 'else' in conditional expression");
+        const alternate = this.parse_expression();
+
+        return {
+            type: NodeType.ConditionalExpression,
+            ...this.loc(startToken),
+            condition,
+            consequent,
+            alternate
+        } as ConditionalExpression;
+    }
+
+    private parses_fully(tokens: Token<any>[], allow_struct: boolean): boolean
+    {
+        if (tokens.length === 0) return false;
+
+        const sub_parser = new Parser([...tokens, {
+            kind:   TokenKind.EOF,
+            value:  null,
+            line:   0,
+            column: 0,
+            offset: 0
+        }]);
+        try
+        {
+            sub_parser.parse_expression(allow_struct);
+            return sub_parser.pos === tokens.length;
+        }
+        catch
+        {
+            return false;
         }
     }
 

@@ -34,6 +34,37 @@ else
     io::print("Minor");
 ```
 
+### Conditional Expressions
+
+An `if`/`else` can also be used as an expression, which makes it behave like a ternary. The `else` branch is required, and both branches are expressions.
+
+```flr
+const age = 20;
+const label = if age >= 18 "Adult" else "Minor";
+io::print(label);
+```
+
+This is especially useful in assignments and return statements.
+
+```flr
+func sign(value) {
+    return if value < 0 "negative" else "positive";
+}
+```
+
+While ternaries can be nested they are not recommended if they make the code hard to read / understand / refactor.
+
+```flr
+// That's a bad practice, use when expressions or a Map.
+func grade_from_score(score) {
+    return if score > 18 "A" 
+           else if score > 14 "B"
+           else if score > 10 "C"
+           else if score > 6 "D"
+           else "E";
+}
+```
+
 ### When Statement (Pattern Matching)
 
 The `when` statement is a powerful alternative to `switch` or multiple `if-else` blocks. It evaluates an expression and matches it against several cases.
@@ -54,6 +85,28 @@ when status {
     }
 }
 ```
+
+### When Expression
+
+`when` can also be used as an expression, so each case produces a value. This is useful in assignments and return statements.
+
+```flr
+func describe(status) {
+    return when status {
+        0 => "Idle";
+        1 => "Running";
+        else => "Unknown";
+    };
+}
+
+const label = when status {
+    0 => "Idle";
+    1 => "Running";
+    else => "Unknown";
+};
+```
+
+If no case matches and there is no `else` case, the expression evaluates to `null`.
 
 ## Loops
 

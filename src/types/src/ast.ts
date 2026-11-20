@@ -31,6 +31,8 @@ export enum NodeType
     MemberExpression = "MemberExpression",
     IndexExpression = "IndexExpression",
     AssignmentExpression = "AssignmentExpression",
+    ConditionalExpression = "ConditionalExpression",
+    WhenExpression = "WhenExpression",
     RangeExpression = "RangeExpression",
     MethodDeclaration = "MethodDeclaration",
     StaticMemberExpression = "StaticMemberExpression",
@@ -207,6 +209,8 @@ export type Expression =
     | StaticMemberExpression
     | IndexExpression
     | AssignmentExpression
+    | ConditionalExpression
+    | WhenExpression
     | RangeExpression
     | MapLiteral;
 
@@ -303,6 +307,24 @@ export type AssignmentExpression = Node & {
     left: Expression;
     right: Expression;
     operator: string;
+};
+
+export type ConditionalExpression = Node & {
+    type: NodeType.ConditionalExpression;
+    condition: Expression;
+    consequent: Expression;
+    alternate: Expression;
+};
+
+export type WhenExpressionCase = {
+    value: Expression | "else";
+    body: Expression;
+};
+
+export type WhenExpression = Node & {
+    type: NodeType.WhenExpression;
+    expression: Expression;
+    cases: WhenExpressionCase[];
 };
 
 export type RangeExpression = Node & {
