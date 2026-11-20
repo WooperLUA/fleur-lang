@@ -66,6 +66,12 @@ fleur comes with an interactive REPL (Read-Eval-Print Loop):
 fleur repl
 ```
 
+You can also preload a file into the REPL session. The file is executed before the prompt appears, so its functions, constants and other definitions are available in the session:
+
+```bash
+fleur repl path/to/your/file.flr
+```
+
 ### Help
 
 To see all available commands:

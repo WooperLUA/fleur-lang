@@ -55,6 +55,12 @@ Start the interactive shell:
 fleur repl
 ```
 
+You can preload a file into the REPL session, making its definitions available at the prompt:
+
+```bash
+fleur repl path/to/your/script.flr
+```
+
 ### Help
 
 Display available commands:

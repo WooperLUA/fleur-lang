@@ -102,7 +102,43 @@ const main = async () =>
             }
             case 'repl':
             {
-                start_repl();
+                const path = args[1];
+                if (!path)
+                {
+                    await start_repl(null);
+                    break;
+                }
+
+                const absolute_path = node_path.resolve(path);
+                const file = Bun.file(absolute_path);
+
+                if (!await file.exists()) return throw_exception({
+                    type:     'InvalidArgument',
+                    message:  "Invalid file path.",
+                    metadata: `\"${path}\"`
+                });
+
+                if (!absolute_path.endsWith('.flr')) return throw_exception({
+                    type:    'InvalidArgument',
+                    message: "You must provide a file with the '.flr' extension.",
+                });
+
+                let aliases: Record<string, string> = {};
+                const config_path = node_path.join(node_path.dirname(absolute_path), 'fleur.json');
+                if (existsSync(config_path))
+                {
+                    try
+                    {
+                        const config = JSON.parse(await Bun.file(config_path).text());
+                        aliases = config.aliases || {};
+                    }
+                    catch (e)
+                    {
+                        // Ignore parse errors
+                    }
+                }
+
+                await start_repl(file, aliases);
                 break;
             }
             case 'pkg':
@@ -276,7 +312,7 @@ const main = async () =>
                 const commands = [
                     {cmd: ['run', '[.flr file] [--optimize] [args...]', '  Executes a .flr file.'], color: YELLOW},
                     {cmd: ['pkg', '[init | install | add | version]', '    Manage Fleur packages.'], color: CYAN},
-                    {cmd: ['repl', '', '\t      Runs a live REPL.'], color: CYAN},
+                    {cmd: ['repl', '[.flr file]', '\t      Runs a live REPL, optionally preloading a file.'], color: CYAN},
                     {cmd: ['help', '', '\t      Displays all available commands.'], color: GREEN},
                 ];
 
