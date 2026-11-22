@@ -809,7 +809,7 @@ export class Parser
 
         const assignTokens = [
             TokenKind.ASSIGN, TokenKind.PLUS_ASSIGN, TokenKind.MINUS_ASSIGN,
-            TokenKind.STAR_ASSIGN, TokenKind.SLASH_ASSIGN, TokenKind.PERCENT_ASSIGN
+            TokenKind.STAR_ASSIGN, TokenKind.SLASH_ASSIGN, TokenKind.PERCENT_ASSIGN, TokenKind.CARET_ASSIGN,
         ];
 
         if (assignTokens.includes(this.peek().kind))

@@ -14,7 +14,8 @@ fleur supports two types of variable declarations: `const` and `var`.
 
 ### Immutability of Complex Types
 
-When you use `const` with complex types like **Arrays, Sets, Maps, and Structs**, the value itself becomes immutable. You cannot modify the contents of the collection or the properties of the struct.
+When you use `const` with complex types like **Arrays, Sets, Maps, and Structs**, the value itself becomes immutable.
+You cannot modify the contents of the collection or the properties of the struct.
 Immutability is `deep`, meaning you cannot mutate complex types inside a complex type.
 
 ```flr
@@ -44,11 +45,11 @@ b = 30; // OK
   const large = 1_000_000;
   ```
 - **String**: Sequences of characters, enclosed in double quotes. Supports escape characters:
-  - `\n` Newline
-  - `\t` Tab
-  - `\r` Carriage return
-  - `\"` Double quote
-  - `\\` Backslash
+    - `\n` Newline
+    - `\t` Tab
+    - `\r` Carriage return
+    - `\"` Double quote
+    - `\\` Backslash
   ```flr
   const name = "fleur Lang";
   const message = "Hello\nWorld";
@@ -93,14 +94,15 @@ const greeting = "Hello " + "World";
 
 ### Assignment Operators
 
-| Operator | Description         |
-|:---------|:--------------------|
-| `=`      | Assignment          |
-| `+=`     | Add and assign      |
-| `-=`     | Subtract and assign |
-| `*=`     | Multiply and assign |
-| `/=`     | Divide and assign   |
-| `%=`     | Modulo and assign   |
+| Operator | Description             |
+|:---------|:------------------------|
+| `=`      | Assignment              |
+| `+=`     | Add and assign          |
+| `-=`     | Subtract and assign     |
+| `*=`     | Multiply and assign     |
+| `/=`     | Divide and assign       |
+| `%=`     | Modulo and assign       |
+| `^=`     | Exponentiate and assign |
 
 ### Comparison Operators
 
@@ -129,7 +131,9 @@ if x > 0 and not is_finished {
 ```
 
 ### Null Coalescing Operator
-The `??` (null coalescing) operator provides a concise way to handle `null` values. It returns the left operand if it is not `null` otherwise, it evaluates and returns the right operand.
+
+The `??` (null coalescing) operator provides a concise way to handle `null` values. It returns the left operand if it is
+not `null` otherwise, it evaluates and returns the right operand.
 This operator short-circuits, meaning the right side is only evaluated if the left side is actually `null`.
 
 ```flr
@@ -142,13 +146,13 @@ const my_config = config ?? expensive_function();
 
 ### Bitwise Operators
 
-| Operator  | Description          |
-|:----------|:---------------------|
-| `band`    | Bitwise AND          |
-| `bor`     | Bitwise OR           |
-| `bxor`    | Bitwise XOR          |
-| `bshl`    | Bitwise shift left   |
-| `bshr`    | Bitwise shift right  |
+| Operator | Description         |
+|:---------|:--------------------|
+| `band`   | Bitwise AND         |
+| `bor`    | Bitwise OR          |
+| `bxor`   | Bitwise XOR         |
+| `bshl`   | Bitwise shift left  |
+| `bshr`   | Bitwise shift right |
 
 ```flr
 const a = 5;  // Binary: 101

@@ -181,7 +181,7 @@ fleur provides a `try/catch` mechanism to handle runtime errors gracefully.
 ```flr
 try {
     // Code that might fail
-    throw("Something went wrong!");
+    Error::new("Something went wrong!")::throw();
 } catch err {
     // Handle error
     io::print("Caught error: ", err);

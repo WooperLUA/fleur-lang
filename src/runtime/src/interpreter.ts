@@ -1573,6 +1573,9 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
                 case "%=":
                     result = l % r;
                     break;
+                case "^=":
+                    result = l ** r;
+                    break;
             }
 
             return {type: RuntimeValueType.Number, value: result};
