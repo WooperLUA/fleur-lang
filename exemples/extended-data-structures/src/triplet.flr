@@ -26,5 +26,5 @@ Triplet::reversed()
 }
 Triplet::string()
 {
-    return str::concat("(", this.fst, ", ", this.snd, ", ", this.trd, ")");
+    return str::format("(%, %, %)", this.fst, this.snd, this.trd);
 }

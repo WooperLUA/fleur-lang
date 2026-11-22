@@ -242,7 +242,7 @@ export const str: StructValue = {
                           const string = (args[0] as StringValue).value
                           const splitter = (args[1] as StringValue).value
                           const strings = string.split(splitter)
-                                                            .map(s => ({type: RuntimeValueType.String, value: s} as StringValue))
+                                                .map(s => ({type: RuntimeValueType.String, value: s} as StringValue))
                           return {type: RuntimeValueType.Array, elements: strings} as ArrayValue
                       },
             } as NativeFunctionValue,
@@ -260,7 +260,69 @@ export const str: StructValue = {
                           const value = (args[1] as StringValue).value
                           const idx = string.indexOf(value)
                           return idx === -1 ? {type: RuntimeValueType.Null, value: null} as NullValue
-                                            : {type: RuntimeValueType.Number, value: idx} as NumberValue
+                              : {type: RuntimeValueType.Number, value: idx} as NumberValue
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
+            "format",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          if (args.length < 1)
+                          {
+                              return throw_exception({
+                                  type:    "Runtime",
+                                  message: "str::format expects at least 1 argument (the format string)",
+                              });
+                          }
+
+                          check_arg_type(args[0]!, RuntimeValueType.String, "str::format");
+                          const str = (args[0] as StringValue).value;
+                          const values = args.slice(1).map(a => stringify_value(a));
+
+                          let value_idx = 0;
+                          let buffer = "";
+
+                          for (let i = 0; i < str.length; i++)
+                          {
+                              const c = str[i]!;
+
+                              if (c === '\\' && str[i + 1] === '%')
+                              {
+                                  buffer += '%';
+                                  i++;
+                              }
+                              else if (c === '%')
+                              {
+                                  if (value_idx < values.length)
+                                  {
+                                      buffer += values[value_idx++];
+                                  }
+                                  else
+                                  {
+                                      return throw_exception({
+                                          type:    "Runtime",
+                                          message: `str::format expects at least ${value_idx + 1} values, but only ${values.length} were provided for string: "${str}"`,
+                                      });
+                                  }
+                              }
+                              else
+                              {
+                                  buffer += c;
+                              }
+                          }
+
+                          if (value_idx < values.length)
+                          {
+                              return throw_exception({
+                                  type:    "Runtime",
+                                  message: `str::format received ${values.length} values, but the format string only had ${value_idx} '%' placeholders.`,
+                              });
+                          }
+
+                          return {type: RuntimeValueType.String, value: buffer} as StringValue;
                       },
             } as NativeFunctionValue,
         ],

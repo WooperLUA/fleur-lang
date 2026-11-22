@@ -21,5 +21,6 @@ Tuple::reversed()
 }
 Tuple::string()
 {
-    return str::concat("(", this.fst, ", ", this.snd, ")");
+
+    return str::format("(%, %)", this.fst, this.snd);
 }
