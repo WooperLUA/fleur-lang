@@ -1,8 +1,0 @@
-import [map, filter] in "./src/array.flr";
-import [flow] in "./src/value.flr";
-
-pub const Lotus = {
-    "map" : map,
-    "filter" : filter,
-    "flow" : flow
-};

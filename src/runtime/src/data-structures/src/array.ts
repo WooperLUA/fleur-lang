@@ -1,6 +1,6 @@
 import {
     type ArrayValue,
-    type BooleanValue,
+    type BooleanValue, type FunctionValue,
     type NativeFunctionValue,
     type NumberValue,
     type RangeValue,
@@ -9,7 +9,14 @@ import {
     type StringValue,
     type StructValue,
 } from "@types";
-import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception,} from "@utils";
+import {
+    call_fleur_function,
+    check_arg_type,
+    check_args_length,
+    check_mutability,
+    is_equal,
+    throw_exception,
+} from "@utils";
 
 export const array: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -822,6 +829,119 @@ export const array: StructValue = {
                                }
 
                                return {type: RuntimeValueType.Array, elements: res} as ArrayValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "map",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::map");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::map");
+                               check_arg_type(args[1]!, [RuntimeValueType.Function, RuntimeValueType.NativeFunction], "<array>::map");
+                               check_mutability(args[0]!, "<array>::map", "Use ::mapped for immutable arrays");
+
+                               const arr = args[0] as ArrayValue;
+                               const func = args[1] as FunctionValue | NativeFunctionValue;
+
+                               for (let i = 0; i < arr.elements.length; i++)
+                               {
+                                   arr.elements[i] = call_fleur_function(func, [arr.elements[i]!]);
+                               }
+                               return arr;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "mapped",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::mapped");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::mapped");
+                               check_arg_type(args[1]!, [RuntimeValueType.Function, RuntimeValueType.NativeFunction], "<array>::mapped");
+
+                               const arr = args[0] as ArrayValue;
+                               const func = args[1] as FunctionValue | NativeFunctionValue;
+
+                               const new_elements: RuntimeValue[] = [];
+                               for (const el of arr.elements)
+                               {
+                                   new_elements.push(call_fleur_function(func, [el]));
+                               }
+
+                               return {
+                                   type:     RuntimeValueType.Array,
+                                   elements: new_elements
+                               } as ArrayValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "filter",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::filter");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::filter");
+                               check_arg_type(args[1]!, [RuntimeValueType.Function, RuntimeValueType.NativeFunction], "<array>::filter");
+                               check_mutability(args[0]!, "<array>::filter", "Use ::filtered for immutable arrays");
+
+                               const arr = args[0] as ArrayValue;
+                               const predicate = args[1] as FunctionValue | NativeFunctionValue;
+
+                               const filtered_elements: RuntimeValue[] = [];
+
+                               for (const element of arr.elements)
+                               {
+                                   const result = call_fleur_function(predicate, [element]);
+                                   if (result.type === RuntimeValueType.Boolean && (result as BooleanValue).value)
+                                   {
+                                       filtered_elements.push(element);
+                                   }
+                               }
+
+                               arr.elements = filtered_elements;
+                               return arr;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "filtered",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<array>::filtered");
+                               check_arg_type(args[0]!, RuntimeValueType.Array, "<array>::filtered");
+                               check_arg_type(args[1]!, [RuntimeValueType.Function, RuntimeValueType.NativeFunction], "<array>::filtered");
+
+                               const arr = args[0] as ArrayValue;
+                               const predicate = args[1] as FunctionValue | NativeFunctionValue;
+
+                               const filtered_elements: RuntimeValue[] = [];
+
+                               for (const element of arr.elements)
+                               {
+                                   const result = call_fleur_function(predicate, [element]);
+                                   if (result.type === RuntimeValueType.Boolean && (result as BooleanValue).value)
+                                   {
+                                       filtered_elements.push(element);
+                                   }
+                               }
+
+                               return {
+                                   type:     RuntimeValueType.Array,
+                                   elements: filtered_elements
+                               } as ArrayValue;
                            },
             } as NativeFunctionValue,
         ],

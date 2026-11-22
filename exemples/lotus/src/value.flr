@@ -1,7 +1,0 @@
-pub func flow(value, funs: Array)
-{
-    if funs::empty() { return value; }
-    const fn: Function or NativeFunction = funs::shift();
-    const _value = fn(value);
-    return flow(_value, funs);
-}

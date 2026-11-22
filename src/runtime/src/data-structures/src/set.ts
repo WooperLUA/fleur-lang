@@ -1,6 +1,6 @@
 import {
     type ArrayValue,
-    type BooleanValue,
+    type BooleanValue, type FunctionValue,
     type NativeFunctionValue,
     type NumberValue,
     type RangeValue,
@@ -10,7 +10,14 @@ import {
     type StringValue,
     type StructValue,
 } from "@types";
-import {check_arg_type, check_args_length, check_mutability, is_equal, throw_exception,} from "@utils";
+import {
+    call_fleur_function,
+    check_arg_type,
+    check_args_length,
+    check_mutability,
+    is_equal,
+    throw_exception,
+} from "@utils";
 
 export const set: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -67,7 +74,7 @@ export const set: StructValue = {
                                   if ((!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
                                   {
                                       throw_exception({
-                                          type: "Runtime",
+                                          type:    "Runtime",
                                           message: `Float range ${start}..${end} has a difference of less than 1. Since the default step is 1, it would only yield the start value.`
                                       });
                                   }
@@ -369,22 +376,22 @@ export const set: StructValue = {
         [
             "concat",
             {
-                type:      RuntimeValueType.NativeFunction,
-                call:      (args: RuntimeValue[]) =>
-                           {
-                               check_args_length(args, 2, "Set::concat");
-                               check_arg_type(args[0]!, RuntimeValueType.Set, "Set::concat");
-                               check_arg_type(args[1]!, RuntimeValueType.Set, "Set::concat");
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 2, "Set::concat");
+                          check_arg_type(args[0]!, RuntimeValueType.Set, "Set::concat");
+                          check_arg_type(args[1]!, RuntimeValueType.Set, "Set::concat");
 
-                               const arr1 = args[0] as SetValue;
-                               const arr2 = args[1] as SetValue;
+                          const arr1 = args[0] as SetValue;
+                          const arr2 = args[1] as SetValue;
 
-                               const combined = [...arr1.elements, ...arr2.elements];
-                               const unique = combined.filter((el, i, self) =>
-                                   self.findIndex((e) => is_equal(e, el)) === i
-                               );
-                               return {type: RuntimeValueType.Set, elements: unique} as SetValue;
-                           },
+                          const combined = [...arr1.elements, ...arr2.elements];
+                          const unique = combined.filter((el, i, self) =>
+                              self.findIndex((e) => is_equal(e, el)) === i
+                          );
+                          return {type: RuntimeValueType.Set, elements: unique} as SetValue;
+                      },
             } as NativeFunctionValue,
         ],
         [
@@ -651,8 +658,8 @@ export const set: StructValue = {
                                }
 
                                return {
-                                   type : RuntimeValueType.Set,
-                                   elements : new_set
+                                   type:     RuntimeValueType.Set,
+                                   elements: new_set
                                } as SetValue;
                            },
             } as NativeFunctionValue,
@@ -675,8 +682,8 @@ export const set: StructValue = {
                                if (group_size <= 0)
                                {
                                    return throw_exception({
-                                       type : "Runtime",
-                                       message : "Group size must be greater than 0"
+                                       type:    "Runtime",
+                                       message: "Group size must be greater than 0"
                                    });
                                }
 
@@ -727,8 +734,8 @@ export const set: StructValue = {
                                if (group_size <= 0)
                                {
                                    return throw_exception({
-                                       type : "Runtime",
-                                       message : "Group size must be greater than 0"
+                                       type:    "Runtime",
+                                       message: "Group size must be greater than 0"
                                    });
                                }
 
@@ -757,7 +764,7 @@ export const set: StructValue = {
                                }
 
                                return {
-                                   type :     RuntimeValueType.Set,
+                                   type:     RuntimeValueType.Set,
                                    elements: grouped_set,
                                } as SetValue;
                            },
@@ -776,6 +783,142 @@ export const set: StructValue = {
                                const set = args[0] as SetValue;
 
                                return {type: RuntimeValueType.Boolean, value: set.elements.length === 0};
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "map",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::map");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::map");
+                               check_arg_type(args[1]!, [RuntimeValueType.Function, RuntimeValueType.NativeFunction], "<set>::map");
+                               check_mutability(args[0]!, "<set>::map", "Use ::mapped for immutable sets");
+
+                               const set = args[0] as SetValue;
+                               const func = args[1] as FunctionValue | NativeFunctionValue;
+
+                               const mapped_elements: RuntimeValue[] = [];
+                               for (const el of set.elements)
+                               {
+                                   mapped_elements.push(call_fleur_function(func, [el]));
+                               }
+
+                               const unique_elements: RuntimeValue[] = [];
+                               for (const el of mapped_elements)
+                               {
+                                   const exists = unique_elements.some((existing) => is_equal(existing, el));
+                                   if (!exists)
+                                   {
+                                       unique_elements.push(el);
+                                   }
+                               }
+
+                               set.elements = unique_elements;
+                               return set;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "mapped",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::mapped");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::mapped");
+                               check_arg_type(args[1]!, [RuntimeValueType.Function, RuntimeValueType.NativeFunction], "<set>::mapped");
+
+                               const set = args[0] as SetValue;
+                               const func = args[1] as FunctionValue | NativeFunctionValue;
+
+                               const mapped_elements: RuntimeValue[] = [];
+                               for (const el of set.elements)
+                               {
+                                   mapped_elements.push(call_fleur_function(func, [el]));
+                               }
+
+                               const unique_elements: RuntimeValue[] = [];
+                               for (const el of mapped_elements)
+                               {
+                                   const exists = unique_elements.some((existing) => is_equal(existing, el));
+                                   if (!exists)
+                                   {
+                                       unique_elements.push(el);
+                                   }
+                               }
+
+                               return {
+                                   type:     RuntimeValueType.Set,
+                                   elements: unique_elements
+                               } as SetValue;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "filter",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::filter");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::filter");
+                               check_arg_type(args[1]!, [RuntimeValueType.Function, RuntimeValueType.NativeFunction], "<set>::filter");
+                               check_mutability(args[0]!, "<set>::filter", "Use ::filtered for immutable sets");
+
+                               const set = args[0] as SetValue;
+                               const predicate = args[1] as FunctionValue | NativeFunctionValue;
+
+                               const filtered_elements: RuntimeValue[] = [];
+
+                               for (const element of set.elements)
+                               {
+                                   const result = call_fleur_function(predicate, [element]);
+                                   if (result.type === RuntimeValueType.Boolean && (result as BooleanValue).value)
+                                   {
+                                       filtered_elements.push(element);
+                                   }
+                               }
+
+                               set.elements = filtered_elements;
+                               return set;
+                           },
+            } as NativeFunctionValue,
+        ],
+        [
+            "filtered",
+            {
+                type:      RuntimeValueType.NativeFunction,
+                is_method: true,
+                call:      (args: RuntimeValue[]) =>
+                           {
+                               check_args_length(args, 2, "<set>::filtered");
+                               check_arg_type(args[0]!, RuntimeValueType.Set, "<set>::filtered");
+                               check_arg_type(args[1]!, [RuntimeValueType.Function, RuntimeValueType.NativeFunction], "<set>::filtered");
+
+                               const set = args[0] as SetValue;
+                               const predicate = args[1] as FunctionValue | NativeFunctionValue;
+
+                               const filtered_elements: RuntimeValue[] = [];
+
+                               for (const element of set.elements)
+                               {
+                                   const result = call_fleur_function(predicate, [element]);
+                                   if (result.type === RuntimeValueType.Boolean && (result as BooleanValue).value)
+                                   {
+                                       filtered_elements.push(element);
+                                   }
+                               }
+
+                               return {
+                                   type:     RuntimeValueType.Set,
+                                   elements: filtered_elements
+                               } as SetValue;
                            },
             } as NativeFunctionValue,
         ],

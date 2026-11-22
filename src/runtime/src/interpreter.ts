@@ -677,7 +677,7 @@ const execute_while_statement = (stmt: WhileStatement, env: Environment): Runtim
     return last_result;
 };
 
-const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
+export const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
 {
     try
     {
