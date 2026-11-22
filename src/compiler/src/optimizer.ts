@@ -1,5 +1,7 @@
 import {
     type BinaryExpression, type BlockStatement,
+    type BooleanLiteral,
+    type ChainedComparisonExpression,
     type ConditionalExpression,
     type WhenExpression,
     type Expression, type ExpressionStatement, type ForStatement, type FunctionDeclaration, type IfStatement,
@@ -45,6 +47,44 @@ const optimize_expression = (expr: Expression): Expression =>
                 body:  optimize_expression(c.body)
             }))
         } as WhenExpression;
+    }
+
+    if (expr.type === NodeType.ChainedComparisonExpression)
+    {
+        const chain = expr as ChainedComparisonExpression;
+        const operands = chain.operands.map(optimize_expression);
+
+        if (operands.every(o => o.type === NodeType.NumericLiteral))
+        {
+            let result = true;
+            for (let i = 0; i < chain.operators.length; i++)
+            {
+                const l_val = (operands[i] as NumericLiteral).value;
+                const r_val = (operands[i + 1] as NumericLiteral).value;
+
+                switch (chain.operators[i])
+                {
+                    case "<":
+                        result = l_val < r_val;
+                        break;
+                    case "<=":
+                        result = l_val <= r_val;
+                        break;
+                    case ">":
+                        result = l_val > r_val;
+                        break;
+                    case ">=":
+                        result = l_val >= r_val;
+                        break;
+                }
+
+                if (!result) break;
+            }
+
+            return {type: NodeType.BooleanLiteral, value: result} as BooleanLiteral;
+        }
+
+        return {...chain, operands} as ChainedComparisonExpression;
     }
 
     if (expr.type === NodeType.BinaryExpression)

@@ -17,6 +17,7 @@ import {
     type BlockStatement,
     type ExpressionStatement,
     type BinaryExpression,
+    type ChainedComparisonExpression,
     type UnaryExpression,
     type Identifier,
     type NumericLiteral,
@@ -994,23 +995,40 @@ export class Parser
 
     private parse_relational(allow_struct: boolean = true): Expression
     {
-        let left = this.parse_shift(allow_struct);
+        const first = this.parse_shift(allow_struct);
+        const operands: Expression[] = [first];
+        const operators: string[] = [];
 
         while ([TokenKind.LESS, TokenKind.GREATER, TokenKind.LESS_EQUAL, TokenKind.GREATER_EQUAL].includes(this.peek().kind))
         {
-            const operator = this.eat().value;
-            const right = this.parse_shift(allow_struct);
-            left = {
-                type:   NodeType.BinaryExpression,
-                line:   left.line,
-                column: left.column,
-                left,
-                right,
-                operator
+            operators.push(this.eat().value);
+            operands.push(this.parse_shift(allow_struct));
+        }
+
+        if (operators.length === 0)
+        {
+            return first;
+        }
+
+        if (operators.length === 1)
+        {
+            return {
+                type:     NodeType.BinaryExpression,
+                line:     first.line,
+                column:   first.column,
+                left:     operands[0]!,
+                right:    operands[1]!,
+                operator: operators[0]!
             } as BinaryExpression;
         }
 
-        return left;
+        return {
+            type:      NodeType.ChainedComparisonExpression,
+            line:      first.line,
+            column:    first.column,
+            operands,
+            operators
+        } as ChainedComparisonExpression;
     }
 
     private parse_shift(allow_struct: boolean = true): Expression

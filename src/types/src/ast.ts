@@ -18,6 +18,7 @@ export enum NodeType
     ContinueStatement = "ContinueStatement",
 
     BinaryExpression = "BinaryExpression",
+    ChainedComparisonExpression = "ChainedComparisonExpression",
     UnaryExpression = "UnaryExpression",
     Identifier = "Identifier",
     NumericLiteral = "NumericLiteral",
@@ -196,6 +197,7 @@ export type ContinueStatement = Node & {
 
 export type Expression =
     | BinaryExpression
+    | ChainedComparisonExpression
     | UnaryExpression
     | Identifier
     | NumericLiteral
@@ -219,6 +221,12 @@ export type BinaryExpression = Node & {
     left: Expression;
     right: Expression;
     operator: string;
+};
+
+export type ChainedComparisonExpression = Node & {
+    type: NodeType.ChainedComparisonExpression;
+    operands: Expression[];
+    operators: string[];
 };
 
 export type UnaryExpression = Node & {

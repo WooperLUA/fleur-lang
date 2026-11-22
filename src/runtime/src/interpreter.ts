@@ -24,6 +24,7 @@ import {
     type MethodDeclaration,
     type StaticMemberExpression,
     type BinaryExpression,
+    type ChainedComparisonExpression,
     type UnaryExpression,
     type Identifier,
     type NumericLiteral,
@@ -694,6 +695,8 @@ const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
                 return env.lookup((expr as Identifier).name);
             case NodeType.BinaryExpression:
                 return evaluate_binary_expression(expr as BinaryExpression, env);
+            case NodeType.ChainedComparisonExpression:
+                return evaluate_chained_comparison(expr as ChainedComparisonExpression, env);
             case NodeType.UnaryExpression:
                 return evaluate_unary_expression(expr as UnaryExpression, env);
             case NodeType.ArrayLiteral:
@@ -994,6 +997,60 @@ const evaluate_binary_expression = (expr: BinaryExpression, env: Environment): R
             });
             return {type: RuntimeValueType.Null, value: null};
     }
+};
+
+const evaluate_chained_comparison = (expr: ChainedComparisonExpression, env: Environment): RuntimeValue =>
+{
+    let left = evaluate(expr.operands[0]!, env);
+
+    for (let i = 0; i < expr.operators.length; i++)
+    {
+        const right = evaluate(expr.operands[i + 1]!, env);
+        const operator = expr.operators[i]!;
+
+        if (left.type !== RuntimeValueType.Number || right.type !== RuntimeValueType.Number)
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: `Operator '${operator}' can only be applied to numbers.`
+            });
+        }
+
+        const l_val = (left as NumberValue).value;
+        const r_val = (right as NumberValue).value;
+
+        let matches: boolean;
+        switch (operator)
+        {
+            case "<":
+                matches = l_val < r_val;
+                break;
+            case "<=":
+                matches = l_val <= r_val;
+                break;
+            case ">":
+                matches = l_val > r_val;
+                break;
+            case ">=":
+                matches = l_val >= r_val;
+                break;
+            default:
+                throw_exception({
+                    type:    "Runtime",
+                    message: `Unknown operator: ${operator}`
+                });
+                return {type: RuntimeValueType.Null, value: null};
+        }
+
+        if (!matches)
+        {
+            return {type: RuntimeValueType.Boolean, value: false} as BooleanValue;
+        }
+
+        left = right;
+    }
+
+    return {type: RuntimeValueType.Boolean, value: true} as BooleanValue;
 };
 
 const evaluate_unary_expression = (expr: UnaryExpression, env: Environment): RuntimeValue =>
