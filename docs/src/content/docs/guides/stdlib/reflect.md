@@ -10,6 +10,7 @@ Metaprogramming and introspection for Structs and other data structures.
 | Member       | Description                                                      |
 |:-------------|:-----------------------------------------------------------------|
 | `properties` | Sub-struct of `reflect` related to struct's instance properties. |
+| `methods`    | Sub-struct of `reflect` related to struct's instance methods.    |
 
 ## Methods
 
