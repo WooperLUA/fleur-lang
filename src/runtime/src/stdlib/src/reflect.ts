@@ -303,6 +303,39 @@ export const reflect: StructValue = {
             } as NativeFunctionValue,
         ],
         [
+            "methods",
+            {
+                type: RuntimeValueType.NativeFunction,
+                call: (args: RuntimeValue[]) =>
+                      {
+                          check_args_length(args, 1, "reflect::methods");
+                          check_arg_type(args[0]!, RuntimeValueType.Struct, "reflect::methods");
+
+                          const struct_decl = args[0] as StructValue;
+                          if (!struct_decl.is_declaration)
+                          {
+                              throw_exception({
+                                  type:    "Runtime",
+                                  message: "reflect::methods expects a struct declaration, not an instance."
+                              });
+                          }
+
+                          const elements: RuntimeValue[] = [];
+
+                          for (const k of struct_decl.methods.keys())
+                          {
+                              const key = deep_copy({type: RuntimeValueType.String, value: k});
+                              elements.push(key);
+                          }
+
+                          return {
+                              type:     RuntimeValueType.Array,
+                              elements: elements,
+                          } as ArrayValue;
+                      },
+            } as NativeFunctionValue,
+        ],
+        [
             "is",
             {
                 type: RuntimeValueType.NativeFunction,

@@ -16,12 +16,13 @@ Metaprogramming and introspection for Structs and other data structures.
 
 ### `reflect`
 
-| Member                | Return Type | Description                                                                                |
-|:----------------------|:------------|:-------------------------------------------------------------------------------------------|
-| `identifier(struct)`  | `String`    | Returns the name of the Struct definition used to create the instance.                     |
-| `fields(struct_decl)` | `Array`     | Returns an array of field names for a struct declaration (e.g., `reflect::fields(Point)`). |
-| `is(a, b)`            | `Boolean`   | Returns `true` if `a` and `b` are the exact same object in memory (reference equality).    |
-| `clone(ds)`           | `Any`       | Returns a deep copy of `ds` (supports `Struct`, `Array`, `Set`, `Map`, `Range`, `Error`).  |
+| Member                 | Return Type | Description                                                                               |
+|:-----------------------|:------------|:------------------------------------------------------------------------------------------|
+| `identifier(struct)`   | `String`    | Returns the name of the Struct definition used to create the instance.                    |
+| `fields(struct_decl)`  | `Array`     | Returns an array of field names for a struct declaration.                                 |
+| `methods(struct_decl)` | `Array`     | Returns an array of method names for a struct declaration.                                |
+| `is(a, b)`             | `Boolean`   | Returns `true` if `a` and `b` are the exact same object in memory (reference equality).   |
+| `clone(ds)`            | `Any`       | Returns a deep copy of `ds` (supports `Struct`, `Array`, `Set`, `Map`, `Range`, `Error`). |
 
 ### `reflect.properties`
 
@@ -58,6 +59,7 @@ io::print(reflect::identifier(p)); // "Point"
 
 // Getting struct fields (requires the declaration, not the instance)
 io::print(reflect::fields(Point)); // ["x", "y"]
+io::print(reflect::methods(Point)); // ["is_origin"]
 
 // Property manipulation
 io::print(reflect.properties::has(p, "x"));   // true
