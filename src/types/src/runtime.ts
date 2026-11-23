@@ -119,6 +119,7 @@ export type RangeValue = {
     type: RuntimeValueType.Range;
     start: RuntimeValue;
     end: RuntimeValue;
+    step?: NumberValue;
 };
 
 export type ErrorValue = {

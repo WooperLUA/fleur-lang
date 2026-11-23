@@ -339,4 +339,5 @@ export type RangeExpression = Node & {
     type: NodeType.RangeExpression;
     start: Expression;
     end: Expression;
+    step?: Expression;
 };

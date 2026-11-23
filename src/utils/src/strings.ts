@@ -39,7 +39,15 @@ export const stringify_value = (val: any): string =>
         case RuntimeValueType.Null:
             return "null";
         case RuntimeValueType.Range:
-            return `${stringify_value((val as RangeValue).start)}..${stringify_value((val as RangeValue).end)}`;
+        {
+            const range = val as RangeValue;
+            const start = stringify_value(range.start);
+            const end = stringify_value(range.end);
+
+            return range.step
+                ? `${start}..${stringify_value(range.step)}..${end}`
+                : `${start}..${end}`;
+        }
         case RuntimeValueType.Error:
             return `<Error: ${(val as any).message}>`;
         case RuntimeValueType.Return:

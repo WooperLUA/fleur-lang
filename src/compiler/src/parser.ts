@@ -1058,13 +1058,27 @@ export class Parser
 
         if (this.match(TokenKind.DOT_DOT))
         {
-            const end = this.parse_additive(allow_struct);
+            const second = this.parse_additive(allow_struct);
+
+            if (this.match(TokenKind.DOT_DOT))
+            {
+                const end = this.parse_additive(allow_struct);
+                return {
+                    type:   NodeType.RangeExpression,
+                    line:   left.line,
+                    column: left.column,
+                    start:  left,
+                    step:   second,
+                    end
+                } as RangeExpression;
+            }
+
             return {
                 type:   NodeType.RangeExpression,
                 line:   left.line,
                 column: left.column,
                 start:  left,
-                end
+                end:    second
             } as RangeExpression;
         }
 

@@ -8,7 +8,7 @@ import {
     type SetValue, type StringValue,
     type StructValue,
 } from "@types";
-import {check_arg_type, check_args_length, throw_exception} from "@utils";
+import {check_arg_type, check_args_length, get_range_iteration, throw_exception} from "@utils";
 
 export const math: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -391,20 +391,7 @@ export const math: StructValue = {
                               }
                               case RuntimeValueType.Range:
                               {
-                                  const range = args[0] as RangeValue;
-                                  const start = (range.start as NumberValue).value;
-                                  const end = (range.end as NumberValue).value;
-
-                                  if ((!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
-                                  {
-                                      throw_exception({
-                                          type:    "Runtime",
-                                          message: `Float range ${start}..${end} has a difference of less than 1.`
-                                      });
-                                  }
-
-                                  const step = start <= end ? 1 : -1;
-                                  const epsilon = 1e-10;
+                                  const {start, end, step, epsilon} = get_range_iteration(args[0] as RangeValue, "math::sum");
 
                                   let total = 0;
                                   for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)

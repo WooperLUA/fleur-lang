@@ -7,7 +7,7 @@ import {
     RuntimeValueType,
     type StringValue,
 } from "@types";
-import {check_arg_type, check_args_length, stringify_value, throw_exception,} from "@utils";
+import {check_arg_type, check_args_length, get_range_iteration, stringify_value, throw_exception,} from "@utils";
 
 export const str: StructValue = {
     type:       RuntimeValueType.Struct,
@@ -109,18 +109,16 @@ export const str: StructValue = {
                           const str = (args[0] as StringValue).value;
                           const range = args[1] as RangeValue;
 
-                          const startVal = (range.start as NumberValue).value;
-                          const endVal = (range.end as NumberValue).value;
+                          const {start: startVal, end: endVal, step, epsilon} = get_range_iteration(range, "str::slice");
 
                           const len = str.length;
 
-                          let start = startVal < 0 ? len + startVal : startVal;
-                          let end = endVal < 0 ? len + endVal : endVal;
+                          const start = startVal < 0 ? len + startVal : startVal;
+                          const end = endVal < 0 ? len + endVal : endVal;
 
                           const elements: string[] = [];
-                          const step = start <= end ? 1 : -1;
 
-                          for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                          for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)
                           {
                               if (i >= 0 && i < len)
                               {

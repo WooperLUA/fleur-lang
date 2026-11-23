@@ -42,7 +42,7 @@ import {
     type ImportStatement, type StructField, type ErrorValue, type NullValue, type MapLiteral, type ConditionalExpression,
     type WhenExpression,
 } from "@types";
-import {throw_exception, stringify_value, is_equal, FleurError, deep_copy} from "@utils";
+import {throw_exception, stringify_value, is_equal, FleurError, deep_copy, get_range_iteration, validate_range_step} from "@utils";
 import {setup_stdlib} from "./stdlib";
 import {setup_data_structures} from "./data-structures";
 import {setup_other_structs} from "./others";
@@ -445,24 +445,7 @@ const execute_for_statement = (stmt: ForStatement, env: Environment): RuntimeVal
 
     if (iterable.type === RuntimeValueType.Range)
     {
-        const range = iterable as RangeValue;
-        if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
-        {
-            throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
-        }
-        const start = (range.start as NumberValue).value;
-        const end = (range.end as NumberValue).value;
-
-        if ((!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
-        {
-            throw_exception({
-                type:    "Runtime",
-                message: `Float range ${start}..${end} has a difference of less than 1. Since the default step is 1, it would only yield the start value. Use a 'while' loop for fractional steps.`
-            });
-        }
-
-        const step = start <= end ? 1 : -1;
-        const epsilon = 1e-10;
+        const {start, end, step, epsilon} = get_range_iteration(iterable as RangeValue);
 
         for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)
         {
@@ -737,11 +720,29 @@ export const evaluate = (expr: Expression, env: Environment): RuntimeValue =>
             case NodeType.WhenExpression:
                 return evaluate_when_expression(expr as WhenExpression, env);
             case NodeType.RangeExpression:
-                return {
+            {
+                const range_expr = expr as RangeExpression;
+                const range: RangeValue = {
                     type:  RuntimeValueType.Range,
-                    start: evaluate((expr as RangeExpression).start, env),
-                    end:   evaluate((expr as RangeExpression).end, env)
-                } as RangeValue;
+                    start: evaluate(range_expr.start, env),
+                    end:   evaluate(range_expr.end, env)
+                };
+
+                if (range_expr.step)
+                {
+                    const step = evaluate(range_expr.step, env);
+
+                    if (step.type !== RuntimeValueType.Number)
+                    {
+                        throw_exception({type: "Runtime", message: "Range step must be a number."});
+                    }
+
+                    validate_range_step(step as NumberValue, "Range");
+                    range.step = {type: RuntimeValueType.Number, value: Math.abs((step as NumberValue).value)};
+                }
+
+                return range;
+            }
             default:
                 throw_exception({
                     type:    "Runtime",

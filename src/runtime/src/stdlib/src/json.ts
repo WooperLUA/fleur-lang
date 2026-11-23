@@ -74,7 +74,14 @@ export const fleur_to_js_value = (val: RuntimeValue): any =>
         case RuntimeValueType.Range:
         {
             const range = val as RangeValue;
-            return {start: fleur_to_js_value(range.start), end: fleur_to_js_value(range.end)};
+            const result: any = {start: fleur_to_js_value(range.start), end: fleur_to_js_value(range.end)};
+
+            if (range.step)
+            {
+                result.step = fleur_to_js_value(range.step);
+            }
+
+            return result;
         }
 
         case RuntimeValueType.Error:

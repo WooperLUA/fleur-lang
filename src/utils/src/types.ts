@@ -91,13 +91,68 @@ export const is_equal = (left: RuntimeValue, right: RuntimeValue): boolean =>
         {
             const l = left as RangeValue;
             const r = right as RangeValue;
+            const l_step = l.step ? (l.step as NumberValue).value : 1;
+            const r_step = r.step ? (r.step as NumberValue).value : 1;
 
             return (l.start as NumberValue).value === (r.start as NumberValue).value &&
-                (l.end as NumberValue).value === (r.end as NumberValue).value;
+                (l.end as NumberValue).value === (r.end as NumberValue).value &&
+                l_step === r_step;
         }
         default:
             return left === right;
     }
+};
+
+export const validate_range_step = (step: NumberValue, name: string): void =>
+{
+    if (!Number.isFinite(step.value) || step.value === 0)
+    {
+        throw_exception({
+            type:    "Runtime",
+            message: `${name} step must be a non-zero number.`
+        });
+    }
+};
+
+export type RangeIteration = {
+    start: number;
+    end: number;
+    step: number;
+    epsilon: number;
+};
+
+export const get_range_iteration = (range: RangeValue, name: string = "Range"): RangeIteration =>
+{
+    if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
+    {
+        throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
+    }
+
+    const start = (range.start as NumberValue).value;
+    const end = (range.end as NumberValue).value;
+    const has_step = range.step !== undefined && range.step !== null;
+
+    if (has_step)
+    {
+        validate_range_step(range.step!, name);
+    }
+
+    const magnitude = has_step ? Math.abs((range.step as NumberValue).value) : 1;
+
+    if (!has_step && (!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
+    {
+        throw_exception({
+            type:    "Runtime",
+            message: `Float range ${start}..${end} has a difference of less than 1. Since the default step is 1, it would only yield the start value. Use a 'while' loop for fractional steps.`
+        });
+    }
+
+    return {
+        start,
+        end,
+        step:    start <= end ? magnitude : -magnitude,
+        epsilon: has_step ? magnitude * 1e-10 : 1e-10,
+    };
 };
 
 // Add this to the bottom of the file
@@ -166,7 +221,8 @@ export const deep_copy = (val: RuntimeValue): RuntimeValue =>
             return {
                 type:  RuntimeValueType.Range,
                 start: deep_copy((val as any).start),
-                end:   deep_copy((val as any).end)
+                end:   deep_copy((val as any).end),
+                ...((val as any).step ? {step: deep_copy((val as any).step) as NumberValue} : {})
             };
         default:
             return val;

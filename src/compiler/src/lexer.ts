@@ -61,7 +61,7 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.STAR_ASSIGN]:    /^\*=/,
     [TokenKind.SLASH_ASSIGN]:   /^\/=/,
     [TokenKind.PERCENT_ASSIGN]: /^%=/,
-    [TokenKind.CARET_ASSIGN]: /^\^=/,
+    [TokenKind.CARET_ASSIGN]:   /^\^=/,
 
     [TokenKind.CARET]: /^\^/,
 

@@ -15,6 +15,7 @@ import {
     check_arg_type,
     check_args_length,
     check_mutability,
+    get_range_iteration,
     is_equal,
     throw_exception,
 } from "@utils";
@@ -63,24 +64,7 @@ export const set: StructValue = {
                           {
                               case RuntimeValueType.Range:
                               {
-                                  const range = arg as RangeValue;
-                                  if (range.start.type !== RuntimeValueType.Number || range.end.type !== RuntimeValueType.Number)
-                                  {
-                                      throw_exception({type: "Runtime", message: "Range bounds must be numbers."});
-                                  }
-                                  const start = (range.start as NumberValue).value;
-                                  const end = (range.end as NumberValue).value;
-
-                                  if ((!Number.isInteger(start) || !Number.isInteger(end)) && Math.abs(end - start) < 1)
-                                  {
-                                      throw_exception({
-                                          type:    "Runtime",
-                                          message: `Float range ${start}..${end} has a difference of less than 1. Since the default step is 1, it would only yield the start value.`
-                                      });
-                                  }
-
-                                  const step = start <= end ? 1 : -1;
-                                  const epsilon = 1e-10;
+                                  const {start, end, step, epsilon} = get_range_iteration(arg as RangeValue, "Set::from");
 
                                   for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)
                                   {
@@ -409,18 +393,16 @@ export const set: StructValue = {
                                const set = args[0] as SetValue;
                                const range = args[1] as RangeValue;
 
-                               const startVal = (range.start as NumberValue).value;
-                               const endVal = (range.end as NumberValue).value;
+                               const {start: startVal, end: endVal, step, epsilon} = get_range_iteration(range, "<set>::slice");
 
                                const len = set.elements.length;
 
-                               let start = startVal < 0 ? len + startVal : startVal;
-                               let end = endVal < 0 ? len + endVal : endVal;
+                               const start = startVal < 0 ? len + startVal : startVal;
+                               const end = endVal < 0 ? len + endVal : endVal;
 
                                const elements: RuntimeValue[] = [];
-                               const step = start <= end ? 1 : -1;
 
-                               for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                               for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)
                                {
                                    if (i >= 0 && i < len)
                                    {
@@ -448,18 +430,16 @@ export const set: StructValue = {
                                const set = args[0] as SetValue;
                                const range = args[1] as RangeValue;
 
-                               const startVal = (range.start as NumberValue).value;
-                               const endVal = (range.end as NumberValue).value;
+                               const {start: startVal, end: endVal, step, epsilon} = get_range_iteration(range, "<set>::sliced");
 
                                const len = set.elements.length;
 
-                               let start = startVal < 0 ? len + startVal : startVal;
-                               let end = endVal < 0 ? len + endVal : endVal;
+                               const start = startVal < 0 ? len + startVal : startVal;
+                               const end = endVal < 0 ? len + endVal : endVal;
 
                                const elements: RuntimeValue[] = [];
-                               const step = start <= end ? 1 : -1;
 
-                               for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+                               for (let i = start; step > 0 ? i <= end + epsilon : i >= end - epsilon; i += step)
                                {
                                    if (i >= 0 && i < len)
                                    {
