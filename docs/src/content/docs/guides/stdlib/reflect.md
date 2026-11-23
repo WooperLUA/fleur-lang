@@ -24,19 +24,33 @@ Metaprogramming and introspection for Structs and other data structures.
 
 ### `reflect.properties`
 
-| Member                  | Return Type     | Description                                                                              |
-|:------------------------|:----------------|:-----------------------------------------------------------------------------------------|
-| `has(struct, key)`      | `Boolean`       | Returns `true` if the `struct` instance has a property named `key`.                      |
-| `get(struct, key)`      | `Any` or `Null` | Returns the value of the property `key` from the `struct` instance, or `null` if absent. |
-| `set(struct, key, val)` | `Null`          | Sets the property `key` of the `struct` instance to `val`.                               |
-| `remove(struct, key)`   | `Boolean`       | Deletes the property `key` from the `struct` instance. Returns `true` if successful.     |
-| `pairs(struct)`         | `Map`           | Returns a map containing all the properties and their values of the `struct` instance.   |
+| Member                  | Return Type   | Description                                                                              |
+|:------------------------|:--------------|:-----------------------------------------------------------------------------------------|
+| `has(struct, key)`      | `Boolean`     | Returns `true` if the `struct` instance has a property named `key`.                      |
+| `get(struct, key)`      | `Any`, `Null` | Returns the value of the property `key` from the `struct` instance, or `null` if absent. |
+| `set(struct, key, val)` | `Null`        | Sets the property `key` of the `struct` instance to `val`.                               |
+| `remove(struct, key)`   | `Boolean`     | Deletes the property `key` from the `struct` instance. Returns `true` if successful.     |
+| `pairs(struct)`         | `Map`         | Returns a map containing all the properties and their values of the `struct` instance.   |
+
+### `reflect.methods`
+
+| Member                  | Return Type                                       | Description                                                                                   |
+|:------------------------|:--------------------------------------------------|:----------------------------------------------------------------------------------------------|
+| `has(struct, key)`      | `Boolean`                                         | Returns `true` if the `struct` instance has a method named `key`.                             |
+| `get(struct, key)`      | `Function`, `Procedure`, `NativeFunction`, `Null` | Returns the method `key` from the `struct` instance, or `null` if absent.                     |
+| `set(struct, key, val)` | `Null`                                            | Sets the method `key` of the `struct` instance to `val`.                                      |
+| `remove(struct, key)`   | `Boolean`                                         | Deletes the method `key` from the `struct` instance. Returns `true` if successful.            |
+| `pairs(struct)`         | `Map`                                             | Returns a map containing all the names and their associated methods of the `struct` instance. |
 
 ## Examples
 
 ```flr
 struct Point { x, y }
-const p = Point { x: 1, y: 2 };
+Point::is_origin()
+{
+    return this.x == 0 and this.y == 0;
+}
+var p = Point { x: 1, y: 2 };
 
 // Basic reflection
 io::print(reflect::identifier(p)); // "Point"
@@ -52,6 +66,15 @@ io::print(reflect.properties::get(p, "z"));   // 3
 // Getting all properties as a Map
 const props = reflect.properties::pairs(p);
 io::print(props); // { "x": 1, "y": 2, "z": 3 }
+
+// Methods manipulation
+io::print(reflect.methods::has(p, "is_origin"));   // true
+reflect.methods::set(p, "is_not_origin", func() not this.is_origin());
+io::print(reflect.methods::get(p, "is_not_origin"));   // true
+
+// Getting all methods as a Map
+const props = reflect.methods::pairs(p);
+io::print(props); // { "is_origin": <Function: is_origin>, "is_not_origin": <Function: __lambda_0> }
 
 // Reference equality
 const p2 = p;
