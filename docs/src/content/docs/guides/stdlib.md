@@ -33,5 +33,5 @@ const s = math::sqrt(9); // sqrt is a method (a function)
 - [**`time`**](./time/): Time-related utilities.
 - [**`tui`**](./tui/): Double-buffered Terminal User Interface engine.
 - [**`type`**](./type/): Type checking and explicit conversion.
-
+- [**`yaml`**](./yaml/): YAML parser and stringifier.
 

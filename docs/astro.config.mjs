@@ -66,6 +66,7 @@ export default defineConfig({
                                 {label: 'time', slug: 'guides/stdlib/time'},
                                 {label: 'tui', slug: 'guides/stdlib/tui'},
                                 {label: 'type', slug: 'guides/stdlib/type'},
+                                {label: 'yaml', slug: 'guides/stdlib/yaml'},
                             ]
                         },
                         {

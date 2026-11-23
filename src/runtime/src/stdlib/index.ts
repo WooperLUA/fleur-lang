@@ -16,6 +16,7 @@ import {http} from "./src/http.ts";
 import {test} from "./src/test.ts";
 import {tui} from "./src/tui.ts";
 import {dir} from "./src/dir.ts";
+import {yaml} from "./src/yaml.ts";
 
 export const setup_stdlib = (env: Environment, args: string[] = []) =>
 {
@@ -41,4 +42,5 @@ export const setup_stdlib = (env: Environment, args: string[] = []) =>
     env.declare("test", test, true);
     env.declare("tui", tui, true);
     env.declare("dir", dir, true);
+    env.declare("yaml", yaml, true);
 };
