@@ -50,6 +50,34 @@ const mixed = Array::new(1, "two", true);
 | `grouped(size)`                     | `Array`       | Returns a new array being the original array splitted into sub-arrays of a specified group `size`. `size` must be greater than 0                                                       |
 | `empty()`                           | `Boolean`     | Returns if the array is empty.                                                                                                                                                         |  
 | `collect(value, keep_idx?)`         | `Array`       | Returns an array of all the occurences of `value` found in the array. Optionally a boolean `keep_idx` can be provided that if true wraps the occurences with their indexes in a tuple. |  
+| `map(func)`                         | `Array`       | Replaces every element with the result of `func(element)`. Mutates the array. Returns the array.                                                                                        |  
+| `mapped(func)`                      | `Array`       | Returns a new array where every element is replaced by the result of `func(element)`. The original array is left untouched.                                                             |  
+| `filter(predicate)`                 | `Array`       | Keeps only the elements for which `predicate(element)` returns `true`. Mutates the array. Returns the array.                                                                             |  
+| `filtered(predicate)`               | `Array`       | Returns a new array containing only the elements for which `predicate(element)` returns `true`. The original array is left untouched.                                                  |  
+
+## Mapping and Filtering
+
+The `map` and `filter` methods mutate the array in place, while `mapped` and `filtered` return a new array and leave the original untouched. Both accept a function (or lambda expression) that receives the current element.
+
+```flr
+var numbers = [1, 2, 3, 4];
+
+// In place: numbers becomes [2, 4, 6, 8]
+numbers::map(func(n) n * 2);
+
+// In place: numbers becomes [4, 6, 8]
+numbers::filter(func(n) n > 2);
+
+const original = [1, 2, 3, 4];
+
+// Returns a new array: doubled is [2, 4, 6, 8]
+const doubled = original::mapped(func(n) n * 2);
+
+// Returns a new array: evens is [2, 4]
+const evens = original::filtered(func(n) n % 2 == 0);
+
+io::print(original); // [1, 2, 3, 4]
+```
 
 ## Bracket Syntax
 
