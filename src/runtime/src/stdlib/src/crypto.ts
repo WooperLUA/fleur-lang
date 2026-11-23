@@ -42,12 +42,22 @@ export const crypto: StructValue =
                 } as NativeFunctionValue
             ],
             [
-                "uuid",
+                "uuid4",
                 {
                     type: RuntimeValueType.NativeFunction,
                     call: (_: RuntimeValue[]) =>
                           {
                               return { type: RuntimeValueType.String, value: randomUUID() };
+                          }
+                } as NativeFunctionValue
+            ],
+            [
+                "uuid7",
+                {
+                    type: RuntimeValueType.NativeFunction,
+                    call: (_: RuntimeValue[]) =>
+                          {
+                              return { type: RuntimeValueType.String, value: Bun.randomUUIDv7() };
                           }
                 } as NativeFunctionValue
             ]
