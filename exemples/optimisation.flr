@@ -1,0 +1,62 @@
+const N_HOT    = 3_000_000;
+const N_BRANCH = 3_000_000;
+const N_STR    = 300_000;
+
+// Hits: x*1, 1*x, x+0, x*0 identity folding
+func hot_arith(x: Number): Number
+{
+    const a = x * 1;
+    const b = a + 0;
+    const c = 1 * b;
+    const d = c * 0 + c;
+    return d * 1 + 0;
+}
+
+// Hits: boolean literal folding, if(true)/if(false) resolution,
+// while(false) erasure, dead code after return
+func hot_branch(x: Number): Number
+{
+    while false
+    {
+        var j = 0;
+        while j < 1000
+            j += 1;
+    }
+
+    if true and true
+    {
+        if false or false
+            return 0;
+        return x + 1;
+    }
+    else
+    {
+        return x - 1;
+    }
+
+    return -999;
+}
+
+// Hits: left-associated string literal concatenation folding
+func hot_string(i: Number): Number
+{
+    const base = "fleur" + "-" + "bench" + "-" + "label";
+    return str::length(base + ":" + type::string(i));
+}
+
+func bench(name: String, f: Function, n: Number): Number
+{
+    const start = time::now();
+    var acc = 0;
+    for i in 0..n - 1
+        acc += f(i);
+    const elapsed = time::now() - start;
+    io::print("  " + name + ": " + type::string(elapsed) + "ms  (checksum " + type::string(acc) + ")");
+    return elapsed;
+}
+
+io::print("--- internal timings ---");
+const t1 = bench("arith ", func(i) hot_arith(i), N_HOT);
+const t2 = bench("branch", func(i) hot_branch(i), N_BRANCH);
+const t3 = bench("string", func(i) hot_string(i), N_STR);
+io::print("  total : " + type::string(t1 + t2 + t3) + "ms");

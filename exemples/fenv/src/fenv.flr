@@ -20,7 +20,7 @@ _Fenv::load(file_path: String)
             line = str::slice(line, 7..str::length(line) - 1);
 
         const eq_pos = str::index(line, "=");
-        if eq_pos == -1
+        if eq_pos == null
             continue;
 
         const key = str::trim(str::slice(line, 0..eq_pos - 1));

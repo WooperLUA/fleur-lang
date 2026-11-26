@@ -39,12 +39,17 @@ const main = async () =>
                 });
 
                 let should_optimize = false;
+                let should_show_ast = false;
                 const fleur_args: string[] = [];
                 for (let i = 2; i < args.length; i++)
                 {
                     if (args[i] === '--optimize')
                     {
                         should_optimize = true;
+                    }
+                    if (args[i] === '--ast')
+                    {
+                        should_show_ast = true;
                     }
                     else
                     {
@@ -74,6 +79,11 @@ const main = async () =>
                     const tokens = tokenize(bytes);
                     const parser = new Parser(tokens);
                     const ast = parser.parse();
+                    
+                    if (should_show_ast)
+                    {
+                        console.log(JSON.stringify(ast,null,2));
+                    }
 
                     if (should_optimize)
                     {
@@ -310,7 +320,7 @@ const main = async () =>
                 const BOLD = '\x1b[1m';
 
                 const commands = [
-                    {cmd: ['run', '[.flr file] [--optimize] [args...]', '  Executes a .flr file.'], color: YELLOW},
+                    {cmd: ['run', '[.flr file] [--optimize, --ast] [args...]', '  Executes a .flr file.'], color: YELLOW},
                     {cmd: ['pkg', '[init | install | add | version]', '    Manage Fleur packages.'], color: CYAN},
                     {cmd: ['repl', '[.flr file]', '\t      Runs a live REPL, optionally preloading a file.'], color: CYAN},
                     {cmd: ['help', '', '\t      Displays all available commands.'], color: GREEN},

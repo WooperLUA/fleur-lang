@@ -94,6 +94,14 @@ Use the `--optimize` flag to apply AST optimisations before running the script (
 fleur run path/to/your/file.flr --optimize
 ```
 
+#### AST
+
+Use the `--ast` flag to show the program's AST:
+
+```bash
+fleur run path/to/your/file.flr --ast
+```
+
 ### Packages
 
 fleur includes a Git-based package manager. Initialize it in your project directory, then add dependencies:

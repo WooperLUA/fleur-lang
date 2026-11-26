@@ -56,30 +56,3 @@ const fixed_set = Set::new(1, 2, 3);
 | `mapped(func)`                        | `Set`         | Returns a new set where every element is replaced by the result of `func(element)`, with duplicates removed. The original set is left untouched.                |  
 | `filter(predicate)`                   | `Set`         | Keeps only the elements for which `predicate(element)` returns `true`. Mutates the set. Returns the set.                                                        |  
 | `filtered(predicate)`                 | `Set`         | Returns a new set containing only the elements for which `predicate(element)` returns `true`. The original set is left untouched.                               |  
-
-## Mapping and Filtering
-
-The `map` and `filter` methods mutate the set in place, while `mapped` and `filtered` return a new set and leave the original untouched. Both accept a function (or lambda expression) that receives the current element.
-
-Because sets only hold unique values, `map` and `mapped` remove any duplicate produced by the mapping function.
-
-```flr
-var numbers = Set::new(1, 2, 3, 4);
-
-// In place: numbers becomes Set::new(2, 4, 6, 8)
-numbers::map(func(n) n * 2);
-
-// In place: numbers becomes Set::new(4, 6, 8)
-numbers::filter(func(n) n > 2);
-
-const original = Set::new(1, 2, 3, 4);
-
-// Returns a new set: doubled is Set::new(2, 4, 6, 8)
-const doubled = original::mapped(func(n) n * 2);
-
-// Returns a new set: evens is Set::new(2, 4)
-const evens = original::filtered(func(n) n % 2 == 0);
-
-io::print(original); // (1, 2, 3, 4)
-```
-

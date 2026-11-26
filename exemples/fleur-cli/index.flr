@@ -1,0 +1,20 @@
+import [Cli] in "@/cli.flr";
+import [CliCmd] in "@/cli-cmd.flr";
+
+const cli = Cli::new(io.args)
+               ::add(CliCmd {
+                    name: "greet",
+                    desc: "a greeting function",
+                    usage: {
+                        "args": ["name"],
+                        "flags": Set::new("--anon")
+                    },
+                    exec: proc(args, flags) {
+                        const name = if not flags::empty() and flags[0] == "anon"
+                                        "nobody"
+                                     else
+                                        flags[0];
+                        io::print("Hello", name);
+                    }
+               })
+               ::run();

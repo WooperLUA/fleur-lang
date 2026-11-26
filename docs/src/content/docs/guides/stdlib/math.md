@@ -38,7 +38,6 @@ Provides mathematical constants and functions.
 | `int(x)`          | `Number`    | Parses a number `x` into an integer (truncating decimals).                                                                           |
 | `clamp(x, range)` | `Number`    | Clamps the value `x` to be within the `range` (e.g., `math::clamp(15, 0..10)` returns `10`).                                         |
 | `sum(ds)`         | `Number`    | Reduces an `array`, `set` or `range` to a sum *or throws an `error` if the `array` or `set` contains anything other than `numbers`*. |
-| `log(x)`          | `Number`    | Returns the logarithm of `x`.                                                                                                        |
 ### Examples
 
 ```flr

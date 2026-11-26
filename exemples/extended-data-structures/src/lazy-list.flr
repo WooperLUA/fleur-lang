@@ -140,7 +140,7 @@ LazyList::filter(predicate: Function): LazyList
 {
     var filtered_list = [];
     const len = this.list::length();
-
+    
     if len > 0
         for i in 0..len - 1
         {

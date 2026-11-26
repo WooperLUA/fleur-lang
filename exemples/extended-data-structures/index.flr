@@ -11,4 +11,3 @@ pub const EDS = {
     "Triplet" : Triplet,
     "Tuple" : Tuple
 };
-
