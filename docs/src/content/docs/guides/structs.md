@@ -73,3 +73,26 @@ if u::is_adult() {
     io::print("Welcome");
 }
 ```
+
+## Custom String Representation
+
+Define a `string` method to control how a struct instance is rendered by `io::print`, string
+concatenation and other stdlib helpers that convert values to strings.
+
+```flr
+struct Point {
+    x,
+    y
+}
+
+const p = Point { x: 10, y: 20 };
+io::print(p);              // Point { x: 10, y: 20 }
+
+Point::string() {
+    return "Point(" + this.x + ", " + this.y + ")";
+}
+
+io::print(p);              // Point(10, 20)
+```
+
+If no `string` method is defined, the struct falls back to its default `Name { field: value, ... }` representation.

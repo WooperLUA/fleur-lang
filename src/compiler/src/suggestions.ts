@@ -40,8 +40,6 @@ const TOKEN_LEXEMES: Partial<Record<TokenKind, string>> = {
     [TokenKind.GREATER_EQUAL]:     ">=",
     [TokenKind.DOT_DOT]:           "..",
     [TokenKind.DOUBLE_COLON]:      "::",
-    [TokenKind.QUESTION_QUESTION]:        "??",
-    [TokenKind.QUESTION_QUESTION_ASSIGN]: "??=",
 
     [TokenKind.PLUS_ASSIGN]:    "+=",
     [TokenKind.MINUS_ASSIGN]:   "-=",
@@ -49,7 +47,9 @@ const TOKEN_LEXEMES: Partial<Record<TokenKind, string>> = {
     [TokenKind.SLASH_ASSIGN]:   "/=",
     [TokenKind.PERCENT_ASSIGN]: "%=",
     [TokenKind.CARET_ASSIGN]:   "^=",
+    [TokenKind.QUESTION_QUESTION_ASSIGN]: "??=",
 
+    [TokenKind.QUESTION_QUESTION]:        "??",
     [TokenKind.ASSIGN]:   "=",
     [TokenKind.LESS]:     "<",
     [TokenKind.GREATER]:  ">",

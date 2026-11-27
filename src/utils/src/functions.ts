@@ -7,7 +7,7 @@ import {
 } from "@types";
 import {Environment, evaluate, interpret} from "@runtime";
 
-export const call_fleur_function = (func: FunctionValue | NativeFunctionValue, args: RuntimeValue[]): RuntimeValue =>
+export const call_fleur_function = (func: FunctionValue | NativeFunctionValue, args: RuntimeValue[], this_val?: RuntimeValue): RuntimeValue =>
 {
     if (func.type === RuntimeValueType.NativeFunction)
     {
@@ -16,6 +16,11 @@ export const call_fleur_function = (func: FunctionValue | NativeFunctionValue, a
 
     const fn = func as FunctionValue;
     const call_env = new Environment(fn.env);
+
+    if (this_val !== undefined)
+    {
+        call_env.declare("this", this_val, true);
+    }
 
     for (let i = 0; i < fn.parameters.length; i++)
     {

@@ -1,4 +1,5 @@
-import {type MapValue, type RangeValue, RuntimeValueType} from "@types";
+import {type MapValue, type RangeValue, RuntimeValueType, type StringValue, type StructValue} from "@types";
+import {call_fleur_function} from "./functions.ts";
 
 export const stringify_value = (val: any): string =>
 {
@@ -25,11 +26,17 @@ export const stringify_value = (val: any): string =>
                 return `${stringify_value(el.key)}: ${stringify_value(el.value)}`;
             }).join(", ") + " }";
         case RuntimeValueType.Struct:
-            return val.identifier + " { " + Array.from(val.properties.entries()).map((entry) =>
-            {
-                const [k, v] = entry as [string, any];
-                return `${k}: ${stringify_value(v)}`;
-            }).join(", ") + " }";
+            const instance = (val as StructValue);
+            if (!instance.methods.has("string"))
+                return val.identifier + " { " + Array.from(val.properties.entries())
+                                                     .map((entry) =>
+                                                     {
+                                                         const [k, v] = entry as [string, any];
+                                                         return `${k}: ${stringify_value(v)}`;
+                                                     })
+                                                     .join(", ") + " }";
+            const string_method = instance.methods.get("string");
+            return (call_fleur_function(string_method!, [], instance) as StringValue).value;
         case RuntimeValueType.Function:
             return `<Function: ${val.identifier}>`;
         case RuntimeValueType.Procedure:
