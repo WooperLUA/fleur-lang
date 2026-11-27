@@ -819,7 +819,7 @@ export class Parser
 
         const assignTokens = [
             TokenKind.ASSIGN, TokenKind.PLUS_ASSIGN, TokenKind.MINUS_ASSIGN,
-            TokenKind.STAR_ASSIGN, TokenKind.SLASH_ASSIGN, TokenKind.PERCENT_ASSIGN, TokenKind.CARET_ASSIGN,
+            TokenKind.STAR_ASSIGN, TokenKind.SLASH_ASSIGN, TokenKind.PERCENT_ASSIGN, TokenKind.CARET_ASSIGN, TokenKind.QUESTION_QUESTION_ASSIGN
         ];
 
         if (assignTokens.includes(this.peek().kind))
@@ -980,7 +980,6 @@ export class Parser
     }
 
 
-
     private parse_equality(allow_struct: boolean = true): Expression
     {
         let left = this.parse_relational(allow_struct);
@@ -1032,9 +1031,9 @@ export class Parser
         }
 
         return {
-            type:      NodeType.ChainedComparisonExpression,
-            line:      first.line,
-            column:    first.column,
+            type:   NodeType.ChainedComparisonExpression,
+            line:   first.line,
+            column: first.column,
             operands,
             operators
         } as ChainedComparisonExpression;
@@ -1247,12 +1246,14 @@ export class Parser
                 const expr = this.parse_expression();
 
                 const stmt = is_proc
-                    ? {type:        NodeType.ExpressionStatement,
+                    ? {
+                        type:       NodeType.ExpressionStatement,
                         line:       expr.line,
                         column:     expr.column,
                         expression: expr
                     } as ExpressionStatement
-                    : {type:    NodeType.ReturnStatement,
+                    : {
+                        type:   NodeType.ReturnStatement,
                         line:   expr.line,
                         column: expr.column,
                         value:  expr
@@ -1622,11 +1623,16 @@ export class Parser
         {
             switch (seq)
             {
-                case 'n':  return '\n';
-                case 't':  return '\t';
-                case 'r':  return '\r';
-                case '"':  return '"';
-                case '\\': return '\\';
+                case 'n':
+                    return '\n';
+                case 't':
+                    return '\t';
+                case 'r':
+                    return '\r';
+                case '"':
+                    return '"';
+                case '\\':
+                    return '\\';
                 default:
                     if (hex) return String.fromCharCode(parseInt(hex, 16));
                     return _match;

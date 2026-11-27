@@ -1618,6 +1618,11 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
     {
         if (operator === "=") return right;
 
+        if (operator === "??=")
+        {
+            return current.type === RuntimeValueType.Null ? right : current;
+        }
+
         if (operator === "+=" && current.type === RuntimeValueType.String)
         {
             return {
@@ -1652,6 +1657,11 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
                 case "^=":
                     result = l ** r;
                     break;
+                default:
+                    throw_exception({
+                        type:    "Runtime",
+                        message: `Unsupported assignment operator '${operator}'.`
+                    });
             }
 
             return {type: RuntimeValueType.Number, value: result};
@@ -1664,7 +1674,59 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
         return {type: RuntimeValueType.Null, value: null};
     };
 
-    // Variable Assignment
+    const assign_to_map = (m: MapValue, key: RuntimeValue, val: RuntimeValue): RuntimeValue =>
+    {
+        if (m.is_immutable)
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: `Cannot assign to key of immutable map.`
+            });
+        }
+
+        const idx = m.elements.findIndex(el => is_equal(el.key, key));
+        if (idx !== -1)
+        {
+            const next = compute_new_value(m.elements[idx]!.value);
+            m.elements[idx]!.value = next;
+            return next;
+        }
+
+        const initial = operator === "??=" ? right : val;
+        m.elements.push({key, value: initial});
+        return initial;
+    };
+
+    const assign_to_struct = (struct: StructValue, key: string, val: RuntimeValue): RuntimeValue =>
+    {
+        if (struct.is_immutable)
+        {
+            throw_exception({type: "Runtime", message: `Cannot assign to property of immutable struct.`});
+        }
+
+        const struct_def = structs.get(struct.identifier);
+        const field_def = struct_def?.find(f => f.name === key);
+        if (!field_def)
+        {
+            throw_exception({
+                type:    "Runtime",
+                message: `Property '${key}' does not exist on struct '${struct.identifier}'.`
+            });
+        }
+
+        const next = operator === "="
+            ? val
+            : compute_new_value(struct.properties.get(key) ?? {type: RuntimeValueType.Null, value: null});
+
+        if (field_def!.type_annotation)
+        {
+            validate_runtime_type(next, field_def!.type_annotation.names, `assignment to struct property '${key}'`);
+        }
+
+        struct.properties.set(key, next);
+        return next;
+    };
+
     if (expr.left.type === NodeType.Identifier)
     {
         const name = (expr.left as Identifier).name;
@@ -1676,74 +1738,26 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
         return env.assign(name, compute_new_value(current));
     }
 
-    // Struct / Map Property Assignment
-    else if (expr.left.type === NodeType.MemberExpression)
+    if (expr.left.type === NodeType.MemberExpression)
     {
         const member = expr.left as MemberExpression;
         const object = evaluate(member.object, env);
 
-        const valid_members = [RuntimeValueType.Map];
-
-        if (valid_members.includes(object.type))
+        if (object.type === RuntimeValueType.Map)
         {
-            const m = object as MapValue;
-            if (m.is_immutable) throw_exception({
-                type:    "Runtime",
-                message: `Cannot assign to key of immutable map.`
-            });
-
             const key: StringValue = {type: RuntimeValueType.String, value: member.property.name};
-            const idx = m.elements.findIndex(el => is_equal(el.key, key));
-
-            if (idx !== -1)
-            {
-                m.elements[idx]!.value = right;
-            }
-            else
-            {
-                m.elements.push({key, value: right});
-            }
-            return right;
+            return assign_to_map(object as MapValue, key, right);
         }
 
-        if (object.type !== RuntimeValueType.Struct)
+        if (object.type === RuntimeValueType.Struct)
         {
-            throw_exception({type: "Runtime", message: "Member assignment is only allowed on structs or maps."});
+            return assign_to_struct(object as StructValue, member.property.name, right);
         }
 
-        const struct = object as StructValue;
-        if (struct.is_immutable)
-        {
-            throw_exception({type: "Runtime", message: `Cannot assign to property of immutable struct.`});
-        }
-
-        const struct_def = structs.get(struct.identifier);
-        const field_def = struct_def?.find(f => f.name === member.property.name);
-
-        if (operator === "=")
-        {
-            if (field_def?.type_annotation)
-            {
-                validate_runtime_type(right, field_def.type_annotation.names, `assignment to struct property '${member.property.name}'`);
-            }
-            struct.properties.set(member.property.name, right);
-            return right;
-        }
-
-        const current = struct.properties.get(member.property.name)!;
-        const newVal = compute_new_value(current);
-
-        if (field_def?.type_annotation)
-        {
-            validate_runtime_type(newVal, field_def.type_annotation.names, `assignment to struct property '${member.property.name}'`);
-        }
-
-        struct.properties.set(member.property.name, newVal);
-        return newVal;
+        throw_exception({type: "Runtime", message: "Member assignment is only allowed on structs or maps."});
     }
 
-    // Index Assignment
-    else if (expr.left.type === NodeType.IndexExpression)
+    if (expr.left.type === NodeType.IndexExpression)
     {
         const index_expr = expr.left as IndexExpression;
         const object = evaluate(index_expr.object, env);
@@ -1752,102 +1766,53 @@ const evaluate_assignment_expression = (expr: AssignmentExpression, env: Environ
         if (object.type === RuntimeValueType.Array)
         {
             const array = object as ArrayValue;
-            if (array.is_immutable) throw_exception({
-                type:    "Runtime",
-                message: `Cannot assign to index of immutable array.`
-            });
-            if (index.type !== RuntimeValueType.Number) throw_exception({
-                type:    "Runtime",
-                message: "Array index must be a number."
-            });
-
-            const idx = (index as NumberValue).value;
-            if (idx < 0 || idx >= array.elements.length) throw_exception({
-                type:    "OutOfBounds",
-                message: `Array index ${idx} is out of bounds.`
-            });
-
-            if (operator === "=")
-            {
-                array.elements[idx] = right;
-                return right;
-            }
-
-            const current = array.elements[idx]!;
-            const newVal = compute_new_value(current);
-            array.elements[idx] = newVal;
-            return newVal;
-        }
-
-        else if (object.type === RuntimeValueType.Map)
-        {
-            const m = object as MapValue;
-            if (m.is_immutable) throw_exception({
-                type:    "Runtime",
-                message: `Cannot assign to key of immutable map.`
-            });
-
-            const key = deep_copy(index);
-            const idx = m.elements.findIndex(el => is_equal(el.key, key));
-
-            if (idx !== -1)
-            {
-                m.elements[idx]!.value = right;
-            }
-            else
-            {
-                m.elements.push({key, value: right});
-            }
-            return right;
-        }
-
-        else if (object.type === RuntimeValueType.Struct)
-        {
-            const struct = object as StructValue;
-            if (struct.is_immutable) throw_exception({
-                type:    "Runtime",
-                message: `Cannot assign to property of immutable struct.`
-            });
-            if (index.type !== RuntimeValueType.String) throw_exception({
-                type:    "Runtime",
-                message: "Struct keys must be strings."
-            });
-
-            const key = (index as StringValue).value;
-            const struct_def = structs.get(struct.identifier);
-            const field_def = struct_def?.find(f => f.name === key);
-
-            if (!field_def)
+            if (array.is_immutable)
             {
                 throw_exception({
                     type:    "Runtime",
-                    message: `Property '${key}' does not exist on struct '${struct.identifier}'.`
+                    message: `Cannot assign to index of immutable array.`
+                });
+            }
+            if (index.type !== RuntimeValueType.Number)
+            {
+                throw_exception({
+                    type:    "Runtime",
+                    message: "Array index must be a number."
                 });
             }
 
-            if (operator === "=")
+            const idx = (index as NumberValue).value;
+            if (!Number.isInteger(idx) || idx < 0 || idx >= array.elements.length)
             {
-                if (field_def!.type_annotation)
-                {
-                    validate_runtime_type(right, field_def!.type_annotation.names, `assignment to struct property '${key}'`);
-                }
-                struct.properties.set(key, right);
-                return right;
+                throw_exception({
+                    type:    "OutOfBounds",
+                    message: `Array index ${idx} is out of bounds.`
+                });
             }
 
-            const current = struct.properties.get(key)!;
-            const newVal = compute_new_value(current);
-            if (field_def!.type_annotation)
-            {
-                validate_runtime_type(newVal, field_def!.type_annotation.names, `assignment to struct property '${key}'`);
-            }
-            struct.properties.set(key, newVal);
-            return newVal;
+            const next = operator === "=" ? right : compute_new_value(array.elements[idx]!);
+            array.elements[idx] = next;
+            return next;
         }
-        else
+
+        if (object.type === RuntimeValueType.Map)
         {
-            throw_exception({type: "Runtime", message: "Index assignment is only allowed on arrays and structs."});
+            return assign_to_map(object as MapValue, deep_copy(index), right);
         }
+
+        if (object.type === RuntimeValueType.Struct)
+        {
+            if (index.type !== RuntimeValueType.String)
+            {
+                throw_exception({
+                    type:    "Runtime",
+                    message: "Struct keys must be strings."
+                });
+            }
+            return assign_to_struct(object as StructValue, (index as StringValue).value, right);
+        }
+
+        throw_exception({type: "Runtime", message: "Index assignment is only allowed on arrays, maps, and structs."});
     }
 
     throw_exception({type: "Runtime", message: "Invalid assignment target."});

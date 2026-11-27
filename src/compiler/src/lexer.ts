@@ -54,7 +54,6 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.GREATER_EQUAL]:     /^>=/,
     [TokenKind.DOT_DOT]:           /^\.\./,
     [TokenKind.DOUBLE_COLON]:      /^::/,
-    [TokenKind.QUESTION_QUESTION]: /^\?\?/,
 
     [TokenKind.PLUS_ASSIGN]:    /^\+=/,
     [TokenKind.MINUS_ASSIGN]:   /^-=/,
@@ -62,7 +61,9 @@ export const lexing_rules: Record<TokenKind, RegExp> = {
     [TokenKind.SLASH_ASSIGN]:   /^\/=/,
     [TokenKind.PERCENT_ASSIGN]: /^%=/,
     [TokenKind.CARET_ASSIGN]:   /^\^=/,
+    [TokenKind.QUESTION_QUESTION_ASSIGN]:   /^\?\?=/,
 
+    [TokenKind.QUESTION_QUESTION]: /^\?\?/,
     [TokenKind.CARET]: /^\^/,
 
     // Single-character Operators

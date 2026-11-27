@@ -103,6 +103,7 @@ const greeting = "Hello " + "World";
 | `/=`     | Divide and assign       |
 | `%=`     | Modulo and assign       |
 | `^=`     | Exponentiate and assign |
+| `??=`    | Assign if null          |
 
 ### Comparison Operators
 
@@ -115,7 +116,8 @@ const greeting = "Hello " + "World";
 | `<=`     | Less than or equal to    |
 | `>=`     | Greater than or equal to |
 
-Comparisons can be chained, like in math. `1 < x < 5` is equivalent to `1 < x and x < 5`, but `x` is evaluated only once:
+Comparisons can be chained, like in math. `1 < x < 5` is equivalent to `1 < x and x < 5`, but `x` is evaluated only
+once:
 
 ```flr
 if 1 < x < 5 {
