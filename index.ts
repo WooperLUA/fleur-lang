@@ -73,9 +73,11 @@ const main = async () =>
                     }
                 }
 
+                let source_text = "";
                 try
                 {
                     const bytes = await file.text();
+                    source_text = bytes;
                     const tokens = tokenize(bytes);
                     const parser = new Parser(tokens);
                     const ast = parser.parse();
@@ -99,7 +101,13 @@ const main = async () =>
                 {
                     if (e instanceof FleurError)
                     {
-                        console.error(format_pretty_error(e.value as ErrorValue));
+                        const error = e.value as ErrorValue;
+                        if (error.line !== undefined && error.column !== undefined)
+                        {
+                            error.source ??= source_text;
+                            error.file ??= absolute_path;
+                        }
+                        console.error(format_pretty_error(error));
                         process.exit(1);
                     }
                     else

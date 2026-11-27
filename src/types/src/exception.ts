@@ -13,5 +13,6 @@ export type Exception = {
     message: string,
     metadata?: string,
     line?: number,
-    column?: number
+    column?: number,
+    source?: string
 }

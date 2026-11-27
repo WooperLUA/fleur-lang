@@ -103,10 +103,19 @@ export class Parser
         }
         return throw_exception({
             type:    'Parser',
-            message: `${message}. Got ${token.kind} at position ${this.pos}.`,
+            message: `${message}. Got ${this.describe_token(token)} at line ${token.line}, column ${token.column}.`,
             line:    token.line,
             column:  token.column
         });
+    }
+
+    private describe_token(token: Token<any>): string
+    {
+        if (token.kind === TokenKind.EOF)
+        {
+            return "end of file";
+        }
+        return `'${token.value}'`;
     }
 
     private loc(token: Token<any>): { line: number; column: number }
@@ -1404,7 +1413,7 @@ export class Parser
             default:
                 return throw_exception({
                     type:    'Parser',
-                    message: `Unexpected token ${token.kind} at position ${this.pos}`,
+                    message: `Unexpected ${this.describe_token(token)} at line ${token.line}, column ${token.column}.`,
                     line:    token.line,
                     column:  token.column
                 });

@@ -18,7 +18,8 @@ export const throw_exception = (err: Exception) =>
         message:  err.message,
         metadata: err.metadata,
         line:     err.line,
-        column:   err.column
+        column:   err.column,
+        source:   err.source
     };
     throw new FleurError(error_val);
 };

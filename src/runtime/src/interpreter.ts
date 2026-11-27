@@ -597,8 +597,26 @@ const execute_import_statement = (stmt: ImportStatement, env: Environment): Runt
     }
 
     const code = node_fs.readFileSync(target_path, "utf-8");
-    const tokens = tokenize(code);
-    const ast = new Parser(tokens).parse();
+
+    let ast: Program;
+    try
+    {
+        const tokens = tokenize(code);
+        ast = new Parser(tokens).parse();
+    }
+    catch (e)
+    {
+        if (e instanceof FleurError)
+        {
+            const error = e.value as ErrorValue;
+            if (error.line !== undefined && error.column !== undefined)
+            {
+                error.source ??= code;
+                error.file ??= target_path;
+            }
+        }
+        throw e;
+    }
 
     const module_env = new Environment(env, target_dir);
     module_env.source = code;

@@ -145,7 +145,10 @@ export const tokenize = (source: string): Tokens =>
                 {
                     return throw_exception({
                         type:    'Lexer',
-                        message: `Unexpected token '${value}' at line ${line}, column ${column} (position ${cursor})`
+                        message: `Unexpected character '${value}'.`,
+                        line,
+                        column,
+                        source
                     });
                 }
 
@@ -169,7 +172,10 @@ export const tokenize = (source: string): Tokens =>
             // This should not happen because of ILLEGAL rule, but for safety:
             return throw_exception({
                 type:    'Lexer',
-                message: `Failed to match any token at line ${line}, column ${column} (position ${cursor})`
+                message: `Failed to match any token at line ${line}, column ${column}.`,
+                line,
+                column,
+                source
             });
         }
     }
