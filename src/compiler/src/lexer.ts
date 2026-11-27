@@ -1,5 +1,6 @@
 import {type Token, TokenKind} from "@types";
 import {throw_exception} from "@utils";
+import {format_token_suggestions} from "./suggestions";
 
 type Tokens = Array<Token<unknown>>;
 
@@ -146,7 +147,7 @@ export const tokenize = (source: string): Tokens =>
                 {
                     return throw_exception({
                         type:    'Lexer',
-                        message: `Unexpected character '${value}'.`,
+                        message: `Unexpected character '${value}'.${format_token_suggestions(value)}`,
                         line,
                         column,
                         source
@@ -173,7 +174,7 @@ export const tokenize = (source: string): Tokens =>
             // This should not happen because of ILLEGAL rule, but for safety:
             return throw_exception({
                 type:    'Lexer',
-                message: `Failed to match any token at line ${line}, column ${column}.`,
+                message: `Failed to match any token at line ${line}, column ${column}.${format_token_suggestions(curr_char)}`,
                 line,
                 column,
                 source

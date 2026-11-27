@@ -46,6 +46,7 @@ import {
     type StructField, type BreakStatement, type ContinueStatement, type MapLiteral, type MapEntry
 } from "@types";
 import {throw_exception} from "@utils";
+import {format_token_suggestions, is_similar_token, suggest_tokens, token_lexeme} from "./suggestions";
 
 export class Parser
 {
@@ -101,9 +102,29 @@ export class Parser
         {
             return this.eat();
         }
+        const expected_lexeme = token_lexeme(kind);
+        let suggestion = "";
+
+        if (expected_lexeme && is_similar_token(token.value, expected_lexeme))
+        {
+            suggestion = ` Did you mean '${expected_lexeme}' instead of '${token.value}'?`;
+        }
+        else
+        {
+            const previous = this.tokens[this.pos - 1];
+            if (previous?.kind === TokenKind.IDENTIFIER && previous.line === token.line)
+            {
+                const [candidate] = suggest_tokens(previous.value, 1);
+                if (candidate)
+                {
+                    suggestion = ` Did you mean '${candidate}' instead of '${previous.value}'?`;
+                }
+            }
+        }
+
         return throw_exception({
             type:    'Parser',
-            message: `${message}. Got ${this.describe_token(token)} at line ${token.line}, column ${token.column}.`,
+            message: `${message}. Got ${this.describe_token(token)} at line ${token.line}, column ${token.column}.${suggestion}`,
             line:    token.line,
             column:  token.column
         });
@@ -1414,7 +1435,7 @@ export class Parser
             default:
                 return throw_exception({
                     type:    'Parser',
-                    message: `Unexpected ${this.describe_token(token)} at line ${token.line}, column ${token.column}.`,
+                    message: `Unexpected ${this.describe_token(token)} at line ${token.line}, column ${token.column}.${format_token_suggestions(token.value)}`,
                     line:    token.line,
                     column:  token.column
                 });
