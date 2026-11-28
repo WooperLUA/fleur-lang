@@ -1,0 +1,15 @@
+// While Fleur is far from a functional language, you can with some tricks
+// write it in an fp "way" (with a lot of limit).
+
+const factorial = func(n: Number)
+    when n {
+        n < 0 => Error::new("n cant be negative", "factorial")::throw();
+        0 => 1;
+        else => n * factorial(n - 1);
+    };
+
+const reverse_arr = func(arr: Array, r_arr: Array = [])
+    when arr {
+        [] => r_arr;
+        else => reverse_arr(arr, r_arr::add(arr::pop()));
+    };

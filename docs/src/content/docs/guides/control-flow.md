@@ -70,6 +70,8 @@ func grade_from_score(score) {
 The `when` statement is a powerful alternative to `switch` or multiple `if-else` blocks. It evaluates an expression and matches it against several cases.
 
 - **Cases**: Each case is defined by a value followed by `=>` and a block of code `{}`. One line statements don't require `{}`.
+- **Multiple alternatives**: Separate several values with commas to run the same body for any of them.
+- **Guard clauses**: A case expression that produces a Boolean is treated as a condition. Guards are evaluated in order and match when the condition is truthy.
 - **Else**: An optional `else` case can be provided to handle any values not covered by other cases.
 - **Strict Equality**: Matching uses deep equality for complex types (Arrays, Structs, etc.).
 
@@ -78,7 +80,8 @@ var status = 1;
 
 when status {
     0 => io::print("Idle");
-    1 => io::print("Running"); 
+    1, 2, 3 => io::print("Running");
+    status > 10 => io::print("Out of range");
     else => { 
         io::print("Unknown"); 
         status = 0;
@@ -94,7 +97,8 @@ when status {
 func describe(status) {
     return when status {
         0 => "Idle";
-        1 => "Running";
+        1, 2, 3 => "Running";
+        status > 10 => "Out of range";
         else => "Unknown";
     };
 }
@@ -107,6 +111,8 @@ const label = when status {
 ```
 
 If no case matches and there is no `else` case, the expression evaluates to `null`.
+
+Boolean values are still matched as literals when the value being matched is a Boolean. Otherwise, a Boolean case expression is treated as a guard.
 
 ## Loops
 

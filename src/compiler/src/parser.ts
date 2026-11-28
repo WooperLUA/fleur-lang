@@ -541,15 +541,7 @@ export class Parser
 
         while (this.peek().kind !== TokenKind.RBRACE && this.peek().kind !== TokenKind.EOF)
         {
-            let value: Expression | "else";
-            if (this.match(TokenKind.K_ELSE))
-            {
-                value = "else";
-            }
-            else
-            {
-                value = this.parse_expression();
-            }
+            const values = this.parse_when_case_values();
 
             this.expect(TokenKind.FAT_ARROW, "Expected '=>' in when case");
 
@@ -571,7 +563,17 @@ export class Parser
                 };
             }
 
-            cases.push({value, body});
+            if (values === "else")
+            {
+                cases.push({value: "else", body});
+            }
+            else
+            {
+                for (const value of values)
+                {
+                    cases.push({value, body});
+                }
+            }
         }
 
         this.expect(TokenKind.RBRACE, "Expected '}' after when cases");
@@ -594,22 +596,24 @@ export class Parser
 
         while (this.peek().kind !== TokenKind.RBRACE && this.peek().kind !== TokenKind.EOF)
         {
-            let value: Expression | "else";
-            if (this.match(TokenKind.K_ELSE))
-            {
-                value = "else";
-            }
-            else
-            {
-                value = this.parse_expression();
-            }
+            const values = this.parse_when_case_values();
 
             this.expect(TokenKind.FAT_ARROW, "Expected '=>' in when case");
 
             const body = this.parse_expression();
             this.expect(TokenKind.SEMICOLON, "Expected ';' after when case");
 
-            cases.push({value, body});
+            if (values === "else")
+            {
+                cases.push({value: "else", body});
+            }
+            else
+            {
+                for (const value of values)
+                {
+                    cases.push({value, body});
+                }
+            }
         }
 
         this.expect(TokenKind.RBRACE, "Expected '}' after when cases");
@@ -620,6 +624,23 @@ export class Parser
             expression,
             cases
         };
+    }
+
+    private parse_when_case_values(): Expression[] | "else"
+    {
+        if (this.match(TokenKind.K_ELSE))
+        {
+            return "else";
+        }
+
+        const values: Expression[] = [this.parse_expression()];
+
+        while (this.match(TokenKind.COMMA))
+        {
+            values.push(this.parse_expression());
+        }
+
+        return values;
     }
 
     private parse_for_statement(): ForStatement

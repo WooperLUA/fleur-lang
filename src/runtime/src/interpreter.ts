@@ -291,6 +291,20 @@ const is_truthy = (val: RuntimeValue): boolean =>
     return true;
 };
 
+const matches_when_case = (subject: RuntimeValue, case_value: Expression, env: Environment): boolean =>
+{
+    const value = evaluate(case_value, env);
+
+    // A boolean case expression is a guard clause, unless the subject is itself a
+    // boolean (in which case it is matched like any other literal).
+    if (value.type === RuntimeValueType.Boolean && subject.type !== RuntimeValueType.Boolean)
+    {
+        return is_truthy(value);
+    }
+
+    return is_equal(subject, value);
+};
+
 const set_immutable_recursive = (val: RuntimeValue): void =>
 {
     if (!val) return;
@@ -425,8 +439,7 @@ const execute_when_statement = (stmt: WhenStatement, env: Environment): RuntimeV
             return execute(case_.body, env);
         }
 
-        const case_val = evaluate(case_.value, env);
-        if (is_equal(val, case_val))
+        if (matches_when_case(val, case_.value, env))
         {
             return execute(case_.body, env);
         }
@@ -794,8 +807,7 @@ const evaluate_when_expression = (expr: WhenExpression, env: Environment): Runti
             return evaluate(case_.body, env);
         }
 
-        const case_val = evaluate(case_.value, env);
-        if (is_equal(val, case_val))
+        if (matches_when_case(val, case_.value, env))
         {
             return evaluate(case_.body, env);
         }
