@@ -138,6 +138,8 @@ fleur repl path/to/your/file.flr
 
 Imports are resolved relative to the loaded file, and aliases from a nearby `fleur.json` are applied. If the file fails to run, the error is printed and the REPL still starts, so you can inspect the session or keep working.
 
+The loaded file is watched for changes. Saving it automatically re-runs it and resets the REPL session to the new definitions. If the edited file has an error, the error is reported and the previous session stays active.
+
 ## Next Steps
 
 - [Language Basics](/fleur-lang/guides/basics/)
